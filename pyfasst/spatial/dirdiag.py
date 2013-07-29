@@ -2,6 +2,8 @@
 
 Draw directivity diagrams
 
+2013 Jean-Louis Durrieu
+http://www.durrieu.ch
 '''
 
 import matplotlib.pyplot as plt
@@ -11,18 +13,9 @@ from numpy.linalg import inv
 
 from .. import audioModel as am
 from ..tools import signalTools as st
+from ..tools.utils import db, ident
 
 sound_celerity = 300. # m/s
-
-def db(energy): 
-    '''computes the decibell of the input value, considered as energy
-    '''
-    return 10*np.log10(energy)
-
-def ident(energy):
-    '''ident : identity function, return the inputs unchanged
-    '''
-    return energy
 
 def make_MVDR_filter_target(steering_vec_target, steering_vec_interf):
     '''make MVDR spatial filter from estimated steering vectors

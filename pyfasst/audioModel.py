@@ -33,6 +33,7 @@ Jean-Louis Durrieu, EPFL-SSTI-IEL-LTS5
     jean DASH louis AT durrieu DOT ch
 
 2012-2013
+http://www.durrieu.ch
 
 Reference
 ---------
@@ -64,7 +65,7 @@ soundCelerity = 340. # m/s
 
 def NMF_decomposition(SX, nbComps=10, niter=10, verbose=0):
     """NMF multiplicative gradient, for Itakura Saito
-    divergence measure between SX and `np.dot(W,H)`
+    divergence measure between SX and ``np.dot(W,H)``
     """
     freqs, nframes = SX.shape
     W = np.random.randn(freqs, nbComps)**2
@@ -103,7 +104,7 @@ def NMF_decomp_init(SX, nbComps=10, niter=10, verbose=0,
                     Winit=None, Hinit=None,
                     updateW=True, updateH=True):
     """NMF multiplicative gradient, for Itakura Saito
-    divergence measure between SX and np.dot(W,H)
+    divergence measure between ``SX`` and ``np.dot(W,H)``
     """
     freqs, nframes = SX.shape
     if Winit is None or (Winit.shape != (freqs, nbComps)):
@@ -359,7 +360,7 @@ def SFNMF_decomp_init(SX, nbComps=10, nbFiltComps=10,
     
 
 def inv_mat(mat_diag, mat_off):
-    """invert hermitian matrix
+    """invert 2D hermitian matrix
     """
     det_mat = np.prod(mat_diag, axis=0) - np.abs(mat_off)**2
     det_mat = (
@@ -403,7 +404,7 @@ def gen_steer_vec_far_src_uniform_linear_array(freqs,
     
     That is more likely valid for electro-magnetic fields, for acoustic
     wave fields, one should probably take into account the difference of
-    gain between the microphones (see ``gen_steer_vec_acous``)
+    gain between the microphones (see :py:func:`gen_steer_vec_acous` )
     
     **Output**:
     
@@ -420,6 +421,15 @@ def gen_steer_vec_far_src_uniform_linear_array(freqs,
 
 def gen_steer_vec_acous(freqs,
                         dist_src_mic):
+    """generates a steering vector for the given frequencies and given
+    distances between the microphones and the source.
+    
+    To the difference with
+    :py:func:`gen_steer_vec_far_src_uniform_linear_array`, this function
+    also includes gains depending on the distance between the source and
+    the mics.
+    
+    """
     gains = 1 / (np.sqrt(4. * np.pi) * dist_src_mic)
     a = (np.vstack(gains) *
          np.exp(- 1j * 2. * np.pi *
@@ -450,9 +460,11 @@ def dir_diag_stereo(Cx,
     
     **Method**:
     
-    We use the Capon method, on each of the Fourier channel:
+    We use the Capon method, on each of the Fourier channel
     
-        phi_k(theta) = a_k(theta).H inv(Rxx) a_k(theta)
+    .. math::
+    
+        \phi_k(\\theta) = a_k(\\theta)^H inv(Rxx) a_k(\\theta)
     
     The algorithm therefore returns one directivity graph for each
     frequency band. 
@@ -461,10 +473,10 @@ def dir_diag_stereo(Cx,
     
     One can compute a summary directivity by adding the directivity functions
     across all the frequency channels. The invert of the resulting array may
-    also be of interest (looking at peaks and not valleys to find directions):
+    also be of interest (looking at peaks and not valleys to find directions)::
     
-    >>> directivity_diag = dir_diag_stereo(Cx)
-    >>> summary_dir_diag = 1./directivity_diag.sum(axis=1)
+     >>> directivity_diag = dir_diag_stereo(Cx)
+     >>> summary_dir_diag = 1./directivity_diag.sum(axis=1)
     
     Some tests show that it is very important that the distance between the
     microphone is known. Otherwise, little can be infered from the resulting
@@ -511,229 +523,6 @@ def dir_diag_stereo(Cx,
             )
     
     return directivity_diagram, theta
-
-# coming from sepLeadStereo programs
-# (https://github.com/wslihgt/separateLeadStereo):
-def generate_WF0_chirped(minF0, maxF0, Fs, Nfft=2048, stepNotes=4, \
-                         lengthWindow=2048, Ot=0.5, perF0=2, \
-                         depthChirpInSemiTone=0.5, loadWF0=True,
-                         analysisWindow='hanning'):
-    """
-    ``F0Table, WF0 = generate_WF0_chirped(minF0, maxF0, Fs, Nfft=2048,
-    stepNotes=4, lengthWindow=2048,
-    Ot=0.5, perF0=2,
-    depthChirpInSemiTone=0.5)``
-    
-    Generates a 'basis' matrix for the source part WF0, using the
-    source model KLGLOTT88, with the following I/O arguments:
-    
-    **Inputs**:
-    
-    *    `minF0`:                the minimum value for the fundamental
-                                 frequency (F0)
-    *    `maxF0`:                the maximum value for F0
-    *    Fs:                     the desired sampling rate
-    *    Nfft:                   the number of bins to compute the Fourier
-                                 transform
-    *    stepNotes:              the number of F0 per semitone
-    *    lengthWindow:           the size of the window for the Fourier
-                                 transform
-    *    Ot:                     the glottal opening coefficient for
-                                 KLGLOTT88
-    *    perF0:                  the number of chirps considered per F0
-                                 value
-    *    depthChirpInSemiTone:   the maximum value, in semitone, of the
-                                 allowed chirp per F0
-                             
-    **Outputs**:
-    
-    *    F0Table:
-
-                the vector containing the values of the fundamental
-                frequencies in Hertz (Hz) corresponding to the
-                harmonic combs in WF0, i.e. the columns of WF0
-    *    WF0:
-    
-                the basis matrix, where each column is a harmonic comb
-                generated by KLGLOTT88 (with a sinusoidal model, then
-                transformed into the spectral domain)
-                
-    """
-    
-    # generating a filename to keep data:
-    filename = str('').join(['wf0_',
-                             '_minF0-', str(minF0),
-                             '_maxF0-', str(maxF0),
-                             '_Fs-', str(Fs),
-                             '_Nfft-', str(Nfft),
-                             '_stepNotes-', str(stepNotes),
-                             '_Ot-', str(Ot),
-                             '_perF0-', str(perF0),
-                             '_depthChirp-', str(depthChirpInSemiTone),
-                             '_analysisWindow-', analysisWindow,
-                             '.npz'])
-    
-    if os.path.isfile(filename) and loadWF0:
-        print "Reading WF0 and F0Table from stored arrays."
-        struc = np.load(filename)
-        return struc['F0Table'], struc['WF0']
-    
-    print "First time WF0 computed with these parameters, please wait..."
-    # converting to double arrays:
-    minF0=np.double(minF0)
-    maxF0=np.double(maxF0)
-    Fs=np.double(Fs)
-    stepNotes=np.double(stepNotes)
-    
-    # computing the F0 table:
-    numberOfF0 = np.ceil(12.0 * stepNotes * np.log2(maxF0 / minF0)) + 1
-    F0Table=minF0 * (2 ** (np.arange(numberOfF0,dtype=np.double) \
-                           / (12 * stepNotes)))
-    
-    numberElementsInWF0 = numberOfF0 * perF0
-    
-    # computing the desired WF0 matrix
-    WF0 = np.zeros([Nfft, numberElementsInWF0],dtype=np.double)
-    for fundamentalFrequency in np.arange(numberOfF0):
-        odgd, odgdSpec = \
-              generate_ODGD_spec(F0Table[fundamentalFrequency], Fs, \
-                                 Ot=Ot, lengthOdgd=lengthWindow, \
-                                 Nfft=Nfft, t0=0.0,\
-                                 analysisWindowType=analysisWindow)
-        WF0[:,fundamentalFrequency * perF0] = np.abs(odgdSpec) ** 2
-        for chirpNumber in np.arange(perF0 - 1):
-            F2 = F0Table[fundamentalFrequency] \
-                 * (2 ** ((chirpNumber + 1.0) * depthChirpInSemiTone \
-                          / (12.0 * (perF0 - 1.0))))
-            # F0 is the mean of F1 and F2.
-            F1 = 2.0 * F0Table[fundamentalFrequency] - F2 
-            odgd, odgdSpec = \
-                  generate_ODGD_spec_chirped(F1, F2, Fs, \
-                                             Ot=Ot, \
-                                             lengthOdgd=lengthWindow, \
-                                             Nfft=Nfft, t0=0.0)
-            WF0[:,fundamentalFrequency * perF0 + chirpNumber + 1] = \
-                                       np.abs(odgdSpec) ** 2
-    
-    np.savez(filename, F0Table=F0Table, WF0=WF0)
-    
-    return F0Table, WF0
-
-def generate_ODGD_spec(F0, Fs, lengthOdgd=2048, Nfft=2048, Ot=0.5, \
-                       t0=0.0, analysisWindowType='sinebell'): 
-    """
-    generateODGDspec:
-    
-    generates a waveform ODGD and the corresponding spectrum,
-    using as analysis window the -optional- window given as
-    argument.
-    """
-    
-    # converting input to double:
-    F0 = np.double(F0)
-    Fs = np.double(Fs)
-    Ot = np.double(Ot)
-    t0 = np.double(t0)
-    
-    # compute analysis window of given type:
-    if analysisWindowType=='sinebell':
-        analysisWindow = ao.sinebell(lengthOdgd)
-    else:
-        if analysisWindowType=='hanning' or \
-               analysisWindowType=='hanning':
-            analysisWindow = np.hanning(lengthOdgd)
-    
-    # maximum number of partials in the spectral comb:
-    partialMax = np.floor((Fs / 2) / F0)
-    
-    # Frequency numbers of the partials:
-    frequency_numbers = np.arange(1,partialMax + 1)
-    
-    # intermediate value
-    temp_array = 1j * 2.0 * np.pi * frequency_numbers * Ot
-    
-    # compute the amplitudes for each of the frequency peaks:
-    amplitudes = F0 * 27 / 4 \
-                 * (np.exp(-temp_array) \
-                    + (2 * (1 + 2 * np.exp(-temp_array)) / temp_array) \
-                    - (6 * (1 - np.exp(-temp_array)) \
-                       / (temp_array ** 2))) \
-                       / temp_array
-    
-    # Time stamps for the time domain ODGD
-    timeStamps = np.arange(lengthOdgd) / Fs + t0 / F0
-    
-    # Time domain odgd:
-    odgd = np.exp(np.outer(2.0 * 1j * np.pi * F0 * frequency_numbers, \
-                           timeStamps)) \
-                           * np.outer(amplitudes, np.ones(lengthOdgd))
-    odgd = np.sum(odgd, axis=0)
-    
-    # spectrum:
-    odgdSpectrum = np.fft.fft(np.real(odgd * analysisWindow), n=Nfft)
-    
-    return odgd, odgdSpectrum
-
-def generate_ODGD_spec_chirped(F1, F2, Fs, lengthOdgd=2048, Nfft=2048, \
-                               Ot=0.5, t0=0.0, \
-                               analysisWindowType='sinebell'):
-    """
-    generateODGDspecChirped:
-    
-    generates a waveform ODGD and the corresponding spectrum,
-    using as analysis window the -optional- window given as
-    argument.
-    """
-    
-    # converting input to double:
-    F1 = np.double(F1)
-    F2 = np.double(F2)
-    F0 = np.double(F1 + F2) / 2.0
-    Fs = np.double(Fs)
-    Ot = np.double(Ot)
-    t0 = np.double(t0)
-    
-    # compute analysis window of given type:
-    if analysisWindowType == 'sinebell':
-        analysisWindow = ao.sinebell(lengthOdgd)
-    else:
-        if analysisWindowType == 'hanning' or \
-               analysisWindowType == 'hann':
-            analysisWindow = np.hanning(lengthOdgd)
-    
-    # maximum number of partials in the spectral comb:
-    partialMax = np.floor((Fs / 2) / np.maximum(F1, F2))
-    
-    # Frequency numbers of the partials:
-    frequency_numbers = np.arange(1,partialMax + 1)
-    
-    # intermediate value
-    temp_array = 1j * 2.0 * np.pi * frequency_numbers * Ot
-    
-    # compute the amplitudes for each of the frequency peaks:
-    amplitudes = F0 * 27 / 4 * \
-                 (np.exp(-temp_array) \
-                  + (2 * (1 + 2 * np.exp(-temp_array)) / temp_array) \
-                  - (6 * (1 - np.exp(-temp_array)) \
-                     / (temp_array ** 2))) \
-                  / temp_array
-    
-    # Time stamps for the time domain ODGD
-    timeStamps = np.arange(lengthOdgd) / Fs + t0 / F0
-    
-    # Time domain odgd:
-    odgd = np.exp(2.0 * 1j * np.pi \
-                  * (np.outer(F1 * frequency_numbers,timeStamps) \
-                     + np.outer((F2 - F1) \
-                                * frequency_numbers,timeStamps ** 2) \
-                     / (2 * lengthOdgd / Fs))) \
-                     * np.outer(amplitudes,np.ones(lengthOdgd))
-    odgd = np.sum(odgd,axis=0)
-    
-    # spectrum:
-    odgdSpectrum = np.fft.fft(np.real(odgd * analysisWindow), n=Nfft)
-    
-    return odgd, odgdSpectrum
 
 ########## Filter generation functions   ##########
 
@@ -1188,20 +977,23 @@ class FASST(object):
         main parameters:
         
         **Outputs**
-        spat_comp_powers
-            (total_spat_rank x nbFreqsSigRepr x nbFramesSigRepr) ndarray
+         ``spat_comp_powers``
+            (``total_spat_rank`` x ``nbFreqsSigRepr`` x ``nbFramesSigRepr``) ndarray
             the spatial component power spectra. Note that total_spat_rank
             is the sum of all the spatial ranks for all the sources.
-        mix_matrix
+            
+         mix_matrix
             (total_spat_rank x nchannels x nbFreqsSigRepr) ndarray
             the mixing matrices for each source
-        rank_part_ind
+            
+         rank_part_ind
             dictionary: each key is one source, and the values are the indices
-            in spat_comp_powers and mix_matrix that correspond to that source.
-            If the spatial rank of source j is 2, then its spectra will appear
-            twice in spat_comp_powers, with mixing parameters (potentially
+            in ``spat_comp_powers`` and ``mix_matrix`` that correspond to that source.
+            If the spatial rank of source ``j`` is 2, then its spectra will appear
+            twice in ``spat_comp_powers``, with mixing parameters (potentially
             different one from the other) appearing in two sub-matrices of
-            mix_matrix.
+            ``mix_matrix``.
+            
         """
         K = len(self.spat_comps)
         rank_total = 0
@@ -1246,11 +1038,13 @@ class FASST(object):
         """
         
         Outputs:
-        hat_Rxx
-        hat_Rxs
-        hat_Rss
-        hat_Ws
-        loglik
+        
+         hat_Rxx
+         hat_Rxs
+         hat_Rss
+         hat_Ws
+         loglik
+         
         """
         if self.audioObject.channels != 2:
             raise ValueError("Nb channels not supported:"+
@@ -3199,16 +2993,6 @@ class multiChanSourceF0Filter(FASST):
         # the source dictionary is shared among all the components,
         # so storing it one for all:
         self.F0Table, WF0, trfoBis = (
-            #generate_WF0_chirped(minF0, maxF0,
-            #                     Fs=self.audioObject.samplerate,
-            #                     Nfft=self.sig_repr_params['fsize'],
-            #                     stepNotes=stepnoteF0,
-            #                     lengthWindow=self.sig_repr_params['wlen'],
-            #                     Ot=0.5,
-            #                     perF0=chirpPerF0,
-            #                     depthChirpInSemiTone=0.5,
-            #                     loadWF0=True,
-            #                     analysisWindow='hanning')
             SLS.slf.generate_WF0_TR_chirped(
                 transform=self.tft,
                 minF0=minF0, maxF0=maxF0,

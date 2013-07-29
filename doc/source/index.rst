@@ -18,6 +18,7 @@ Contents:
    spatial
    separateleadstereo
    separateleadfunctions
+   tools
 
 
 Indices and tables

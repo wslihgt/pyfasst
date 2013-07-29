@@ -15,6 +15,7 @@ Usage
 See each function docstring for more information.
 
 TODO: expend this?
+TODO: move all these functions in different modules, in ..tools for instance
 
 License
 =======
@@ -35,6 +36,7 @@ from ..tftransforms import nsgt
 from .. import audioObject as ao # for all these fancy transforms
 
 from ..tools.utils import *
+from ..tools.distances import ISDistortion
 
 ### SOME USEFUL, INSTRUMENTAL, FUNCTIONS
 
@@ -50,15 +52,15 @@ from ..tools.utils import *
 ##        n = n * 2
 ##    return n
 
-def ISDistortion(X,Y):
-    """
-    value = ISDistortion(X, Y)
+##def ISDistortion(X,Y):
+##    """
+##    value = ISDistortion(X, Y)
   
-    Returns the value of the Itakura-Saito (IS) divergence between
-    matrix X and matrix Y. X and Y should be two NumPy arrays with
-    same dimension.
-    """
-    return sum((-np.log(X / Y) + (X / Y) - 1))
+##    Returns the value of the Itakura-Saito (IS) divergence between
+##    matrix X and matrix Y. X and Y should be two NumPy arrays with
+##    same dimension.
+##    """
+##    return sum((-np.log(X / Y) + (X / Y) - 1))
 
 # DEFINING SOME WINDOW FUNCTIONS
 
@@ -1000,6 +1002,14 @@ def generate_ODGD_spec_chirped(F1, F2, Fs, lengthOdgd=2048, Nfft=2048, \
 def generateHannBasis(numberFrequencyBins, sizeOfFourier, Fs, \
                       frequencyScale='linear', numberOfBasis=20, \
                       overlap=.75):
+    """Generates a collection of Hann functions, spaced across the
+    frequency axis, as desired by the user (and if implemented),
+    targetting the given number of basis and adapting the extent (or bandwidth)
+    of each function (over the frequencies) to that number and according
+    to the desired overlap between these windows.
+    
+    
+    """
     isScaleRecognized = False
     if frequencyScale == 'linear':
         # number of windows generated:

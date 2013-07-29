@@ -1,0 +1,171 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>TOOLS &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="index.html" />
+    <link rel="prev" title="separateLeadFunctions" href="separateleadfunctions.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="separateleadfunctions.html" title="separateLeadFunctions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tools">
+<h1>TOOLS<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="xref py py-mod docutils literal"><span class="pre">tools</span></tt> package contains various modules with different uses.</p>
+<div class="section" id="module-pyfasst.tools.utils">
+<span id="utils"></span><h2>UTILS<a class="headerlink" href="#module-pyfasst.tools.utils" title="Permalink to this headline">¶</a></h2>
+<p>utils.py</p>
+<p>Useful functions for (audio) signal processing</p>
+<p>2013 Jean-Louis Durrieu
+<a class="reference external" href="http://www.durrieu.ch">http://www.durrieu.ch</a></p>
+<dl class="function">
+<dt id="pyfasst.tools.utils.db">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">db</tt><big>(</big><em>val</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/utils.html#db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.db" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyfasst.tools.utils.db" title="pyfasst.tools.utils.db"><tt class="xref py py-func docutils literal"><span class="pre">db()</span></tt></a> db(positiveValue)</p>
+<p>Returns the decibel value of the input positiveValue</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.hann">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">hann</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/utils.html#hann"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.hann" title="Permalink to this definition">¶</a></dt>
+<dd><p>window = hann(args)</p>
+<p>Computes a Hann window, with NumPy&#8217;s function hanning(args).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.ident">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">ident</tt><big>(</big><em>energy</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/utils.html#ident"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.ident" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyfasst.tools.utils.ident" title="pyfasst.tools.utils.ident"><tt class="xref py py-func docutils literal"><span class="pre">ident()</span></tt></a> : identity function, return the inputs unchanged</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.nextpow2">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">nextpow2</tt><big>(</big><em>i</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/utils.html#nextpow2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.nextpow2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find <span class="math">\(2^n\)</span> that is equal to or greater than.</p>
+<p>code taken from the website:</p>
+<blockquote>
+<div><a class="reference external" href="http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html">http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html</a></div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.sinebell">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">sinebell</tt><big>(</big><em>lengthWindow</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/utils.html#sinebell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.sinebell" title="Permalink to this definition">¶</a></dt>
+<dd><p>window = sinebell(lengthWindow)</p>
+<p>Computes a &#8220;sinebell&#8221; window function of length L=lengthWindow</p>
+<p>The formula is:</p>
+<div class="math">
+\[window(t) = sin(\pi \frac{t}{L}), t=0..L-1\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.sqrt_blackmanharris">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">sqrt_blackmanharris</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/utils.html#sqrt_blackmanharris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.sqrt_blackmanharris" title="Permalink to this definition">¶</a></dt>
+<dd><p>A root-squared Blackman-Harris window function.</p>
+<p>For use in scholkhuber and klapuri&#8217;s framework.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">TOOLS</a><ul>
+<li><a class="reference internal" href="#module-pyfasst.tools.utils">UTILS</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="separateleadfunctions.html"
+                        title="previous chapter">separateLeadFunctions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tools.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="separateleadfunctions.html" title="separateLeadFunctions"
+             >previous</a> |</li>
+        <li><a href="index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

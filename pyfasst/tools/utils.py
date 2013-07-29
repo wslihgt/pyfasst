@@ -1,19 +1,34 @@
+"""utils.py
+
+Useful functions for (audio) signal processing 
+
+2013 Jean-Louis Durrieu
+http://www.durrieu.ch
+"""
+
 import numpy as np
+import scipy.signal as spsig  # for the windows
 
 def db(val):
     """
-    db(positiveValue)
+    :py:func:`db` db(positiveValue)
     
     Returns the decibel value of the input positiveValue
     """
     return 10 * np.log10(val)
+
+def ident(energy):
+    ''':py:func:`ident` : identity function, return the inputs unchanged
+    '''
+    return energy
 
 def nextpow2(i):
     """
     Find :math:`2^n` that is equal to or greater than.
     
     code taken from the website:
-    http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html
+    
+     http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html
     """
     n = 2
     while n < i:
@@ -30,7 +45,7 @@ def sinebell(lengthWindow):
 
     .. math::
     
-        window(t) = sin(pi*t/L), t=0..L-1
+        window(t) = sin(\pi \\frac{t}{L}), t=0..L-1
         
     """
     window = np.sin((np.pi*(np.arange(lengthWindow)))/(1.0*lengthWindow))

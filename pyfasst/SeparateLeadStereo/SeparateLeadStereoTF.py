@@ -4,8 +4,6 @@ Provides a class (``SeparateLeadProcess``) within which several
 processings can be run on an audio file, in order to extract the
 lead instrument/main voice from a (stereophonic) audio mixture.
 
-
-
 copyright (C) 2011 - 2013 Jean-Louis Durrieu
 """
 

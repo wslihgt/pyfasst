@@ -19,7 +19,7 @@ Jean-Louis Durrieu, EPFL, 2012 - 2013
 """
 
 import numpy as np
-import scipy.signal as spsig  # for the windows
+import scipy.signal as spsig  # for the windows and filters
 # import scipy.sparse as spspa
 import scipy.interpolate as spinterp
 from .. import audioObject as ao # for the stft and istft

@@ -470,7 +470,7 @@
                <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">a</span>
 </div>
-<span class="k">def</span> <span class="nf">gen_steer_vec_acous</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span>
+<div class="viewcode-block" id="gen_steer_vec_acous"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.gen_steer_vec_acous">[docs]</a><span class="k">def</span> <span class="nf">gen_steer_vec_acous</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span>
                         <span class="n">dist_src_mic</span><span class="p">):</span>
     <span class="n">gains</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dist_src_mic</span><span class="p">)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">gains</span><span class="p">)</span> <span class="o">*</span>
@@ -481,7 +481,7 @@
                 <span class="p">)</span>
          <span class="p">)</span>
     <span class="k">return</span> <span class="n">a</span>
-
+</div>
 <div class="viewcode-block" id="dir_diag_stereo"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.dir_diag_stereo">[docs]</a><span class="k">def</span> <span class="nf">dir_diag_stereo</span><span class="p">(</span><span class="n">Cx</span><span class="p">,</span>
                     <span class="n">nft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
                     <span class="n">ntheta</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>

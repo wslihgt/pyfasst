@@ -8,6 +8,8 @@ import numpy as np
 import scipy.signal as spsig
 import warnings
 
+eps = 1e-10
+
 def medianFilter(inputArray, length = 10):
     """median filter
     """
@@ -121,6 +123,72 @@ def invHermMat2D(a_00, a_01, a_11):
         warnings.warn("The matrix is probably non invertible! %s"
                       %str(det[det==0]))
     return a_11/det, -a_01/det, a_00/det
+    
+def inv_herm_mat_2d(self, sigma_x_diag, sigma_x_off):
+    """Computes the inverse of 2D hermitian matrices.
+
+    Inputs
+    ------
+    sigma_x_diag
+        ndarray, with (dim of axis=0) = 2
+
+        The diagonal elements of the matrices to invert.
+        sigma_x_diag[0] are the (0,0) elements and
+        sigma_x_diag[1] are the (1,1) ones.
+
+    sigma_x_off
+        ndarray, with the same dimensions as sigma_x_diag[0]
+
+        The off-diagonal elements of the matrices, more precisely the
+        (0,1) element (since the matrices are assumed Hermitian,
+        the (1,0) element is the complex conjugate)
+
+    Outputs
+    -------
+    inv_sigma_x_diag
+        ndarray, 2 x shape(sigma_x_off)
+
+        Diagonal elements of the inverse matrices.
+        [0] <-> (0,0)
+        [1] <-> (1,1)
+
+    inv_sigma_x_off
+        ndarray, shape(sigma_x_off)
+
+        Off-diagonal (0,1) elements of the inverse matrices
+
+    det_sigma_x
+        ndarray, shape(sigma_x_off)
+
+        For each inversion, the determinant of the matrix.
+
+    Remarks
+    -------
+    The inversion is done explicitly, by computing the determinant
+    (explicit formula for 2D matrices), then the elements of the
+    inverse with the corresponding formulas.
+
+    To deal with ill-conditioned matrices, a minimum (absolute) value of
+    the determinant is guaranteed. 
+
+    """
+    #if len(sigma_x_diag.shape) != 3:
+    #    raise ValueError("Something weird happened to sigma_x")
+    det_sigma_x = np.prod(sigma_x_diag, axis=0) - np.abs(sigma_x_off)**2
+    if self.verbose:
+        print "number of 0s in det ",(det_sigma_x==0.).sum()
+    # issue when det sigma x is 0... 
+    det_sigma_x = (
+        np.sign(det_sigma_x + eps) *
+        np.maximum(np.abs(det_sigma_x), eps))
+    if self.verbose:
+        print "number of 0s left in det", (det_sigma_x==0.).sum()
+    inv_sigma_x_diag = np.zeros_like(sigma_x_diag)
+    inv_sigma_x_off = - sigma_x_off / det_sigma_x
+    inv_sigma_x_diag[0] = sigma_x_diag[1] / det_sigma_x
+    inv_sigma_x_diag[1] = sigma_x_diag[0] / det_sigma_x
+
+    return inv_sigma_x_diag, inv_sigma_x_off, det_sigma_x
 
 def f0detectionFunction(TFmatrix, freqs=None, axis=None,
                         samplingrate=44100, fouriersize=2048,

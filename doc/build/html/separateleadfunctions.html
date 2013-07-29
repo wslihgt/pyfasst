@@ -27,6 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="pyFASST 0.1 documentation" href="index.html" />
+    <link rel="next" title="TOOLS" href="tools.html" />
     <link rel="prev" title="SeparateLeadStereo" href="separateleadstereo.html" /> 
   </head>
   <body>
@@ -39,6 +40,9 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="TOOLS"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="separateleadstereo.html" title="SeparateLeadStereo"
              accesskey="P">previous</a> |</li>
@@ -63,18 +67,20 @@ as generation of dictionary matrices.</p>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>See each function docstring for more information.</p>
-<p>TODO: expend this?</p>
+<p>TODO: expend this?
+TODO: move all these functions in different modules, in ..tools for instance</p>
 </div>
 <div class="section" id="license">
 <h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
 <p>Copyright (C) 2011-2013 Jean-Louis Durrieu</p>
 <dl class="function">
-<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.ISDistortion">
-<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">ISDistortion</tt><big>(</big><em>X</em>, <em>Y</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#ISDistortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.ISDistortion" title="Permalink to this definition">¶</a></dt>
-<dd><p>value = ISDistortion(X, Y)</p>
-<p>Returns the value of the Itakura-Saito (IS) divergence between
-matrix X and matrix Y. X and Y should be two NumPy arrays with
-same dimension.</p>
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generateHannBasis">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generateHannBasis</tt><big>(</big><em>numberFrequencyBins</em>, <em>sizeOfFourier</em>, <em>Fs</em>, <em>frequencyScale='linear'</em>, <em>numberOfBasis=20</em>, <em>overlap=0.75</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generateHannBasis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generateHannBasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a collection of Hann functions, spaced across the
+frequency axis, as desired by the user (and if implemented),
+targetting the given number of basis and adapting the extent (or bandwidth)
+of each function (over the frequencies) to that number and according
+to the desired overlap between these windows.</p>
 </dd></dl>
 
 <dl class="function">
@@ -106,7 +112,7 @@ argument.</p>
 
 <dl class="function">
 <dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_MinQT_chirped">
-<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_WF0_MinQT_chirped</tt><big>(</big><em>minF0</em>, <em>maxF0</em>, <em>cqtfmax</em>, <em>cqtfmin</em>, <em>cqtbins=48.0</em>, <em>Fs=44100.0</em>, <em>Nfft=2048</em>, <em>stepNotes=4</em>, <em>lengthWindow=2048</em>, <em>Ot=0.5</em>, <em>perF0=1</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>analysisWindow='hanning'</em>, <em>atomHopFactor=0.25</em>, <em>cqtWinFunc=&lt;function hanning at 0x102a23a28&gt;</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_WF0_MinQT_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_MinQT_chirped" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_WF0_MinQT_chirped</tt><big>(</big><em>minF0</em>, <em>maxF0</em>, <em>cqtfmax</em>, <em>cqtfmin</em>, <em>cqtbins=48.0</em>, <em>Fs=44100.0</em>, <em>Nfft=2048</em>, <em>stepNotes=4</em>, <em>lengthWindow=2048</em>, <em>Ot=0.5</em>, <em>perF0=1</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>analysisWindow='hanning'</em>, <em>atomHopFactor=0.25</em>, <em>cqtWinFunc=&lt;function hanning at 0x1025d1b90&gt;</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_WF0_MinQT_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_MinQT_chirped" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,</dt>
 <dd>stepNotes=4, lengthWindow=2048,
@@ -157,7 +163,7 @@ transformed into the spectral domain)</dd>
 
 <dl class="function">
 <dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_NSGTMinQT_chirped">
-<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_WF0_NSGTMinQT_chirped</tt><big>(</big><em>minF0</em>, <em>maxF0</em>, <em>cqtfmax</em>, <em>cqtfmin</em>, <em>cqtbins=48.0</em>, <em>Fs=44100.0</em>, <em>Nfft=2048</em>, <em>stepNotes=4</em>, <em>lengthWindow=2048</em>, <em>Ot=0.5</em>, <em>perF0=1</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>analysisWindow='hanning'</em>, <em>atomHopFactor=0.25</em>, <em>cqtWinFunc=&lt;function hanning at 0x102a23a28&gt;</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_WF0_NSGTMinQT_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_NSGTMinQT_chirped" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_WF0_NSGTMinQT_chirped</tt><big>(</big><em>minF0</em>, <em>maxF0</em>, <em>cqtfmax</em>, <em>cqtfmin</em>, <em>cqtbins=48.0</em>, <em>Fs=44100.0</em>, <em>Nfft=2048</em>, <em>stepNotes=4</em>, <em>lengthWindow=2048</em>, <em>Ot=0.5</em>, <em>perF0=1</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>analysisWindow='hanning'</em>, <em>atomHopFactor=0.25</em>, <em>cqtWinFunc=&lt;function hanning at 0x1025d1b90&gt;</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_WF0_NSGTMinQT_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_NSGTMinQT_chirped" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,</dt>
 <dd>stepNotes=4, lengthWindow=2048,
@@ -391,6 +397,9 @@ F                     : values of frequencies at each Fourier</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="separateleadstereo.html"
                         title="previous chapter">SeparateLeadStereo</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">TOOLS</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/separateleadfunctions.txt"
@@ -422,6 +431,9 @@ F                     : values of frequencies at each Fourier</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="TOOLS"
+             >next</a> |</li>
         <li class="right" >
           <a href="separateleadstereo.html" title="SeparateLeadStereo"
              >previous</a> |</li>

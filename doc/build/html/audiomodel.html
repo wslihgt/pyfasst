@@ -87,7 +87,8 @@ Available: <a class="reference external" href="http://hal.inria.fr/hal-00626962/
 <p>Jean-Louis Durrieu, EPFL-SSTI-IEL-LTS5</p>
 <div class="highlight-python"><pre>jean DASH louis AT durrieu DOT ch</pre>
 </div>
-<p>2012-2013</p>
+<p>2012-2013
+<a class="reference external" href="http://www.durrieu.ch">http://www.durrieu.ch</a></p>
 </div>
 <div class="section" id="id1">
 <h2>Reference<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
@@ -222,7 +223,7 @@ loglik</p>
 <dl class="method">
 <dt id="pyfasst.audioModel.FASST.estim_param_a_post_model">
 <tt class="descname">estim_param_a_post_model</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#FASST.estim_param_a_post_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST.estim_param_a_post_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Estimates the _a <a href="#id2"><span class="problematic" id="id3">posteriori_</span></a> model for the provided
+<dd><p>Estimates the _a <a href="#id4"><span class="problematic" id="id5">posteriori_</span></a> model for the provided
 audio signal. In particular, this runs self.iter_num times
 the Generalized Expectation-Maximisation algorithm to
 update the various parameters of the model, so as to
@@ -349,23 +350,25 @@ the &#8220;Capon&#8221; filter.</p>
 <tt class="descname">retrieve_subsrc_params</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#FASST.retrieve_subsrc_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST.retrieve_subsrc_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the various quantities necessary for the estimation of the
 main parameters:</p>
-<p><strong>Outputs</strong>
-spat_comp_powers</p>
-<blockquote>
-<div>(total_spat_rank x nbFreqsSigRepr x nbFramesSigRepr) ndarray
-the spatial component power spectra. Note that total_spat_rank
-is the sum of all the spatial ranks for all the sources.</div></blockquote>
 <dl class="docutils">
+<dt><strong>Outputs</strong></dt>
+<dd><dl class="first last docutils">
+<dt><tt class="docutils literal"><span class="pre">spat_comp_powers</span></tt></dt>
+<dd>(<tt class="docutils literal"><span class="pre">total_spat_rank</span></tt> x <tt class="docutils literal"><span class="pre">nbFreqsSigRepr</span></tt> x <tt class="docutils literal"><span class="pre">nbFramesSigRepr</span></tt>) ndarray
+the spatial component power spectra. Note that total_spat_rank
+is the sum of all the spatial ranks for all the sources.</dd>
 <dt>mix_matrix</dt>
 <dd>(total_spat_rank x nchannels x nbFreqsSigRepr) ndarray
 the mixing matrices for each source</dd>
 <dt>rank_part_ind</dt>
 <dd>dictionary: each key is one source, and the values are the indices
-in spat_comp_powers and mix_matrix that correspond to that source.
-If the spatial rank of source j is 2, then its spectra will appear
-twice in spat_comp_powers, with mixing parameters (potentially
+in <a href="#id2"><span class="problematic" id="id3">:py:attrs:`spat_comp_powers`</span></a> and <tt class="docutils literal"><span class="pre">mix_matrix</span></tt> that correspond to that source.
+If the spatial rank of source <tt class="docutils literal"><span class="pre">j</span></tt> is 2, then its spectra will appear
+twice in <tt class="docutils literal"><span class="pre">spat_comp_powers</span></tt>, with mixing parameters (potentially
 different one from the other) appearing in two sub-matrices of
-mix_matrix.</dd>
+<tt class="docutils literal"><span class="pre">mix_matrix</span></tt>.</dd>
+</dl>
+</dd>
 </dl>
 </dd></dl>
 
@@ -463,14 +466,14 @@ convolutive!</p>
 <dt id="pyfasst.audioModel.NMF_decomp_init">
 <tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">NMF_decomp_init</tt><big>(</big><em>SX</em>, <em>nbComps=10</em>, <em>niter=10</em>, <em>verbose=0</em>, <em>Winit=None</em>, <em>Hinit=None</em>, <em>updateW=True</em>, <em>updateH=True</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#NMF_decomp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.NMF_decomp_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>NMF multiplicative gradient, for Itakura Saito
-divergence measure between SX and np.dot(W,H)</p>
+divergence measure between <tt class="docutils literal"><span class="pre">SX</span></tt> and <tt class="docutils literal"><span class="pre">np.dot(W,H)</span></tt></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyfasst.audioModel.NMF_decomposition">
 <tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">NMF_decomposition</tt><big>(</big><em>SX</em>, <em>nbComps=10</em>, <em>niter=10</em>, <em>verbose=0</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#NMF_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.NMF_decomposition" title="Permalink to this definition">¶</a></dt>
 <dd><p>NMF multiplicative gradient, for Itakura Saito
-divergence measure between SX and <cite>np.dot(W,H)</cite></p>
+divergence measure between SX and <tt class="docutils literal"><span class="pre">np.dot(W,H)</span></tt></p>
 </dd></dl>
 
 <dl class="function">
@@ -487,9 +490,9 @@ short time Fourier transform second order statistics in Cx</p>
 <div class="math">
 \[C_x[0] = E[|x_0|^2]\]\[C_x[2] = E[|x_1|^2]\]\[C_x[1] = E[x_0 x_1^H]\]</div>
 <p><strong>Method</strong>:</p>
-<p>We use the Capon method, on each of the Fourier channel:</p>
-<blockquote>
-<div>phi_k(theta) = a_k(theta).H inv(Rxx) a_k(theta)</div></blockquote>
+<p>We use the Capon method, on each of the Fourier channel</p>
+<div class="math">
+\[\phi_k(\theta) = a_k(\theta)^H inv(Rxx) a_k(\theta)\]</div>
 <p>The algorithm therefore returns one directivity graph for each
 frequency band.</p>
 <p><strong>Remarks</strong>:</p>
@@ -503,6 +506,17 @@ also be of interest (looking at peaks and not valleys to find directions):</p>
 <p>Some tests show that it is very important that the distance between the
 microphone is known. Otherwise, little can be infered from the resulting
 directivity measure...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.audioModel.gen_steer_vec_acous">
+<tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">gen_steer_vec_acous</tt><big>(</big><em>freqs</em>, <em>dist_src_mic</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#gen_steer_vec_acous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.gen_steer_vec_acous" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates a steering vector for the given frequencies and given
+distances between the microphones and the source.</p>
+<p>To the difference with
+<a class="reference internal" href="#pyfasst.audioModel.gen_steer_vec_far_src_uniform_linear_array" title="pyfasst.audioModel.gen_steer_vec_far_src_uniform_linear_array"><tt class="xref py py-func docutils literal"><span class="pre">gen_steer_vec_far_src_uniform_linear_array()</span></tt></a>, this function
+also includes gains depending on the distance between the source and
+the mics.</p>
 </dd></dl>
 
 <dl class="function">
@@ -530,7 +544,7 @@ M1   M2   M3  ...
 </div>
 <p>That is more likely valid for electro-magnetic fields, for acoustic
 wave fields, one should probably take into account the difference of
-gain between the microphones (see <tt class="docutils literal"><span class="pre">gen_steer_vec_acous</span></tt>)</p>
+gain between the microphones (see <a class="reference internal" href="#pyfasst.audioModel.gen_steer_vec_acous" title="pyfasst.audioModel.gen_steer_vec_acous"><tt class="xref py py-func docutils literal"><span class="pre">gen_steer_vec_acous()</span></tt></a> )</p>
 <p><strong>Output</strong>:</p>
 <dl class="docutils">
 <dt>a (nc, nfreqs) ndarray</dt>
@@ -539,100 +553,9 @@ gain between the microphones (see <tt class="docutils literal"><span class="pre"
 </dd></dl>
 
 <dl class="function">
-<dt id="pyfasst.audioModel.generate_ODGD_spec">
-<tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">generate_ODGD_spec</tt><big>(</big><em>F0</em>, <em>Fs</em>, <em>lengthOdgd=2048</em>, <em>Nfft=2048</em>, <em>Ot=0.5</em>, <em>t0=0.0</em>, <em>analysisWindowType='sinebell'</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#generate_ODGD_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.generate_ODGD_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>generateODGDspec:</p>
-<p>generates a waveform ODGD and the corresponding spectrum,
-using as analysis window the -optional- window given as
-argument.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.audioModel.generate_ODGD_spec_chirped">
-<tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">generate_ODGD_spec_chirped</tt><big>(</big><em>F1</em>, <em>F2</em>, <em>Fs</em>, <em>lengthOdgd=2048</em>, <em>Nfft=2048</em>, <em>Ot=0.5</em>, <em>t0=0.0</em>, <em>analysisWindowType='sinebell'</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#generate_ODGD_spec_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.generate_ODGD_spec_chirped" title="Permalink to this definition">¶</a></dt>
-<dd><p>generateODGDspecChirped:</p>
-<p>generates a waveform ODGD and the corresponding spectrum,
-using as analysis window the -optional- window given as
-argument.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.audioModel.generate_WF0_chirped">
-<tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">generate_WF0_chirped</tt><big>(</big><em>minF0</em>, <em>maxF0</em>, <em>Fs</em>, <em>Nfft=2048</em>, <em>stepNotes=4</em>, <em>lengthWindow=2048</em>, <em>Ot=0.5</em>, <em>perF0=2</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>analysisWindow='hanning'</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#generate_WF0_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.generate_WF0_chirped" title="Permalink to this definition">¶</a></dt>
-<dd><p><tt class="docutils literal"><span class="pre">F0Table,</span> <span class="pre">WF0</span> <span class="pre">=</span> <span class="pre">generate_WF0_chirped(minF0,</span> <span class="pre">maxF0,</span> <span class="pre">Fs,</span> <span class="pre">Nfft=2048,</span>
-<span class="pre">stepNotes=4,</span> <span class="pre">lengthWindow=2048,</span>
-<span class="pre">Ot=0.5,</span> <span class="pre">perF0=2,</span>
-<span class="pre">depthChirpInSemiTone=0.5)</span></tt></p>
-<p>Generates a &#8216;basis&#8217; matrix for the source part WF0, using the
-source model KLGLOTT88, with the following I/O arguments:</p>
-<p><strong>Inputs</strong>:</p>
-<ul>
-<li><dl class="first docutils">
-<dt><cite>minF0</cite>:                the minimum value for the fundamental</dt>
-<dd><p class="first last">frequency (F0)</p>
-</dd>
-</dl>
-</li>
-<li><p class="first"><cite>maxF0</cite>:                the maximum value for F0</p>
-</li>
-<li><p class="first">Fs:                     the desired sampling rate</p>
-</li>
-<li><dl class="first docutils">
-<dt>Nfft:                   the number of bins to compute the Fourier</dt>
-<dd><p class="first last">transform</p>
-</dd>
-</dl>
-</li>
-<li><p class="first">stepNotes:              the number of F0 per semitone</p>
-</li>
-<li><dl class="first docutils">
-<dt>lengthWindow:           the size of the window for the Fourier</dt>
-<dd><p class="first last">transform</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>Ot:                     the glottal opening coefficient for</dt>
-<dd><p class="first last">KLGLOTT88</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>perF0:                  the number of chirps considered per F0</dt>
-<dd><p class="first last">value</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>depthChirpInSemiTone:   the maximum value, in semitone, of the</dt>
-<dd><p class="first last">allowed chirp per F0</p>
-</dd>
-</dl>
-</li>
-</ul>
-<p><strong>Outputs</strong>:</p>
-<ul>
-<li><p class="first">F0Table:</p>
-<blockquote>
-<div><p>the vector containing the values of the fundamental
-frequencies in Hertz (Hz) corresponding to the
-harmonic combs in WF0, i.e. the columns of WF0</p>
-</div></blockquote>
-</li>
-<li><p class="first">WF0:</p>
-<blockquote>
-<div><p>the basis matrix, where each column is a harmonic comb
-generated by KLGLOTT88 (with a sinusoidal model, then
-transformed into the spectral domain)</p>
-</div></blockquote>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="function">
 <dt id="pyfasst.audioModel.inv_mat">
 <tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">inv_mat</tt><big>(</big><em>mat_diag</em>, <em>mat_off</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#inv_mat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.inv_mat" title="Permalink to this definition">¶</a></dt>
-<dd><p>invert hermitian matrix</p>
+<dd><p>invert 2D hermitian matrix</p>
 </dd></dl>
 
 <dl class="class">

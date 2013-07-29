@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>separateLeadFunctions &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="index.html" />
+    <link rel="prev" title="SeparateLeadStereo" href="separateleadstereo.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="separateleadstereo.html" title="SeparateLeadStereo"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pyfasst.SeparateLeadStereo.separateLeadFunctions">
+<span id="separateleadfunctions"></span><h1>separateLeadFunctions<a class="headerlink" href="#module-pyfasst.SeparateLeadStereo.separateLeadFunctions" title="Permalink to this headline">¶</a></h1>
+<p>separateLeadFunctions.py</p>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>This module provides functions that are useful for the SeparateLeadStereo
+modules, essentially time-frequency transformations (and inverse), as well
+as generation of dictionary matrices.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>See each function docstring for more information.</p>
+<p>TODO: expend this?</p>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>Copyright (C) 2011-2013 Jean-Louis Durrieu</p>
+<dl class="function">
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.ISDistortion">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">ISDistortion</tt><big>(</big><em>X</em>, <em>Y</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#ISDistortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.ISDistortion" title="Permalink to this definition">¶</a></dt>
+<dd><p>value = ISDistortion(X, Y)</p>
+<p>Returns the value of the Itakura-Saito (IS) divergence between
+matrix X and matrix Y. X and Y should be two NumPy arrays with
+same dimension.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_ODGD_spec</tt><big>(</big><em>F0</em>, <em>Fs</em>, <em>lengthOdgd=2048</em>, <em>Nfft=2048</em>, <em>Ot=0.5</em>, <em>t0=0.0</em>, <em>analysisWindowType='sinebell'</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_ODGD_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>generateODGDspec:</p>
+<p>generates a waveform ODGD and the corresponding spectrum,
+using as analysis window the -optional- window given as
+argument.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec_chirped">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_ODGD_spec_chirped</tt><big>(</big><em>F1</em>, <em>F2</em>, <em>Fs</em>, <em>lengthOdgd=2048</em>, <em>Nfft=2048</em>, <em>Ot=0.5</em>, <em>t0=0.0</em>, <em>analysisWindowType='sinebell'</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_ODGD_spec_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec_chirped" title="Permalink to this definition">¶</a></dt>
+<dd><p>generateODGDspecChirped:</p>
+<p>generates a waveform ODGD and the corresponding spectrum,
+using as analysis window the -optional- window given as
+argument.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec_inharmo">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_ODGD_spec_inharmo</tt><big>(</big><em>F0</em>, <em>Fs</em>, <em>lengthOdgd=2048</em>, <em>Nfft=2048</em>, <em>Ot=0.5</em>, <em>t0=0.0</em>, <em>analysisWindowType='sinebell'</em>, <em>inharmonicity=0.5</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_ODGD_spec_inharmo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec_inharmo" title="Permalink to this definition">¶</a></dt>
+<dd><p>generateODGDspec:</p>
+<p>generates a waveform ODGD and the corresponding spectrum,
+using as analysis window the -optional- window given as
+argument.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_MinQT_chirped">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_WF0_MinQT_chirped</tt><big>(</big><em>minF0</em>, <em>maxF0</em>, <em>cqtfmax</em>, <em>cqtfmin</em>, <em>cqtbins=48.0</em>, <em>Fs=44100.0</em>, <em>Nfft=2048</em>, <em>stepNotes=4</em>, <em>lengthWindow=2048</em>, <em>Ot=0.5</em>, <em>perF0=1</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>analysisWindow='hanning'</em>, <em>atomHopFactor=0.25</em>, <em>cqtWinFunc=&lt;function hanning at 0x102a23a28&gt;</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_WF0_MinQT_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_MinQT_chirped" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,</dt>
+<dd>stepNotes=4, lengthWindow=2048,
+Ot=0.5, perF0=2,
+depthChirpInSemiTone=0.5)</dd>
+</dl>
+<p>Generates a &#8216;basis&#8217; matrix for the source part WF0, using the
+source model KLGLOTT88, with the following I/O arguments:
+Inputs:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>minF0                the minimum value for the fundamental</dt>
+<dd>frequency (F0)</dd>
+</dl>
+<p>maxF0                the maximum value for F0
+cqtfmax...
+Fs                   the desired sampling rate
+Nfft                 the number of bins to compute the Fourier</p>
+<blockquote>
+<div>transform</div></blockquote>
+<p>stepNotes            the number of F0 per semitone
+lengthWindow         the size of the window for the Fourier</p>
+<blockquote>
+<div>transform</div></blockquote>
+<dl class="docutils">
+<dt>Ot                   the glottal opening coefficient for</dt>
+<dd>KLGLOTT88</dd>
+<dt>perF0                the number of chirps considered per F0</dt>
+<dd>value</dd>
+<dt>depthChirpInSemiTone the maximum value, in semitone, of the</dt>
+<dd>allowed chirp per F0</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Outputs:</dt>
+<dd><dl class="first last docutils">
+<dt>F0Table the vector containing the values of the fundamental</dt>
+<dd>frequencies in Hertz (Hz) corresponding to the
+harmonic combs in WF0, i.e. the columns of WF0</dd>
+<dt>WF0     the basis matrix, where each column is a harmonic comb</dt>
+<dd>generated by KLGLOTT88 (with a sinusoidal model, then
+transformed into the spectral domain)</dd>
+</dl>
+</dd>
+</dl>
+<p>20120828T2358 Horribly slow...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_NSGTMinQT_chirped">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_WF0_NSGTMinQT_chirped</tt><big>(</big><em>minF0</em>, <em>maxF0</em>, <em>cqtfmax</em>, <em>cqtfmin</em>, <em>cqtbins=48.0</em>, <em>Fs=44100.0</em>, <em>Nfft=2048</em>, <em>stepNotes=4</em>, <em>lengthWindow=2048</em>, <em>Ot=0.5</em>, <em>perF0=1</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>analysisWindow='hanning'</em>, <em>atomHopFactor=0.25</em>, <em>cqtWinFunc=&lt;function hanning at 0x102a23a28&gt;</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_WF0_NSGTMinQT_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_NSGTMinQT_chirped" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,</dt>
+<dd>stepNotes=4, lengthWindow=2048,
+Ot=0.5, perF0=2,
+depthChirpInSemiTone=0.5)</dd>
+</dl>
+<p>Generates a &#8216;basis&#8217; matrix for the source part WF0, using the
+source model KLGLOTT88, with the following I/O arguments:
+Inputs:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>minF0                the minimum value for the fundamental</dt>
+<dd>frequency (F0)</dd>
+</dl>
+<p>maxF0                the maximum value for F0
+cqtfmax...
+Fs                   the desired sampling rate
+Nfft                 the number of bins to compute the Fourier</p>
+<blockquote>
+<div>transform</div></blockquote>
+<p>stepNotes            the number of F0 per semitone
+lengthWindow         the size of the window for the Fourier</p>
+<blockquote>
+<div>transform</div></blockquote>
+<dl class="docutils">
+<dt>Ot                   the glottal opening coefficient for</dt>
+<dd>KLGLOTT88</dd>
+<dt>perF0                the number of chirps considered per F0</dt>
+<dd>value</dd>
+<dt>depthChirpInSemiTone the maximum value, in semitone, of the</dt>
+<dd>allowed chirp per F0</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Outputs:</dt>
+<dd><dl class="first last docutils">
+<dt>F0Table the vector containing the values of the fundamental</dt>
+<dd>frequencies in Hertz (Hz) corresponding to the
+harmonic combs in WF0, i.e. the columns of WF0</dd>
+<dt>WF0     the basis matrix, where each column is a harmonic comb</dt>
+<dd>generated by KLGLOTT88 (with a sinusoidal model, then
+transformed into the spectral domain)</dd>
+</dl>
+</dd>
+</dl>
+<p>20120828T2358 Horribly slow...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_TR_chirped">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_WF0_TR_chirped</tt><big>(</big><em>transform</em>, <em>minF0</em>, <em>maxF0</em>, <em>stepNotes=4</em>, <em>Ot=0.5</em>, <em>perF0=1</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_WF0_TR_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_TR_chirped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a &#8216;basis&#8217; matrix for the source part WF0, using the
+source model KLGLOTT88, with the following I/O arguments:
+Inputs:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>minF0                the minimum value for the fundamental</dt>
+<dd>frequency (F0)</dd>
+</dl>
+<p>maxF0                the maximum value for F0
+cqtfmax...
+Fs                   the desired sampling rate
+Nfft                 the number of bins to compute the Fourier</p>
+<blockquote>
+<div>transform</div></blockquote>
+<p>stepNotes            the number of F0 per semitone
+lengthWindow         the size of the window for the Fourier</p>
+<blockquote>
+<div>transform</div></blockquote>
+<dl class="docutils">
+<dt>Ot                   the glottal opening coefficient for</dt>
+<dd>KLGLOTT88</dd>
+<dt>perF0                the number of chirps considered per F0</dt>
+<dd>value</dd>
+<dt>depthChirpInSemiTone the maximum value, in semitone, of the</dt>
+<dd>allowed chirp per F0</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Outputs:</dt>
+<dd><dl class="first last docutils">
+<dt>F0Table the vector containing the values of the fundamental</dt>
+<dd>frequencies in Hertz (Hz) corresponding to the
+harmonic combs in WF0, i.e. the columns of WF0</dd>
+<dt>WF0     the basis matrix, where each column is a harmonic comb</dt>
+<dd>generated by KLGLOTT88 (with a sinusoidal model, then
+transformed into the spectral domain)</dd>
+</dl>
+</dd>
+</dl>
+<p>20120828T2358 Horribly slow...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_chirped">
+<tt class="descclassname">pyfasst.SeparateLeadStereo.separateLeadFunctions.</tt><tt class="descname">generate_WF0_chirped</tt><big>(</big><em>minF0</em>, <em>maxF0</em>, <em>Fs</em>, <em>Nfft=2048</em>, <em>stepNotes=4</em>, <em>lengthWindow=2048</em>, <em>Ot=0.5</em>, <em>perF0=1</em>, <em>depthChirpInSemiTone=0.5</em>, <em>loadWF0=True</em>, <em>analysisWindow='hanning'</em><big>)</big><a class="reference internal" href="_modules/pyfasst/SeparateLeadStereo/separateLeadFunctions.html#generate_WF0_chirped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_chirped" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>F0Table, WF0 = generate_WF0_chirped(minF0, maxF0, Fs, Nfft=2048,</dt>
+<dd>stepNotes=4, lengthWindow=2048,
+Ot=0.5, perF0=2,
+depthChirpInSemiTone=0.5)</dd>
+</dl>
+<p>Generates a &#8216;basis&#8217; matrix for the source part WF0, using the
+source model KLGLOTT88, with the following I/O arguments:
+Inputs:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>minF0                the minimum value for the fundamental</dt>
+<dd>frequency (F0)</dd>
+</dl>
+<p>maxF0                the maximum value for F0
+Fs                   the desired sampling rate
+Nfft                 the number of bins to compute the Fourier</p>
+<blockquote>
+<div>transform</div></blockquote>
+<p>stepNotes            the number of F0 per semitone
+lengthWindow         the size of the window for the Fourier</p>
+<blockquote>
+<div>transform</div></blockquote>
+<dl class="docutils">
+<dt>Ot                   the glottal opening coefficient for</dt>
+<dd>KLGLOTT88</dd>
+<dt>perF0                the number of chirps considered per F0</dt>
+<dd>value</dd>
+<dt>depthChirpInSemiTone the maximum value, in semitone, of the</dt>
+<dd>allowed chirp per F0</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Outputs:</dt>
+<dd><dl class="first last docutils">
+<dt>F0Table the vector containing the values of the fundamental</dt>
+<dd>frequencies in Hertz (Hz) corresponding to the
+harmonic combs in WF0, i.e. the columns of WF0</dd>
+<dt>WF0     the basis matrix, where each column is a harmonic comb</dt>
+<dd>generated by KLGLOTT88 (with a sinusoidal model, then
+transformed into the spectral domain)</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">istft(X, analysisWindow=None, window=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), hopsize=256.0, nfft=2048.0, originalDataLen=None, start=-1, stop=None)</tt></dt>
+<dd><p>data = istft(X, window=sinebell(2048), hopsize=256.0, nfft=2048.0)</p>
+<p>Computes an inverse of the short time Fourier transform (STFT),
+here, the overlap-add procedure is implemented.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><p class="first">X                     : STFT of the signal, to be &#8220;inverted&#8221;
+window=sinebell(2048) : synthesis window</p>
+<blockquote>
+<div>(should be the &#8220;complementary&#8221; window
+for the analysis window)</div></blockquote>
+<p>hopsize=1024.0        : hopsize for the analysis
+nfft=2048.0           : number of points for the Fourier</p>
+<blockquote class="last">
+<div>computation
+(the user has to provide an even number)</div></blockquote>
+</dd>
+<dt>Outputs:</dt>
+<dd><dl class="first last docutils">
+<dt>data <span class="classifier-delimiter">:</span> <span class="classifier">time series corresponding to the given</span></dt>
+<dd>STFT the first half-window is removed,
+complying with the STFT computation
+given in the function &#8216;stft&#8217;</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">stft(data, window=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), hopsize=256.0, nfft=2048.0, fs=44100.0, start=0, stop=None)</tt></dt>
+<dd><dl class="docutils">
+<dt>X, F, N = stft(data, window=sinebell(2048), hopsize=1024.0,</dt>
+<dd>nfft=2048.0, fs=44100)</dd>
+</dl>
+<p>Computes the short time Fourier transform (STFT) of data.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><dl class="first docutils">
+<dt>data <span class="classifier-delimiter">:</span> <span class="classifier">one-dimensional time-series to be</span></dt>
+<dd>analyzed</dd>
+</dl>
+<p>window=sinebell(2048) : analysis window
+hopsize=1024.0        : hopsize for the analysis
+nfft=2048.0           : number of points for the Fourier</p>
+<blockquote>
+<div>computation (the user has to provide an
+even number)</div></blockquote>
+<p class="last">fs=44100.0            : sampling rate of the signal</p>
+</dd>
+<dt>Outputs:</dt>
+<dd><p class="first">X                     : STFT of data
+F                     : values of frequencies at each Fourier</p>
+<blockquote>
+<div>bins</div></blockquote>
+<dl class="last docutils">
+<dt>N <span class="classifier-delimiter">:</span> <span class="classifier">central time at the middle of each</span></dt>
+<dd>analysis window</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">separateLeadFunctions</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="separateleadstereo.html"
+                        title="previous chapter">SeparateLeadStereo</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/separateleadfunctions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="separateleadstereo.html" title="SeparateLeadStereo"
+             >previous</a> |</li>
+        <li><a href="index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

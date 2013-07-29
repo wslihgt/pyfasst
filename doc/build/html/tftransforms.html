@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Time-Frequency Transforms &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="index.html" />
+    <link rel="next" title="demix" href="demix.html" />
+    <link rel="prev" title="audioModel" href="audiomodel.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demix.html" title="demix"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="audiomodel.html" title="audioModel"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pyfasst.tftransforms.tft">
+<span id="time-frequency-transforms"></span><h1>Time-Frequency Transforms<a class="headerlink" href="#module-pyfasst.tftransforms.tft" title="Permalink to this headline">¶</a></h1>
+<p>Time-Frequency Transforms</p>
+<p>TODO: turn this into something more self-contained (like defining a super class
+for all the possible time-freq transforms)</p>
+<span class="target" id="module-pyfasst.tftransforms.stft"></span><dl class="function">
+<dt>
+<tt class="descname">filter_conv_stft(data, W, analysisWindow=None, synthWindow=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), hopsize=256.0, nfft=2048.0, fs=44100.0, verbose=0)</tt></dt>
+<dd><p>Sequentially compute Fourier transfo, filter and overlap-add</p>
+<p>INPUTS</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>W</dt>
+<dd>M x F x N (or M x F) filter for the data, which should be single channel</dd>
+<dt>data</dt>
+<dd>T (number of samples, number of channels)</dd>
+</dl>
+<p>...</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">filter_stft(data, W, analysisWindow=None, synthWindow=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), hopsize=256.0, nfft=2048.0, fs=44100.0)</tt></dt>
+<dd><p>Sequentially compute Fourier transfo, filter and overlap-add</p>
+<p>W is the M x M x F x N filter for the data, which should be T x M
+data T x M (number of samples, number of channels)</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">istft(X, window=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), analysisWindow=None, hopsize=256.0, nfft=2048.0)</tt></dt>
+<dd><p>data = istft(X,window=sinebell(2048),hopsize=1024.0,nfft=2048.0,fs=44100)</p>
+<p>Computes an inverse of the short time Fourier transform (STFT),
+here, the overlap-add procedure is implemented.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><dl class="first last docutils">
+<dt>X                     :</dt>
+<dd>STFT of the signal, to be &#8220;inverted&#8221;</dd>
+<dt>window=sinebell(2048) :</dt>
+<dd>synthesis window
+(should be the &#8220;complementary&#8221; window
+for the analysis window)</dd>
+<dt>hopsize=1024.0        :</dt>
+<dd>hopsize for the analysis</dd>
+<dt>nfft=2048.0           :</dt>
+<dd>number of points for the Fourier computation
+(the user has to provide an even number)</dd>
+</dl>
+</dd>
+<dt>Outputs:</dt>
+<dd><dl class="first last docutils">
+<dt>data                  :</dt>
+<dd>time series corresponding to the given STFT
+the first half-window is removed, complying
+with the STFT computation given in the
+function stft</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">stft(data, window=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), hopsize=256.0, nfft=2048.0, fs=44100.0)</tt></dt>
+<dd><dl class="docutils">
+<dt>X, F, N = stft(data,window=sinebell(2048),hopsize=1024.0,</dt>
+<dd>nfft=2048.0,fs=44100)</dd>
+</dl>
+<p>Computes the short time Fourier transform (STFT) of data.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><p class="first">data                  : one-dimensional time-series to be analyzed
+window=sinebell(2048) : analysis window
+hopsize=1024.0        : hopsize for the analysis
+nfft=2048.0           : number of points for the Fourier computation</p>
+<blockquote>
+<div>(the user has to provide an even number)</div></blockquote>
+<p class="last">fs=44100.0            : sampling rate of the signal</p>
+</dd>
+<dt>Outputs:</dt>
+<dd><p class="first">X                     : STFT of data
+F                     : values of frequencies at each Fourier bins
+N                     : central time at the middle of each analysis</p>
+<blockquote class="last">
+<div>window</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-pyfasst.tftransforms.minqt"></span><p>Constant-Q transform after the work by C. Scholkhuber and A. Klapuri
+2010 [SK2010]</p>
+<p>Adaptation of the Constant Q transform as presented in
+.. [SK2010] Schoerkhuber, C. and Klapuri, A., &#8220;Constant-Q transform toolbox for music processing,&#8221;
+submitted to the 7th Sound and Music Computing Conference, Barcelona, Spain.</p>
+<p>Comments beginning with &#8216;%&#8217; and &#8216;%%&#8217; are retained from the original Matlab
+code.</p>
+<p>Python/Numpy/Scipy by
+Jean-Louis Durrieu, EPFL, 2012 - 2013</p>
+<dl class="class">
+<dt id="pyfasst.tftransforms.minqt.CQTKernel">
+<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">CQTKernel</tt><big>(</big><em>fmax</em>, <em>bins</em>, <em>fs</em>, <em>q=1</em>, <em>atomHopFactor=0.25</em>, <em>thresh=0.0005</em>, <em>winFunc=&lt;function sqrt_blackmanharris at 0x102b33758&gt;</em>, <em>perfRast=0</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tftransforms/minqt.html#CQTKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>The CQT Kernel contains everything that can be
+precomputed for Constant-Q transforms. This
+relies on [SK2010], and therefore computes a Kernel
+for a single octave. It is then efficiently used to
+compute the decomposition on the different octaves by
+downsampling the signal.</p>
+<p>Parameters:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>fmax</dt>
+<dd>The maximum desired central frequency</dd>
+<dt>bins</dt>
+<dd>The number of bins per octave</dd>
+<dt>fs</dt>
+<dd>Sampling rate of the audio files</dd>
+<dt>q</dt>
+<dd>parameter that controls the quality</dd>
+<dt>atomHopFactor</dt>
+<dd>hopsize rate (0.25 is a hopsize of 25% the size of the windows)
+between successive analysis windows</dd>
+<dt>thresh</dt>
+<dd>threshold value for sparsifying the kernel
+(Note: in this implementation, we do not use the sparsity, more
+efficiency could be achieved by considering it)</dd>
+<dt>winFunc (python function that outputs an array)</dt>
+<dd>the analysis window function</dd>
+<dt>perfRast</dt>
+<dd>whether computing rasterized version or not
+(if so, the decompositions at all scales will have the same
+number of frames, otherwise, each lower analysis octave will have
+half as many frames as the direct upper analysis octave.)</dd>
+</dl>
+</div></blockquote>
+<p>Attributes:</p>
+<blockquote>
+<div>sparKernel
+weight
+atomHOP
+FFTLen
+fftOLP
+fftHOP
+bins
+winNr
+Nk_max
+Q 
+fmin
+fmax
+frequencies
+perfRast
+first_center
+fs 
+winFunc
+thresh
+q</div></blockquote>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="audiomodel.html"
+                        title="previous chapter">audioModel</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="demix.html"
+                        title="next chapter">demix</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tftransforms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demix.html" title="demix"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="audiomodel.html" title="audioModel"
+             >previous</a> |</li>
+        <li><a href="index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

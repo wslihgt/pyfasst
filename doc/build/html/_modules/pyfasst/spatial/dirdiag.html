@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyfasst.spatial.dirdiag &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyfasst.spatial.dirdiag</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;dirdiag.py</span>
+
+<span class="sd">Draw directivity diagrams</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span> <span class="k">as</span> <span class="n">ax3d</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">inv</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">audioModel</span> <span class="k">as</span> <span class="n">am</span>
+<span class="kn">from</span> <span class="nn">..tools</span> <span class="kn">import</span> <span class="n">signalTools</span> <span class="k">as</span> <span class="n">st</span>
+
+<span class="n">sound_celerity</span> <span class="o">=</span> <span class="mf">300.</span> <span class="c"># m/s</span>
+
+<div class="viewcode-block" id="db"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.dirdiag.db">[docs]</a><span class="k">def</span> <span class="nf">db</span><span class="p">(</span><span class="n">energy</span><span class="p">):</span> 
+    <span class="sd">&#39;&#39;&#39;computes the decibell of the input value, considered as energy</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ident"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.dirdiag.ident">[docs]</a><span class="k">def</span> <span class="nf">ident</span><span class="p">(</span><span class="n">energy</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;ident : identity function, return the inputs unchanged</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">energy</span>
+</div>
+<div class="viewcode-block" id="make_MVDR_filter_target"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.dirdiag.make_MVDR_filter_target">[docs]</a><span class="k">def</span> <span class="nf">make_MVDR_filter_target</span><span class="p">(</span><span class="n">steering_vec_target</span><span class="p">,</span> <span class="n">steering_vec_interf</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;make MVDR spatial filter from estimated steering vectors</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># get the sizes:</span>
+    <span class="n">n_target</span><span class="p">,</span> <span class="n">n_freqs</span><span class="p">,</span> <span class="n">n_chans</span> <span class="o">=</span> <span class="n">steering_vec_target</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">n_interf</span><span class="p">,</span> <span class="n">n_freq2</span><span class="p">,</span> <span class="n">n_chan2</span> <span class="o">=</span> <span class="n">steering_vec_interf</span><span class="o">.</span><span class="n">shape</span>
+    
+    <span class="k">if</span> <span class="n">n_freqs</span><span class="o">!=</span><span class="n">n_freq2</span> <span class="ow">or</span> <span class="n">n_chans</span><span class="o">!=</span><span class="n">n_chan2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Not the right dim for the steering_vectors&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">n_chans</span><span class="o">!=</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;Program only for stereo filters.&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">n_target</span><span class="o">!=</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;For now, only for rank-1 spatial target source.&quot;</span><span class="p">)</span>
+    
+    <span class="n">RaaDiag0</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">steering_vec_interf</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">RaaDiag1</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">steering_vec_interf</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">RaaOff</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">steering_vec_interf</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">steering_vec_interf</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]),</span>
+                 <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">invRaa_00</span><span class="p">,</span> <span class="n">invRaa_01</span><span class="p">,</span> <span class="n">invRaa_11</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">invHermMat2D</span><span class="p">(</span>
+        <span class="n">RaaDiag0</span><span class="p">,</span> <span class="n">RaaOff</span><span class="p">,</span> <span class="n">RaaDiag1</span><span class="p">)</span>
+    
+    <span class="n">w_filter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_chans</span><span class="p">,</span> <span class="n">n_freqs</span><span class="p">],</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+    <span class="n">w_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">invRaa_00</span> <span class="o">*</span> <span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
+        <span class="n">invRaa_01</span> <span class="o">*</span> <span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">w_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">invRaa_01</span><span class="p">)</span> <span class="o">*</span> <span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
+        <span class="n">invRaa_11</span> <span class="o">*</span> <span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">w_filter</span> <span class="o">/=</span> <span class="p">(</span>
+        <span class="n">w_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+        <span class="n">w_filter</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">steering_vec_target</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="p">)</span>
+    <span class="n">w_filter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">w_filter</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">w_filter</span>
+</div>
+<div class="viewcode-block" id="directivity_filter_diagram_ULA"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.dirdiag.directivity_filter_diagram_ULA">[docs]</a><span class="k">def</span> <span class="nf">directivity_filter_diagram_ULA</span><span class="p">(</span><span class="n">n_sensors</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dist_inter_sensor</span><span class="o">=.</span><span class="mi">15</span><span class="p">,</span>
+                                   <span class="n">w_filter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">theta_filter</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">freqs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">thetas</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                   <span class="n">nfreqs</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">nthetas</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                                   <span class="n">samplerate</span><span class="o">=</span><span class="mf">8000.</span><span class="p">,</span> <span class="n">doplot</span><span class="o">=</span><span class="s">&#39;2d&#39;</span><span class="p">,</span>
+                                   <span class="n">fig</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">subplot_number</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span>
+                                   <span class="n">dyn_func</span><span class="o">=</span><span class="n">db</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Computes and displays the directivity diagram associated to</span>
+<span class="sd">    the provided filter ``w_filter`` (optionally parameterized by the</span>
+<span class="sd">    targetted direction ``theta_filter``).</span>
+<span class="sd">    </span>
+<span class="sd">    the diagram can be interpreted as the amplitude of the filter for</span>
+<span class="sd">    a source at frequency ``f``, located at an angle ``theta`` from</span>
+<span class="sd">    the the ULA array axis.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c"># setting the frequency range</span>
+    <span class="k">if</span> <span class="n">freqs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nfreqs</span><span class="p">)</span> <span class="o">*</span> <span class="n">samplerate</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">nfreqs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nfreqs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span>
+        
+    <span class="c"># setting the theta range</span>
+    <span class="k">if</span> <span class="n">thetas</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">nthetas</span><span class="p">,</span> <span class="n">nthetas</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">nthetas</span><span class="p">)</span>
+    
+    <span class="n">nthetas</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span>
+    
+    <span class="c"># initializing the filter as a steering vector in direction of theta:</span>
+    <span class="k">if</span> <span class="n">w_filter</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">w_filter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">am</span><span class="o">.</span><span class="n">gen_steer_vec_far_src_uniform_linear_array</span><span class="p">(</span>
+            <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
+            <span class="n">nchannels</span><span class="o">=</span><span class="n">n_sensors</span><span class="p">,</span>
+            <span class="n">theta</span><span class="o">=</span><span class="n">theta_filter</span><span class="p">,</span>
+            <span class="n">distanceInterMic</span><span class="o">=</span><span class="n">dist_inter_sensor</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_sensors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c"># check that the length is correct</span>
+        <span class="k">if</span> <span class="n">w_filter</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_sensors</span><span class="p">,</span> <span class="n">nfreqs</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s">&quot;w_filter.shape&quot;</span><span class="p">,</span> <span class="n">w_filter</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">print</span> <span class="s">&quot;expected shape&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">n_sensors</span><span class="p">,</span> <span class="n">nfreqs</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;w_filter does not have the correct shape.&quot;</span><span class="p">)</span>
+        
+    <span class="c"># computing the matrix of diagram:</span>
+    <span class="n">diagram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">nthetas</span><span class="p">,</span> <span class="n">nfreqs</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">n_theta</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">thetas</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">am</span><span class="o">.</span><span class="n">gen_steer_vec_far_src_uniform_linear_array</span><span class="p">(</span>
+            <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
+            <span class="n">nchannels</span><span class="o">=</span><span class="n">n_sensors</span><span class="p">,</span>
+            <span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span>
+            <span class="n">distanceInterMic</span><span class="o">=</span><span class="n">dist_inter_sensor</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_sensors</span><span class="p">)</span>
+        <span class="n">diagram</span><span class="p">[</span><span class="n">n_theta</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">w_filter</span><span class="o">*</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+        
+    <span class="c"># displayin</span>
+    <span class="k">if</span> <span class="n">doplot</span> <span class="o">==</span> <span class="s">&#39;3d&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">ax3d</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nfreqs</span><span class="p">)),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nthetas</span><span class="p">),</span> <span class="n">freqs</span><span class="p">),</span>
+                        <span class="n">dyn_func</span><span class="p">(</span><span class="n">diagram</span><span class="p">),</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+                        <span class="n">rstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cstride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">gray</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">doplot</span> <span class="o">==</span> <span class="s">&#39;2d&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="o">*</span><span class="n">subplot_number</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dyn_func</span><span class="p">(</span><span class="n">diagram</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;frequencies&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;$</span><span class="se">\\</span><span class="s">theta$ (in $\pi$)&#39;</span><span class="p">)</span>
+        <span class="c"># for now, this only works for freqs linear, from 0 to fs/2:</span>
+        <span class="n">nlabs</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">xlabs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nlabs</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span><span class="o">*</span> <span class="p">(</span><span class="n">nlabs</span> <span class="o">+</span> <span class="mf">2.</span><span class="p">))</span> <span class="o">*</span> <span class="n">samplerate</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
+        <span class="n">xpos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nlabs</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nlabs</span> <span class="o">+</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">*</span> <span class="n">nfreqs</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">xpos</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;</span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">lab</span> <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">xlabs</span><span class="p">])</span>
+        <span class="n">ypos</span><span class="p">,</span> <span class="n">ylab</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">()</span>
+        <span class="n">ypos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">ypos</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ylab</span> <span class="o">=</span> <span class="n">thetas</span><span class="p">[</span><span class="n">ypos</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">ylab</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;</span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">lab</span> <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">ylab</span><span class="p">]</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">ypos</span><span class="p">,</span> <span class="n">ylab</span><span class="p">)</span>
+        
+    <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        
+    <span class="k">return</span> <span class="n">thetas</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">diagram</span>
+</div>
+<div class="viewcode-block" id="producePicDiagramAgainstDistNSensors"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.dirdiag.producePicDiagramAgainstDistNSensors">[docs]</a><span class="k">def</span> <span class="nf">producePicDiagramAgainstDistNSensors</span><span class="p">(</span><span class="n">w_filter</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                         <span class="n">theta_filter</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">4.</span><span class="p">,</span>
+                                         <span class="n">sensors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                         <span class="n">samplerate</span><span class="o">=</span><span class="mf">8000.</span><span class="p">,</span>
+                                         <span class="n">doplot</span><span class="o">=</span><span class="s">&#39;2d&#39;</span><span class="p">,</span> <span class="n">dyn_func</span><span class="o">=</span><span class="n">db</span><span class="p">,</span>
+                                         <span class="n">thetas</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nthetas</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;generate a drawing that shows the directivity diagrams for</span>
+<span class="sd">    several values of distance between sensors and number of sensors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">sensors</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">sensors</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dists</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+        
+    <span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">nd</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dists</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ns</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sensors</span><span class="p">):</span>
+            <span class="n">truc</span> <span class="o">=</span> <span class="n">directivity_filter_diagram_ULA</span><span class="p">(</span>
+                <span class="n">w_filter</span><span class="o">=</span><span class="n">w_filter</span><span class="p">,</span>
+                <span class="n">theta_filter</span><span class="o">=</span><span class="n">theta_filter</span><span class="p">,</span>
+                <span class="n">n_sensors</span><span class="o">=</span><span class="n">s</span><span class="p">,</span>
+                <span class="n">samplerate</span><span class="o">=</span><span class="n">samplerate</span><span class="p">,</span>
+                <span class="n">nthetas</span><span class="o">=</span><span class="n">nthetas</span><span class="p">,</span> <span class="n">thetas</span><span class="o">=</span><span class="n">thetas</span><span class="p">,</span>
+                <span class="n">dist_inter_sensor</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+                <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span><span class="n">doplot</span><span class="o">=</span><span class="n">doplot</span><span class="p">,</span>
+                <span class="n">subplot_number</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dists</span><span class="p">),</span>
+                                <span class="nb">len</span><span class="p">(</span><span class="n">sensors</span><span class="p">),</span>
+                                <span class="mi">1</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">sensors</span><span class="p">)</span><span class="o">*</span><span class="n">nd</span><span class="o">+</span><span class="n">ns</span><span class="p">),</span>
+                <span class="n">dyn_func</span><span class="o">=</span><span class="n">dyn_func</span><span class="p">)</span>
+                               <span class="c">#int(&#39;%d%d%d&#39; %(len(dists),</span>
+                               <span class="c">#               len(sensors),</span>
+                               <span class="c">#               1+len(sensors)*ns+nd)))</span>
+            <span class="c"># show the zone where there is no ambiguity with the angle:</span>
+            <span class="k">if</span> <span class="n">theta_filter</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">lim1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="o">-</span><span class="n">sound_celerity</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">truc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">d</span><span class="p">))</span>
+                <span class="n">lim2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">sound_celerity</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">truc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">d</span><span class="p">))</span>
+                <span class="n">lim1</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">lim1</span> <span class="o">+=</span> <span class="mi">30</span>
+                <span class="n">lim2</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">lim2</span> <span class="o">+=</span> <span class="mi">30</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lim1</span><span class="p">,</span> <span class="s">&#39;--k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;valid $</span><span class="se">\\</span><span class="s">theta$&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lim2</span><span class="p">,</span> <span class="s">&#39;--k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;valid $</span><span class="se">\\</span><span class="s">theta$&#39;</span><span class="p">)</span>
+                <span class="c"># plt.legend()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%f</span><span class="s"> </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="p">)</span>
+        
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                        <span class="n">left</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span><span class="n">top</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.08</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">truc</span>
+</div>
+<div class="viewcode-block" id="generate_steer_vec_thetas"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.dirdiag.generate_steer_vec_thetas">[docs]</a><span class="k">def</span> <span class="nf">generate_steer_vec_thetas</span><span class="p">(</span><span class="n">n_sensors</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dist_inter_sensors</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+                              <span class="n">freqs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_freqs</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+                              <span class="n">thetas</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_thetas</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                              <span class="n">samplerate</span><span class="o">=</span><span class="mf">8000.</span><span class="p">,</span> <span class="n">computeRaa</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                              <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Generates a collection of steering vectors with the provided array and</span>
+<span class="sd">    signal parameters.</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">freqs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_freqs</span><span class="p">)</span> <span class="o">*</span> <span class="n">samplerate</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">n_freqs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_freqs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span>
+        
+    <span class="c"># setting the theta range</span>
+    <span class="k">if</span> <span class="n">thetas</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">n_thetas</span><span class="p">,</span> <span class="n">n_thetas</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">n_thetas</span><span class="p">)</span>
+    
+    <span class="n">n_thetas</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span>
+    
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_freqs</span><span class="p">,</span> <span class="n">n_sensors</span><span class="p">,</span> <span class="n">n_thetas</span><span class="p">],</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ntheta</span><span class="p">,</span> <span class="n">theta</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">thetas</span><span class="p">):</span>
+        <span class="n">A</span><span class="p">[:,:,</span><span class="n">ntheta</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">am</span><span class="o">.</span><span class="n">gen_steer_vec_far_src_uniform_linear_array</span><span class="p">(</span>
+                <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
+                <span class="n">nchannels</span><span class="o">=</span><span class="n">n_sensors</span><span class="p">,</span>
+                <span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span>
+                <span class="n">distanceInterMic</span><span class="o">=</span><span class="n">dist_inter_sensors</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_sensors</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">computeRaa</span><span class="p">:</span>
+        <span class="n">Raa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_freqs</span><span class="p">,</span> <span class="n">n_sensors</span><span class="p">,</span> <span class="n">n_sensors</span><span class="p">],</span>
+                       <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">nfreq</span><span class="p">,</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freqs</span><span class="p">):</span>
+            <span class="n">Raa</span><span class="p">[</span><span class="n">nfreq</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">nfreq</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">nfreq</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">thetas</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">Raa</span>
+    <span class="k">return</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">thetas</span><span class="p">,</span> <span class="n">A</span>
+</div>
+<div class="viewcode-block" id="produceMVDRplots"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.dirdiag.produceMVDRplots">[docs]</a><span class="k">def</span> <span class="nf">produceMVDRplots</span><span class="p">(</span><span class="n">theta_filter</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">4.</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_freqs</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+                     <span class="n">thetas</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_thetas</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="mf">8000.</span><span class="p">,</span>
+                     <span class="n">n_sensors</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dist_inter_sensors</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+                     <span class="n">dists</span><span class="o">=</span><span class="p">[</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span> <span class="n">doplot</span><span class="o">=</span><span class="s">&#39;2d&#39;</span><span class="p">,</span> <span class="n">dyn_func</span><span class="o">=</span><span class="n">db</span><span class="p">,</span>
+                     <span class="n">theta_interf</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">n_theta_interf</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;MVDR gains for spatial filtering</span>
+
+<span class="sd">    **Description**:</span>
+<span class="sd">    </span>
+<span class="sd">    Minimum Variance - Distortionless Response</span>
+<span class="sd">    </span>
+<span class="sd">    **Examples**::</span>
+
+<span class="sd">     &gt;&gt;&gt;# importing the module</span>
+<span class="sd">     &gt;&gt;&gt;import pyfasst.spatial.dirdiag as dd</span>
+<span class="sd">     &gt;&gt;&gt;# the MVDR plots, for 4 sensors and 4 interferers: visible rejection</span>
+<span class="sd">     &gt;&gt;&gt;Raa, w, th, fr, thetas, diag = dd.produceMVDRplots(n_sensors=4,</span>
+<span class="sd">            n_theta_interf=2, samplerate=8000., dists=[0.15,])</span>
+<span class="sd">     &gt;&gt;&gt;# plotting also the filter responses against the angles</span>
+<span class="sd">     &gt;&gt;&gt;plt.figure();plt.plot(thetas,dd.db(diag))</span>
+<span class="sd">     &gt;&gt;&gt;plt.xlabel(&#39;$\\theta$ (rad)&#39;);plt.ylabel(&#39;Response (dB)&#39;)</span>
+<span class="sd">     &gt;&gt;&gt;# MVDR plots 2 sensors for 4 interferers: no rejection!</span>
+<span class="sd">     &gt;&gt;&gt;Raa, w, th, fr, thetas, diag = dd.produceMVDRplots(n_sensors=2,</span>
+<span class="sd">            n_theta_interf=2, samplerate=8000., dists=[0.15,])</span>
+<span class="sd">     &gt;&gt;&gt;# plotting also the filter responses against the angles</span>
+<span class="sd">     &gt;&gt;&gt;plt.figure();plt.plot(thetas,dd.db(diag))</span>
+<span class="sd">     &gt;&gt;&gt;plt.xlabel(&#39;$\\theta$ (rad)&#39;);plt.ylabel(&#39;Response (dB)&#39;)</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">freqs</span><span class="p">,</span> <span class="n">theta_interf</span><span class="p">,</span> <span class="n">steering_vectors</span><span class="p">,</span> <span class="n">Raa</span> <span class="o">=</span> <span class="n">generate_steer_vec_thetas</span><span class="p">(</span>
+        <span class="n">n_sensors</span><span class="o">=</span><span class="n">n_sensors</span><span class="p">,</span> <span class="n">dist_inter_sensors</span><span class="o">=</span><span class="n">dist_inter_sensors</span><span class="p">,</span>
+        <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span> <span class="n">n_freqs</span><span class="o">=</span><span class="n">n_freqs</span><span class="p">,</span>
+        <span class="n">thetas</span><span class="o">=</span><span class="n">theta_interf</span><span class="p">,</span> <span class="n">n_thetas</span><span class="o">=</span><span class="n">n_theta_interf</span><span class="p">,</span>
+        <span class="n">samplerate</span><span class="o">=</span><span class="n">samplerate</span><span class="p">,</span> <span class="n">computeRaa</span><span class="o">=</span><span class="bp">True</span>
+        <span class="p">)</span>
+    <span class="n">n_freqs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span>
+    
+    <span class="n">w_filter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">n_sensors</span><span class="p">,</span> <span class="n">n_freqs</span><span class="p">],</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_sensors</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">theta_filter</span><span class="o">-</span><span class="n">theta_interf</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">&lt;</span><span class="mf">1e-3</span><span class="p">):</span><span class="c">#theta_filter in thetas:</span>
+        <span class="k">print</span> <span class="s">&quot;we re here&quot;</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">theta_filter</span><span class="o">-</span><span class="n">theta_interf</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">i_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&quot;taking&quot;</span><span class="p">,</span> <span class="n">theta_interf</span><span class="p">[</span><span class="n">i_theta</span><span class="p">]</span> 
+        <span class="n">target_loc_vec</span> <span class="o">=</span> <span class="n">steering_vectors</span><span class="p">[:,:,</span><span class="n">i_theta</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">target_loc_vec</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">am</span><span class="o">.</span><span class="n">gen_steer_vec_far_src_uniform_linear_array</span><span class="p">(</span>
+                <span class="n">freqs</span><span class="o">=</span><span class="n">freqs</span><span class="p">,</span>
+                <span class="n">nchannels</span><span class="o">=</span><span class="n">n_sensors</span><span class="p">,</span>
+                <span class="n">theta</span><span class="o">=</span><span class="n">theta_filter</span><span class="p">,</span>
+                <span class="n">distanceInterMic</span><span class="o">=</span><span class="n">dist_inter_sensors</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_sensors</span><span class="p">)</span>
+
+    <span class="c"># adding the target in Raa:</span>
+    <span class="k">for</span> <span class="n">nf</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freqs</span><span class="p">):</span>
+        <span class="n">Raa</span><span class="p">[</span><span class="n">nf</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">target_loc_vec</span><span class="p">[:,</span> <span class="n">nf</span><span class="p">],</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">target_loc_vec</span><span class="p">[:,</span> <span class="n">nf</span><span class="p">]))</span>
+    
+    <span class="k">for</span> <span class="n">nf</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freqs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">nf</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c"># avoiding freq 0, because Raa non-invertible</span>
+            <span class="n">w_filter</span><span class="p">[:,</span> <span class="n">nf</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inv</span><span class="p">(</span><span class="n">Raa</span><span class="p">[</span><span class="n">nf</span><span class="p">]),</span> <span class="n">target_loc_vec</span><span class="p">[:,</span> <span class="n">nf</span><span class="p">])</span>
+            <span class="n">w_filter</span><span class="p">[:,</span> <span class="n">nf</span><span class="p">]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w_filter</span><span class="p">[:,</span> <span class="n">nf</span><span class="p">],</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">target_loc_vec</span><span class="p">[:,</span> <span class="n">nf</span><span class="p">]))</span>
+    <span class="n">w_filter</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">w_filter</span><span class="p">)</span>
+    
+    <span class="n">thetas</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">diagram</span> <span class="o">=</span> <span class="n">producePicDiagramAgainstDistNSensors</span><span class="p">(</span>
+        <span class="n">w_filter</span><span class="o">=</span><span class="n">w_filter</span><span class="p">,</span> <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">n_sensors</span><span class="p">,],</span> <span class="n">dists</span><span class="o">=</span><span class="n">dists</span><span class="p">,</span>
+        <span class="n">thetas</span><span class="o">=</span><span class="n">thetas</span><span class="p">,</span> <span class="n">nthetas</span><span class="o">=</span><span class="n">n_thetas</span><span class="p">,</span>
+        <span class="n">samplerate</span><span class="o">=</span><span class="n">samplerate</span><span class="p">,</span> <span class="n">doplot</span><span class="o">=</span><span class="n">doplot</span><span class="p">,</span> <span class="n">dyn_func</span><span class="o">=</span><span class="n">dyn_func</span><span class="p">)</span>
+    
+    <span class="c"># displaying the lines for each of the interferers:</span>
+    <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">get_axes</span><span class="p">():</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_freqs</span><span class="p">),</span>
+                          <span class="n">theta_interf</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">n_thetas</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">n_thetas</span><span class="p">,</span>
+                 <span class="s">&#39;--k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;interferers&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_freqs</span><span class="p">)</span> <span class="o">*</span> <span class="n">theta_filter</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">n_thetas</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">n_thetas</span><span class="p">,</span>
+                <span class="s">&#39;--w&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;target&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">Raa</span><span class="p">,</span> <span class="n">w_filter</span><span class="p">,</span> <span class="n">theta_interf</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">thetas</span><span class="p">,</span> <span class="n">diagram</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

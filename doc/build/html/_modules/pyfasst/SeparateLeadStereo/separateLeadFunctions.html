@@ -1,0 +1,1159 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyfasst.SeparateLeadStereo.separateLeadFunctions &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyfasst.SeparateLeadStereo.separateLeadFunctions</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+
+<span class="sd">&quot;&quot;&quot;separateLeadFunctions.py</span>
+
+<span class="sd">Description</span>
+<span class="sd">===========</span>
+
+<span class="sd">This module provides functions that are useful for the SeparateLeadStereo</span>
+<span class="sd">modules, essentially time-frequency transformations (and inverse), as well</span>
+<span class="sd">as generation of dictionary matrices.</span>
+
+<span class="sd">Usage</span>
+<span class="sd">=====</span>
+
+<span class="sd">See each function docstring for more information.</span>
+
+<span class="sd">TODO: expend this?</span>
+
+<span class="sd">License</span>
+<span class="sd">=======</span>
+
+<span class="sd">Copyright (C) 2011-2013 Jean-Louis Durrieu</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c"># copyright (C) 2011 Jean-Louis Durrieu</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="c"># temporary: in last move, put the right module as in a package once</span>
+<span class="c"># debugged</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">..tftransforms</span> <span class="kn">import</span> <span class="n">minqt</span>
+<span class="kn">from</span> <span class="nn">..tftransforms</span> <span class="kn">import</span> <span class="n">nsgt</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">audioObject</span> <span class="k">as</span> <span class="n">ao</span> <span class="c"># for all these fancy transforms</span>
+
+<span class="kn">from</span> <span class="nn">..tools.utils</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c">### SOME USEFUL, INSTRUMENTAL, FUNCTIONS</span>
+
+<span class="c">##def nextpow2(i):</span>
+<span class="c">##    &quot;&quot;&quot;</span>
+<span class="c">##    Find 2^n that is equal to or greater than.</span>
+    
+<span class="c">##    code taken from the website:</span>
+<span class="c">##    http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html</span>
+<span class="c">##    &quot;&quot;&quot;</span>
+<span class="c">##    n = 2</span>
+<span class="c">##    while n &lt; i:</span>
+<span class="c">##        n = n * 2</span>
+<span class="c">##    return n</span>
+
+<div class="viewcode-block" id="ISDistortion"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.ISDistortion">[docs]</a><span class="k">def</span> <span class="nf">ISDistortion</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    value = ISDistortion(X, Y)</span>
+<span class="sd">  </span>
+<span class="sd">    Returns the value of the Itakura-Saito (IS) divergence between</span>
+<span class="sd">    matrix X and matrix Y. X and Y should be two NumPy arrays with</span>
+<span class="sd">    same dimension.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">((</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span> <span class="o">/</span> <span class="n">Y</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span> <span class="o">/</span> <span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c"># DEFINING SOME WINDOW FUNCTIONS</span>
+
+<span class="c">##def sinebell(lengthWindow):</span>
+<span class="c">##    &quot;&quot;&quot;</span>
+<span class="c">##    window = sinebell(lengthWindow)</span>
+    
+<span class="c">##    Computes a &quot;sinebell&quot; window function of length L=lengthWindow</span>
+    
+<span class="c">##    The formula is:</span>
+<span class="c">##        window(t) = sin(pi * t / L), t = 0..L-1</span>
+<span class="c">##    &quot;&quot;&quot;</span>
+<span class="c">##    window = np.sin((np.pi * (np.arange(lengthWindow))) \</span>
+<span class="c">##                    / (1.0 * lengthWindow))</span>
+<span class="c">##    return window</span>
+
+<span class="c">##def hann(args):</span>
+<span class="c">##    &quot;&quot;&quot;</span>
+<span class="c">##    window = hann(args)</span>
+    
+<span class="c">##    Computes a Hann window, with NumPy&#39;s function hanning(args).</span>
+<span class="c">##    &quot;&quot;&quot;</span>
+<span class="c">##    return np.hanning(args)</span>
+
+<span class="c"># FUNCTIONS FOR TIME-FREQUENCY REPRESENTATION</span>
+</div>
+<span class="k">def</span> <span class="nf">stft</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">sinebell</span><span class="p">(</span><span class="mi">2048</span><span class="p">),</span> <span class="n">hopsize</span><span class="o">=</span><span class="mf">256.0</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="mf">2048.0</span><span class="p">,</span> \
+         <span class="n">fs</span><span class="o">=</span><span class="mf">44100.0</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    X, F, N = stft(data, window=sinebell(2048), hopsize=1024.0,</span>
+<span class="sd">                   nfft=2048.0, fs=44100)</span>
+<span class="sd">                   </span>
+<span class="sd">    Computes the short time Fourier transform (STFT) of data.</span>
+<span class="sd">    </span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        data                  : one-dimensional time-series to be</span>
+<span class="sd">                                analyzed</span>
+<span class="sd">        window=sinebell(2048) : analysis window</span>
+<span class="sd">        hopsize=1024.0        : hopsize for the analysis</span>
+<span class="sd">        nfft=2048.0           : number of points for the Fourier</span>
+<span class="sd">                                computation (the user has to provide an</span>
+<span class="sd">                                even number)</span>
+<span class="sd">        fs=44100.0            : sampling rate of the signal</span>
+<span class="sd">        </span>
+<span class="sd">    Outputs:</span>
+<span class="sd">        X                     : STFT of data</span>
+<span class="sd">        F                     : values of frequencies at each Fourier</span>
+<span class="sd">                                bins</span>
+<span class="sd">        N                     : central time at the middle of each</span>
+<span class="sd">                                analysis window</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c"># window defines the size of the analysis windows</span>
+    <span class="n">lengthWindow</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">size</span>
+    
+    <span class="c"># !!! adding zeros to the beginning of data, such that the first</span>
+    <span class="c"># window is centered on the first sample of data</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">lengthWindow</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">),</span>
+                           <span class="n">data</span><span class="p">,</span>
+                           <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">lengthWindow</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)))</span>
+    <span class="n">lengthData</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span>
+    
+    <span class="c"># adding one window for the last frame (same reason as for the</span>
+    <span class="c"># first frame)</span>
+    <span class="n">numberFrames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">lengthData</span> <span class="o">-</span> <span class="n">lengthWindow</span><span class="p">)</span> <span class="o">/</span> <span class="n">hopsize</span> \
+                           <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>  
+    <span class="n">newLengthData</span> <span class="o">=</span> <span class="p">(</span><span class="n">numberFrames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">hopsize</span> <span class="o">+</span> <span class="n">lengthWindow</span>
+    <span class="c"># zero-padding data such that it holds an exact number of frames</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">newLengthData</span> <span class="o">-</span> <span class="n">lengthData</span><span class="p">])))</span>
+    
+    <span class="c"># the output STFT has nfft/2+1 rows. Note that nfft has to be an</span>
+    <span class="c"># even number (and a power of 2 for the fft to be fast)</span>
+    <span class="n">numberFrequencies</span> <span class="o">=</span> <span class="n">nfft</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="mi">1</span>
+    
+    <span class="k">if</span> <span class="n">stop</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">numberFrames</span>
+    
+    <span class="n">STFT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">numberFrequencies</span><span class="p">,</span>
+                     <span class="n">stop</span><span class="o">-</span><span class="n">start</span><span class="p">],</span><span class="c">#numberFrames],</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span><span class="c">#numberFrames):</span>
+        <span class="n">beginFrame</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">hopsize</span>
+        <span class="n">endFrame</span> <span class="o">=</span> <span class="n">beginFrame</span> <span class="o">+</span> <span class="n">lengthWindow</span>
+        <span class="n">frameToProcess</span> <span class="o">=</span> <span class="n">window</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="n">beginFrame</span><span class="p">:</span><span class="n">endFrame</span><span class="p">]</span>
+        <span class="n">STFT</span><span class="p">[:,</span><span class="n">n</span><span class="o">-</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">frameToProcess</span><span class="p">,</span> <span class="n">nfft</span><span class="p">);</span>
+    
+    <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberFrequencies</span><span class="p">)</span> <span class="o">/</span> <span class="n">nfft</span> <span class="o">*</span> <span class="n">fs</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberFrames</span><span class="p">)</span> <span class="o">*</span> <span class="n">hopsize</span> <span class="o">/</span> <span class="n">fs</span>
+    
+    <span class="k">return</span> <span class="n">STFT</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">N</span>
+
+<span class="k">def</span> <span class="nf">istft</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">analysisWindow</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+          <span class="n">window</span><span class="o">=</span><span class="n">sinebell</span><span class="p">(</span><span class="mi">2048</span><span class="p">),</span> <span class="n">hopsize</span><span class="o">=</span><span class="mf">256.0</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="mf">2048.0</span><span class="p">,</span>
+          <span class="n">originalDataLen</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    data = istft(X, window=sinebell(2048), hopsize=256.0, nfft=2048.0)</span>
+<span class="sd">    </span>
+<span class="sd">    Computes an inverse of the short time Fourier transform (STFT),</span>
+<span class="sd">    here, the overlap-add procedure is implemented.</span>
+<span class="sd">    </span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        X                     : STFT of the signal, to be &quot;inverted&quot;</span>
+<span class="sd">        window=sinebell(2048) : synthesis window</span>
+<span class="sd">                                (should be the &quot;complementary&quot; window</span>
+<span class="sd">                                for the analysis window)</span>
+<span class="sd">        hopsize=1024.0        : hopsize for the analysis</span>
+<span class="sd">        nfft=2048.0           : number of points for the Fourier</span>
+<span class="sd">                                computation</span>
+<span class="sd">                                (the user has to provide an even number)</span>
+<span class="sd">                                </span>
+<span class="sd">    Outputs:</span>
+<span class="sd">        data                  : time series corresponding to the given</span>
+<span class="sd">                                STFT the first half-window is removed,</span>
+<span class="sd">                                complying with the STFT computation</span>
+<span class="sd">                                given in the function &#39;stft&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">analysisWindow</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">window</span>
+        
+    <span class="n">lengthWindow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">numberFrequencies</span><span class="p">,</span> <span class="n">numberFrames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">lengthData</span> <span class="o">=</span> <span class="n">hopsize</span> <span class="o">*</span> <span class="p">(</span><span class="n">numberFrames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">lengthWindow</span>
+    
+    <span class="n">normalisationSeq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">lengthData</span><span class="p">)</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">lengthData</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberFrames</span><span class="p">):</span>
+        <span class="n">beginFrame</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">hopsize</span>
+        <span class="n">endFrame</span> <span class="o">=</span> <span class="n">beginFrame</span> <span class="o">+</span> <span class="n">lengthWindow</span>
+        <span class="n">frameTMP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span><span class="n">n</span><span class="p">],</span> <span class="n">nfft</span><span class="p">)</span>
+        <span class="n">frameTMP</span> <span class="o">=</span> <span class="n">frameTMP</span><span class="p">[:</span><span class="n">lengthWindow</span><span class="p">]</span>
+        <span class="n">normalisationSeq</span><span class="p">[</span><span class="n">beginFrame</span><span class="p">:</span><span class="n">endFrame</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">normalisationSeq</span><span class="p">[</span><span class="n">beginFrame</span><span class="p">:</span><span class="n">endFrame</span><span class="p">]</span> <span class="o">+</span>
+            <span class="n">window</span> <span class="o">*</span> <span class="n">analysisWindow</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">beginFrame</span><span class="p">:</span><span class="n">endFrame</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">beginFrame</span><span class="p">:</span><span class="n">endFrame</span><span class="p">]</span> \
+                                    <span class="o">+</span> <span class="n">window</span> <span class="o">*</span> <span class="n">frameTMP</span>
+    
+    <span class="c"># remove the extra bit before data that was - supposedly - added</span>
+    <span class="c"># in the stft computation:</span>
+    <span class="n">normalisationSeq</span><span class="p">[:</span><span class="n">lengthWindow</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">normalisationSeq</span><span class="p">[</span><span class="n">lengthWindow</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">lengthWindow</span><span class="p">])</span>
+    <span class="n">normalisationSeq</span><span class="p">[</span><span class="o">-</span><span class="n">lengthWindow</span><span class="p">:]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">normalisationSeq</span><span class="p">[(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">lengthWindow</span><span class="p">):(</span><span class="o">-</span><span class="n">lengthWindow</span><span class="p">)])</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">normalisationSeq</span><span class="o">==</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;there were some 0s in there...&quot;</span><span class="c"># DEBUG</span>
+    <span class="n">normalisationSeq</span><span class="p">[</span><span class="n">normalisationSeq</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">data</span> <span class="o">/=</span> <span class="n">normalisationSeq</span>
+    
+    <span class="c"># this could be used somewhere, but better do the cutting outside:</span>
+    <span class="c">##if start == 0 and False:</span>
+    <span class="c">##    data = data[(lengthWindow / 2.0):]</span>
+    
+    <span class="k">if</span> <span class="n">originalDataLen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">originalDataLen</span><span class="p">]</span> 
+    <span class="k">return</span> <span class="n">data</span>
+
+<span class="c"># DEFINING THE FUNCTIONS TO CREATE THE &#39;BASIS&#39; WF0</span>
+
+<div class="viewcode-block" id="generate_WF0_chirped"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_chirped">[docs]</a><span class="k">def</span> <span class="nf">generate_WF0_chirped</span><span class="p">(</span><span class="n">minF0</span><span class="p">,</span> <span class="n">maxF0</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> <span class="n">Nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">stepNotes</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> \
+                         <span class="n">lengthWindow</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">Ot</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">perF0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> \
+                         <span class="n">depthChirpInSemiTone</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">loadWF0</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                         <span class="n">analysisWindow</span><span class="o">=</span><span class="s">&#39;hanning&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    F0Table, WF0 = generate_WF0_chirped(minF0, maxF0, Fs, Nfft=2048,</span>
+<span class="sd">                                        stepNotes=4, lengthWindow=2048,</span>
+<span class="sd">                                        Ot=0.5, perF0=2,</span>
+<span class="sd">                                        depthChirpInSemiTone=0.5)</span>
+<span class="sd">                                        </span>
+<span class="sd">    Generates a &#39;basis&#39; matrix for the source part WF0, using the</span>
+<span class="sd">    source model KLGLOTT88, with the following I/O arguments:</span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        minF0                the minimum value for the fundamental</span>
+<span class="sd">                             frequency (F0)</span>
+<span class="sd">        maxF0                the maximum value for F0</span>
+<span class="sd">        Fs                   the desired sampling rate</span>
+<span class="sd">        Nfft                 the number of bins to compute the Fourier</span>
+<span class="sd">                             transform</span>
+<span class="sd">        stepNotes            the number of F0 per semitone</span>
+<span class="sd">        lengthWindow         the size of the window for the Fourier</span>
+<span class="sd">                             transform</span>
+<span class="sd">        Ot                   the glottal opening coefficient for</span>
+<span class="sd">                             KLGLOTT88</span>
+<span class="sd">        perF0                the number of chirps considered per F0</span>
+<span class="sd">                             value</span>
+<span class="sd">        depthChirpInSemiTone the maximum value, in semitone, of the</span>
+<span class="sd">                             allowed chirp per F0</span>
+<span class="sd">                             </span>
+<span class="sd">    Outputs:</span>
+<span class="sd">        F0Table the vector containing the values of the fundamental</span>
+<span class="sd">                frequencies in Hertz (Hz) corresponding to the</span>
+<span class="sd">                harmonic combs in WF0, i.e. the columns of WF0</span>
+<span class="sd">        WF0     the basis matrix, where each column is a harmonic comb</span>
+<span class="sd">                generated by KLGLOTT88 (with a sinusoidal model, then</span>
+<span class="sd">                transformed into the spectral domain)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># generating a filename to keep data:</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;wf0_&#39;</span><span class="p">,</span>
+                             <span class="s">&#39;_minF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">minF0</span><span class="p">),</span>
+                             <span class="s">&#39;_maxF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">maxF0</span><span class="p">),</span>
+                             <span class="s">&#39;_Fs-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Fs</span><span class="p">),</span>
+                             <span class="s">&#39;_Nfft-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Nfft</span><span class="p">),</span>
+                             <span class="s">&#39;_stepNotes-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">stepNotes</span><span class="p">),</span>
+                             <span class="s">&#39;_Ot-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Ot</span><span class="p">),</span>
+                             <span class="s">&#39;_perF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">perF0</span><span class="p">),</span>
+                             <span class="s">&#39;_depthChirp-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">depthChirpInSemiTone</span><span class="p">),</span>
+                             <span class="s">&#39;_analysisWindow-&#39;</span><span class="p">,</span> <span class="n">analysisWindow</span><span class="p">,</span>
+                             <span class="s">&#39;.npz&#39;</span><span class="p">])</span>
+    
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="n">loadWF0</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Reading WF0 and F0Table from stored arrays.&quot;</span>
+        <span class="n">struc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;F0Table&#39;</span><span class="p">],</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;WF0&#39;</span><span class="p">]</span>
+    
+    <span class="k">print</span> <span class="s">&quot;First time WF0 computed with these parameters, please wait...&quot;</span>
+    <span class="c"># converting to double arrays:</span>
+    <span class="n">minF0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">minF0</span><span class="p">)</span>
+    <span class="n">maxF0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">maxF0</span><span class="p">)</span>
+    <span class="n">Fs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Fs</span><span class="p">)</span>
+    <span class="n">stepNotes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">stepNotes</span><span class="p">)</span>
+    
+    <span class="c"># computing the F0 table:</span>
+    <span class="n">numberOfF0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="n">stepNotes</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">maxF0</span> <span class="o">/</span> <span class="n">minF0</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">F0Table</span><span class="o">=</span><span class="n">minF0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfF0</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span> \
+                           <span class="o">/</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="n">stepNotes</span><span class="p">)))</span>
+    
+    <span class="n">numberElementsInWF0</span> <span class="o">=</span> <span class="n">numberOfF0</span> <span class="o">*</span> <span class="n">perF0</span>
+    
+    <span class="c"># computing the desired WF0 matrix</span>
+    <span class="n">WF0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">numberElementsInWF0</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">fundamentalFrequency</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfF0</span><span class="p">):</span>
+        <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpec</span> <span class="o">=</span> \
+              <span class="n">generate_ODGD_spec</span><span class="p">(</span><span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">],</span> <span class="n">Fs</span><span class="p">,</span> \
+                                 <span class="n">Ot</span><span class="o">=</span><span class="n">Ot</span><span class="p">,</span> <span class="n">lengthOdgd</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span> \
+                                 <span class="n">Nfft</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>\
+                                 <span class="n">analysisWindowType</span><span class="o">=</span><span class="n">analysisWindow</span><span class="p">)</span>
+        <span class="c"># 20100924 trying with hann window</span>
+        <span class="n">WF0</span><span class="p">[:,</span><span class="n">fundamentalFrequency</span> <span class="o">*</span> <span class="n">perF0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">odgdSpec</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="k">for</span> <span class="n">chirpNumber</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">perF0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">F2</span> <span class="o">=</span> <span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">]</span> \
+                 <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">((</span><span class="n">chirpNumber</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">depthChirpInSemiTone</span> \
+                          <span class="o">/</span> <span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">perF0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))))</span>
+            <span class="c"># F0 is the mean of F1 and F2.</span>
+            <span class="n">F1</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">]</span> <span class="o">-</span> <span class="n">F2</span> 
+            <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpec</span> <span class="o">=</span> \
+                  <span class="n">generate_ODGD_spec_chirped</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> \
+                                             <span class="n">Ot</span><span class="o">=</span><span class="n">Ot</span><span class="p">,</span> \
+                                             <span class="n">lengthOdgd</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span> \
+                                             <span class="n">Nfft</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">WF0</span><span class="p">[:,</span><span class="n">fundamentalFrequency</span> <span class="o">*</span> <span class="n">perF0</span> <span class="o">+</span> <span class="n">chirpNumber</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                                       <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">odgdSpec</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+    
+    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">F0Table</span><span class="o">=</span><span class="n">F0Table</span><span class="p">,</span> <span class="n">WF0</span><span class="o">=</span><span class="n">WF0</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">F0Table</span><span class="p">,</span> <span class="n">WF0</span>
+</div>
+<div class="viewcode-block" id="generate_WF0_MinQT_chirped"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_MinQT_chirped">[docs]</a><span class="k">def</span> <span class="nf">generate_WF0_MinQT_chirped</span><span class="p">(</span><span class="n">minF0</span><span class="p">,</span> <span class="n">maxF0</span><span class="p">,</span> <span class="n">cqtfmax</span><span class="p">,</span> <span class="n">cqtfmin</span><span class="p">,</span> <span class="n">cqtbins</span><span class="o">=</span><span class="mf">48.</span><span class="p">,</span>
+                               <span class="n">Fs</span><span class="o">=</span><span class="mf">44100.</span><span class="p">,</span> <span class="n">Nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">stepNotes</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> \
+                               <span class="n">lengthWindow</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">Ot</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">perF0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> \
+                               <span class="n">depthChirpInSemiTone</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">loadWF0</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                               <span class="n">analysisWindow</span><span class="o">=</span><span class="s">&#39;hanning&#39;</span><span class="p">,</span>
+                               <span class="n">atomHopFactor</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+                               <span class="n">cqtWinFunc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,</span>
+<span class="sd">                                        stepNotes=4, lengthWindow=2048,</span>
+<span class="sd">                                        Ot=0.5, perF0=2,</span>
+<span class="sd">                                        depthChirpInSemiTone=0.5)</span>
+<span class="sd">                                        </span>
+<span class="sd">    Generates a &#39;basis&#39; matrix for the source part WF0, using the</span>
+<span class="sd">    source model KLGLOTT88, with the following I/O arguments:</span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        minF0                the minimum value for the fundamental</span>
+<span class="sd">                             frequency (F0)</span>
+<span class="sd">        maxF0                the maximum value for F0</span>
+<span class="sd">        cqtfmax...</span>
+<span class="sd">        Fs                   the desired sampling rate</span>
+<span class="sd">        Nfft                 the number of bins to compute the Fourier</span>
+<span class="sd">                             transform</span>
+<span class="sd">        stepNotes            the number of F0 per semitone</span>
+<span class="sd">        lengthWindow         the size of the window for the Fourier</span>
+<span class="sd">                             transform</span>
+<span class="sd">        Ot                   the glottal opening coefficient for</span>
+<span class="sd">                             KLGLOTT88</span>
+<span class="sd">        perF0                the number of chirps considered per F0</span>
+<span class="sd">                             value</span>
+<span class="sd">        depthChirpInSemiTone the maximum value, in semitone, of the</span>
+<span class="sd">                             allowed chirp per F0</span>
+<span class="sd">                             </span>
+<span class="sd">    Outputs:</span>
+<span class="sd">        F0Table the vector containing the values of the fundamental</span>
+<span class="sd">                frequencies in Hertz (Hz) corresponding to the</span>
+<span class="sd">                harmonic combs in WF0, i.e. the columns of WF0</span>
+<span class="sd">        WF0     the basis matrix, where each column is a harmonic comb</span>
+<span class="sd">                generated by KLGLOTT88 (with a sinusoidal model, then</span>
+<span class="sd">                transformed into the spectral domain)</span>
+<span class="sd">    </span>
+<span class="sd">    20120828T2358 Horribly slow...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c"># note: cqtfmax should actually be computed so as to guarantee</span>
+    <span class="c">#       the desired Nfft: - not necessary for minqt anymore</span>
+    <span class="c"># cqtfmax = np.ceil(3. * Fs / (Nfft * (2**(1./cqtbins) - 1)))</span>
+    <span class="c"># strange things happening to FFTLen...</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="k">print</span> <span class="s">&quot;cqtfmax set to&quot;</span><span class="p">,</span> <span class="n">cqtfmax</span>
+    <span class="n">mqt</span> <span class="o">=</span> <span class="n">minqt</span><span class="o">.</span><span class="n">MinQTransfo</span><span class="p">(</span><span class="n">linFTLen</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span>
+                            <span class="n">fmin</span><span class="o">=</span><span class="n">cqtfmin</span><span class="p">,</span>
+                            <span class="n">fmax</span><span class="o">=</span><span class="n">cqtfmax</span><span class="p">,</span>
+                            <span class="n">bins</span><span class="o">=</span><span class="n">cqtbins</span><span class="p">,</span>
+                            <span class="n">fs</span><span class="o">=</span><span class="n">Fs</span><span class="p">,</span>
+                            <span class="n">perfRast</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                            <span class="n">winFunc</span><span class="o">=</span><span class="n">cqtWinFunc</span><span class="p">,</span>
+                            <span class="n">atomHopFactor</span><span class="o">=</span><span class="n">atomHopFactor</span><span class="p">)</span>
+    <span class="c"># getting the right window length:</span>
+    <span class="c">#    in particular, it should not be less than the biggest window</span>
+    <span class="c">#    used by the minqt transform:</span>
+    <span class="n">lengthWindow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">lengthWindow</span><span class="p">,</span>
+                              <span class="n">mqt</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">FFTLen</span> <span class="o">*</span>
+                              <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">mqt</span><span class="o">.</span><span class="n">octaveNr</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span> 
+    
+    <span class="c"># generating a filename to keep data:</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;wf0minqt_&#39;</span><span class="p">,</span>
+                             <span class="s">&#39;_minF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">minF0</span><span class="p">),</span>
+                             <span class="s">&#39;_maxF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">maxF0</span><span class="p">),</span>
+                             <span class="s">&#39;_cqtfmax-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cqtfmax</span><span class="p">),</span>
+                             <span class="s">&#39;_cqtfmin-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cqtfmin</span><span class="p">),</span>
+                             <span class="s">&#39;_cqtbins-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cqtbins</span><span class="p">),</span>
+                             <span class="s">&#39;_Fs-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Fs</span><span class="p">)),</span>
+                             <span class="s">&#39;_Nfft-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Nfft</span><span class="p">)),</span>
+                             <span class="s">&#39;_atomHopFactor-</span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">atomHopFactor</span><span class="p">),</span>
+                             <span class="s">&#39;_stepNotes-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">stepNotes</span><span class="p">)),</span>
+                             <span class="s">&#39;_Ot-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Ot</span><span class="p">),</span>
+                             <span class="s">&#39;_perF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">perF0</span><span class="p">)),</span>
+                             <span class="s">&#39;_depthChirp-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">depthChirpInSemiTone</span><span class="p">),</span>
+                             <span class="s">&#39;_analysisWindow-&#39;</span><span class="p">,</span> <span class="n">analysisWindow</span><span class="p">,</span>
+                             <span class="s">&#39;_lengthWindow-</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lengthWindow</span><span class="p">)),</span>
+                             <span class="s">&#39;_cqtwinfunc-&#39;</span><span class="p">,</span> <span class="n">cqtWinFunc</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                             <span class="s">&#39;.npz&#39;</span><span class="p">])</span>
+    
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="n">loadWF0</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Reading WF0 and F0Table from stored arrays in </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">filename</span>
+        <span class="n">struc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;F0Table&#39;</span><span class="p">],</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;WF0&#39;</span><span class="p">],</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;mqt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;No such file: </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">filename</span>
+        
+    
+    <span class="k">print</span> <span class="s">&quot;First time WF0 computed with these parameters, please wait...&quot;</span>
+    <span class="c"># converting to double arrays:</span>
+    <span class="n">minF0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">minF0</span><span class="p">)</span>
+    <span class="n">maxF0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">maxF0</span><span class="p">)</span>
+    <span class="n">Fs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Fs</span><span class="p">)</span>
+    <span class="n">stepNotes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">stepNotes</span><span class="p">)</span>
+    
+    <span class="c"># computing the F0 table:</span>
+    <span class="n">numberOfF0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="n">stepNotes</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">maxF0</span> <span class="o">/</span> <span class="n">minF0</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">F0Table</span><span class="o">=</span><span class="n">minF0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfF0</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span> \
+                           <span class="o">/</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="n">stepNotes</span><span class="p">)))</span>
+    
+    <span class="n">numberElementsInWF0</span> <span class="o">=</span> <span class="n">numberOfF0</span> <span class="o">*</span> <span class="n">perF0</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">mqt</span><span class="o">.</span><span class="n">cqtkernel</span>
+        <span class="k">print</span> <span class="n">mqt</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">fmax</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">linFTLen</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">octaveNr</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">linBins</span>
+    
+    <span class="c"># computing the desired WF0 matrix</span>
+    <span class="n">WF0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">mqt</span><span class="o">.</span><span class="n">freqbins</span><span class="p">,</span>
+                    <span class="n">numberElementsInWF0</span><span class="p">],</span>
+                   <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    
+    <span class="c"># slow... try faster : concatenate the odgd, compute one big cqt of that</span>
+    <span class="c"># result and extract only the desired frames:</span>
+    <span class="c">##odgds = np.array([])</span>
+    <span class="k">for</span> <span class="n">fundamentalFrequency</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfF0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;    f0 n.&quot;</span><span class="p">,</span> <span class="n">fundamentalFrequency</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="n">numberOfF0</span>
+        <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpec</span> <span class="o">=</span> \
+              <span class="n">generate_ODGD_spec</span><span class="p">(</span><span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">],</span> <span class="n">Fs</span><span class="p">,</span> \
+                                 <span class="n">Ot</span><span class="o">=</span><span class="n">Ot</span><span class="p">,</span> <span class="n">lengthOdgd</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span> \
+                                 <span class="n">Nfft</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>\
+                                 <span class="n">analysisWindowType</span><span class="o">=</span><span class="n">analysisWindow</span><span class="p">)</span>
+        <span class="n">mqt</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">odgd</span><span class="p">)</span>
+        <span class="c"># getting the cqt transform at the middle of the window:</span>
+        <span class="n">midindex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">mqt</span><span class="o">.</span><span class="n">datalen_init</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">-</span> <span class="n">mqt</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="k">print</span> <span class="n">midindex</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">transfo</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">WF0</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">WF0</span><span class="p">[:,</span><span class="n">fundamentalFrequency</span> <span class="o">*</span> <span class="n">perF0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mqt</span><span class="o">.</span><span class="n">transfo</span><span class="p">[:,</span><span class="n">midindex</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c"># del mqt.transfo # maybe needed but might slow down even more...</span>
+        <span class="c">##odgds = np.concatenate([odgds, odgd/(np.abs(odgd).max()*1.2)])</span>
+        <span class="c">##print odgds.shape, odgd.shape</span>
+        <span class="k">for</span> <span class="n">chirpNumber</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">perF0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">F2</span> <span class="o">=</span> <span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">]</span> \
+                 <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">((</span><span class="n">chirpNumber</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">depthChirpInSemiTone</span> \
+                          <span class="o">/</span> <span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">perF0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))))</span>
+            <span class="c"># F0 is the mean of F1 and F2.</span>
+            <span class="n">F1</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">]</span> <span class="o">-</span> <span class="n">F2</span> 
+            <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpec</span> <span class="o">=</span> \
+                  <span class="n">generate_ODGD_spec_chirped</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> \
+                                             <span class="n">Ot</span><span class="o">=</span><span class="n">Ot</span><span class="p">,</span> \
+                                             <span class="n">lengthOdgd</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span> \
+                                             <span class="n">Nfft</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">mqt</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">odgd</span><span class="p">)</span>
+            <span class="c"># getting the cqt transform at the middle of the window:</span>
+            <span class="n">midindex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">mqt</span><span class="o">.</span><span class="n">datalen_init</span> <span class="o">/</span> <span class="mf">2.</span>
+                                  <span class="o">-</span> <span class="n">mqt</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">WF0</span><span class="p">[:,</span><span class="n">fundamentalFrequency</span> <span class="o">*</span> <span class="n">perF0</span> <span class="o">+</span> <span class="n">chirpNumber</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                                       <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mqt</span><span class="o">.</span><span class="n">transfo</span><span class="p">[:,</span><span class="n">midindex</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="c"># del mqt.transfo # idem</span>
+            <span class="c">##odgds = np.concatenate([odgds, odgd/(np.abs(odgd).max()*1.2)])</span>
+    <span class="c">##hybt.computeHybrid(data=odgds)</span>
+    <span class="c">##midindex = np.argmin((lengthWindow / 2. + lengthWindow</span>
+    <span class="c">##                      * np.vstack(np.arange(numberElementsInWF0))</span>
+    <span class="c">##                      - hybt.time_stamps)**2, axis=1)</span>
+    <span class="c">##if verbose&gt;1: print midindex</span>
+    <span class="c">##WF0 = np.abs(hybt.spCQT[:,midindex]) ** 2</span>
+    
+    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">F0Table</span><span class="o">=</span><span class="n">F0Table</span><span class="p">,</span> <span class="n">WF0</span><span class="o">=</span><span class="n">WF0</span><span class="p">,</span> <span class="n">mqt</span><span class="o">=</span><span class="n">mqt</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">F0Table</span><span class="p">,</span> <span class="n">WF0</span><span class="p">,</span> <span class="n">mqt</span> <span class="c">#, hybt, odgds</span>
+</div>
+<div class="viewcode-block" id="generate_WF0_NSGTMinQT_chirped"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_NSGTMinQT_chirped">[docs]</a><span class="k">def</span> <span class="nf">generate_WF0_NSGTMinQT_chirped</span><span class="p">(</span><span class="n">minF0</span><span class="p">,</span> <span class="n">maxF0</span><span class="p">,</span> <span class="n">cqtfmax</span><span class="p">,</span> <span class="n">cqtfmin</span><span class="p">,</span> <span class="n">cqtbins</span><span class="o">=</span><span class="mf">48.</span><span class="p">,</span>
+                                   <span class="n">Fs</span><span class="o">=</span><span class="mf">44100.</span><span class="p">,</span> <span class="n">Nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">stepNotes</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> \
+                                   <span class="n">lengthWindow</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">Ot</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">perF0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> \
+                                   <span class="n">depthChirpInSemiTone</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">loadWF0</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                   <span class="n">analysisWindow</span><span class="o">=</span><span class="s">&#39;hanning&#39;</span><span class="p">,</span>
+                                   <span class="n">atomHopFactor</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+                                   <span class="n">cqtWinFunc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,</span>
+<span class="sd">                                        stepNotes=4, lengthWindow=2048,</span>
+<span class="sd">                                        Ot=0.5, perF0=2,</span>
+<span class="sd">                                        depthChirpInSemiTone=0.5)</span>
+<span class="sd">                                        </span>
+<span class="sd">    Generates a &#39;basis&#39; matrix for the source part WF0, using the</span>
+<span class="sd">    source model KLGLOTT88, with the following I/O arguments:</span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        minF0                the minimum value for the fundamental</span>
+<span class="sd">                             frequency (F0)</span>
+<span class="sd">        maxF0                the maximum value for F0</span>
+<span class="sd">        cqtfmax...</span>
+<span class="sd">        Fs                   the desired sampling rate</span>
+<span class="sd">        Nfft                 the number of bins to compute the Fourier</span>
+<span class="sd">                             transform</span>
+<span class="sd">        stepNotes            the number of F0 per semitone</span>
+<span class="sd">        lengthWindow         the size of the window for the Fourier</span>
+<span class="sd">                             transform</span>
+<span class="sd">        Ot                   the glottal opening coefficient for</span>
+<span class="sd">                             KLGLOTT88</span>
+<span class="sd">        perF0                the number of chirps considered per F0</span>
+<span class="sd">                             value</span>
+<span class="sd">        depthChirpInSemiTone the maximum value, in semitone, of the</span>
+<span class="sd">                             allowed chirp per F0</span>
+<span class="sd">                             </span>
+<span class="sd">    Outputs:</span>
+<span class="sd">        F0Table the vector containing the values of the fundamental</span>
+<span class="sd">                frequencies in Hertz (Hz) corresponding to the</span>
+<span class="sd">                harmonic combs in WF0, i.e. the columns of WF0</span>
+<span class="sd">        WF0     the basis matrix, where each column is a harmonic comb</span>
+<span class="sd">                generated by KLGLOTT88 (with a sinusoidal model, then</span>
+<span class="sd">                transformed into the spectral domain)</span>
+<span class="sd">    </span>
+<span class="sd">    20120828T2358 Horribly slow...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># generating a filename to keep data:</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;wf0nsgtminqt_&#39;</span><span class="p">,</span>
+                             <span class="s">&#39;_minF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">minF0</span><span class="p">),</span>
+                             <span class="s">&#39;_maxF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">maxF0</span><span class="p">),</span>
+                             <span class="s">&#39;_cqtfmax-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cqtfmax</span><span class="p">),</span>
+                             <span class="s">&#39;_cqtfmin-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cqtfmin</span><span class="p">),</span>
+                             <span class="s">&#39;_cqtbins-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cqtbins</span><span class="p">),</span>
+                             <span class="s">&#39;_Fs-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Fs</span><span class="p">)),</span>
+                             <span class="s">&#39;_Nfft-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Nfft</span><span class="p">)),</span>
+                             <span class="s">&#39;_atomHopFactor-</span><span class="si">%.2f</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">atomHopFactor</span><span class="p">),</span>
+                             <span class="s">&#39;_stepNotes-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">stepNotes</span><span class="p">)),</span>
+                             <span class="s">&#39;_Ot-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Ot</span><span class="p">),</span>
+                             <span class="s">&#39;_perF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">perF0</span><span class="p">)),</span>
+                             <span class="s">&#39;_depthChirp-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">depthChirpInSemiTone</span><span class="p">),</span>
+                             <span class="s">&#39;_analysisWindow-&#39;</span><span class="p">,</span> <span class="n">analysisWindow</span><span class="p">,</span>
+                             <span class="s">&#39;_cqtwinfunc-&#39;</span><span class="p">,</span> <span class="n">cqtWinFunc</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                             <span class="s">&#39;.npz&#39;</span><span class="p">])</span>
+    
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="n">loadWF0</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Reading WF0 and F0Table from stored arrays in </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">filename</span>
+        <span class="n">struc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;F0Table&#39;</span><span class="p">],</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;WF0&#39;</span><span class="p">],</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;mqt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;No such file: </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">filename</span>
+        
+    
+    <span class="k">print</span> <span class="s">&quot;First time WF0 computed with these parameters, please wait...&quot;</span>
+    <span class="c"># converting to double arrays:</span>
+    <span class="n">minF0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">minF0</span><span class="p">)</span>
+    <span class="n">maxF0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">maxF0</span><span class="p">)</span>
+    <span class="n">Fs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Fs</span><span class="p">)</span>
+    <span class="n">stepNotes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">stepNotes</span><span class="p">)</span>
+    
+    <span class="c"># computing the F0 table:</span>
+    <span class="n">numberOfF0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="n">stepNotes</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">maxF0</span> <span class="o">/</span> <span class="n">minF0</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">F0Table</span><span class="o">=</span><span class="n">minF0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfF0</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span> \
+                           <span class="o">/</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="n">stepNotes</span><span class="p">)))</span>
+    
+    <span class="n">numberElementsInWF0</span> <span class="o">=</span> <span class="n">numberOfF0</span> <span class="o">*</span> <span class="n">perF0</span>
+    
+    <span class="c"># note: cqtfmax should actually be computed so as to guarantee</span>
+    <span class="c">#       the desired Nfft:</span>
+    <span class="c"># cqtfmax = np.ceil(3. * Fs / (Nfft * (2**(1./cqtbins) - 1)))</span>
+    <span class="c"># strange things happening to FFTLen...</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="k">print</span> <span class="s">&quot;cqtfmax set to&quot;</span><span class="p">,</span> <span class="n">cqtfmax</span>
+    
+    <span class="n">mqt</span> <span class="o">=</span> <span class="n">nsgt</span><span class="o">.</span><span class="n">nsgtMinQT</span><span class="p">(</span><span class="n">ftlen</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span>
+                         <span class="n">cqtfmin</span><span class="o">=</span><span class="n">cqtfmin</span><span class="p">,</span>
+                         <span class="n">cqtfmax</span><span class="o">=</span><span class="n">cqtfmax</span><span class="p">,</span>
+                         <span class="n">bpo</span><span class="o">=</span><span class="n">cqtbins</span><span class="p">,</span>
+                         <span class="n">fs</span><span class="o">=</span><span class="n">Fs</span><span class="p">,</span>
+                         <span class="n">datalength</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span>
+                         <span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">mqt</span><span class="o">.</span><span class="n">cqtkernel</span>
+        <span class="k">print</span> <span class="n">mqt</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">fmax</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">linFTLen</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">octaveNr</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">linBins</span>
+    
+    <span class="c"># computing the desired WF0 matrix</span>
+    <span class="n">WF0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">mqt</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">bins</span><span class="o">*</span><span class="n">mqt</span><span class="o">.</span><span class="n">octaveNr</span><span class="o">+</span>
+                    <span class="n">mqt</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linBins</span><span class="p">,</span>
+                    <span class="n">numberElementsInWF0</span><span class="p">],</span>
+                   <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    
+    <span class="c"># slow... try faster : concatenate the odgd, compute one big cqt of that</span>
+    <span class="c"># result and extract only the desired frames:</span>
+    <span class="c">##odgds = np.array([])</span>
+    <span class="k">for</span> <span class="n">fundamentalFrequency</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfF0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;    f0 n.&quot;</span><span class="p">,</span> <span class="n">fundamentalFrequency</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="n">numberOfF0</span>
+        <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpec</span> <span class="o">=</span> \
+              <span class="n">generate_ODGD_spec</span><span class="p">(</span><span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">],</span> <span class="n">Fs</span><span class="p">,</span> \
+                                 <span class="n">Ot</span><span class="o">=</span><span class="n">Ot</span><span class="p">,</span> <span class="n">lengthOdgd</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span> \
+                                 <span class="n">Nfft</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>\
+                                 <span class="n">analysisWindowType</span><span class="o">=</span><span class="n">analysisWindow</span><span class="p">)</span>
+        <span class="n">mqt</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">odgd</span><span class="p">)</span>
+        <span class="c"># getting the cqt transform at the middle of the window:</span>
+        <span class="n">midindex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">mqt</span><span class="o">.</span><span class="n">datalen_init</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">-</span> <span class="n">mqt</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="k">print</span> <span class="n">midindex</span><span class="p">,</span> <span class="n">mqt</span><span class="o">.</span><span class="n">transfo</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">WF0</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">WF0</span><span class="p">[:,</span><span class="n">fundamentalFrequency</span> <span class="o">*</span> <span class="n">perF0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mqt</span><span class="o">.</span><span class="n">transfo</span><span class="p">[:,</span><span class="n">midindex</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c"># del mqt.transfo # maybe needed but might slow down even more...</span>
+        <span class="c">##odgds = np.concatenate([odgds, odgd/(np.abs(odgd).max()*1.2)])</span>
+        <span class="c">##print odgds.shape, odgd.shape</span>
+        <span class="k">for</span> <span class="n">chirpNumber</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">perF0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">F2</span> <span class="o">=</span> <span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">]</span> \
+                 <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">((</span><span class="n">chirpNumber</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">depthChirpInSemiTone</span> \
+                          <span class="o">/</span> <span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">perF0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))))</span>
+            <span class="c"># F0 is the mean of F1 and F2.</span>
+            <span class="n">F1</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">]</span> <span class="o">-</span> <span class="n">F2</span> 
+            <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpec</span> <span class="o">=</span> \
+                  <span class="n">generate_ODGD_spec_chirped</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> \
+                                             <span class="n">Ot</span><span class="o">=</span><span class="n">Ot</span><span class="p">,</span> \
+                                             <span class="n">lengthOdgd</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span> \
+                                             <span class="n">Nfft</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">mqt</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">odgd</span><span class="p">)</span>
+            <span class="c"># getting the cqt transform at the middle of the window:</span>
+            <span class="n">midindex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">mqt</span><span class="o">.</span><span class="n">datalen_init</span> <span class="o">/</span> <span class="mf">2.</span>
+                                  <span class="o">-</span> <span class="n">mqt</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">WF0</span><span class="p">[:,</span><span class="n">fundamentalFrequency</span> <span class="o">*</span> <span class="n">perF0</span> <span class="o">+</span> <span class="n">chirpNumber</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                                       <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mqt</span><span class="o">.</span><span class="n">transfo</span><span class="p">[:,</span><span class="n">midindex</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="c"># del mqt.transfo # idem</span>
+            <span class="c">##odgds = np.concatenate([odgds, odgd/(np.abs(odgd).max()*1.2)])</span>
+    <span class="c">##hybt.computeHybrid(data=odgds)</span>
+    <span class="c">##midindex = np.argmin((lengthWindow / 2. + lengthWindow</span>
+    <span class="c">##                      * np.vstack(np.arange(numberElementsInWF0))</span>
+    <span class="c">##                      - hybt.time_stamps)**2, axis=1)</span>
+    <span class="c">##if verbose&gt;1: print midindex</span>
+    <span class="c">##WF0 = np.abs(hybt.spCQT[:,midindex]) ** 2</span>
+    
+    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">F0Table</span><span class="o">=</span><span class="n">F0Table</span><span class="p">,</span> <span class="n">WF0</span><span class="o">=</span><span class="n">WF0</span><span class="p">,</span> <span class="n">mqt</span><span class="o">=</span><span class="n">mqt</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">F0Table</span><span class="p">,</span> <span class="n">WF0</span><span class="p">,</span> <span class="n">mqt</span> <span class="c">#, hybt, odgds</span>
+</div>
+<div class="viewcode-block" id="generate_WF0_TR_chirped"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_WF0_TR_chirped">[docs]</a><span class="k">def</span> <span class="nf">generate_WF0_TR_chirped</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">minF0</span><span class="p">,</span> <span class="n">maxF0</span><span class="p">,</span> <span class="n">stepNotes</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                            <span class="n">Ot</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">perF0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                            <span class="n">depthChirpInSemiTone</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">loadWF0</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                            <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a &#39;basis&#39; matrix for the source part WF0, using the</span>
+<span class="sd">    source model KLGLOTT88, with the following I/O arguments:</span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        minF0                the minimum value for the fundamental</span>
+<span class="sd">                             frequency (F0)</span>
+<span class="sd">        maxF0                the maximum value for F0</span>
+<span class="sd">        cqtfmax...</span>
+<span class="sd">        Fs                   the desired sampling rate</span>
+<span class="sd">        Nfft                 the number of bins to compute the Fourier</span>
+<span class="sd">                             transform</span>
+<span class="sd">        stepNotes            the number of F0 per semitone</span>
+<span class="sd">        lengthWindow         the size of the window for the Fourier</span>
+<span class="sd">                             transform</span>
+<span class="sd">        Ot                   the glottal opening coefficient for</span>
+<span class="sd">                             KLGLOTT88</span>
+<span class="sd">        perF0                the number of chirps considered per F0</span>
+<span class="sd">                             value</span>
+<span class="sd">        depthChirpInSemiTone the maximum value, in semitone, of the</span>
+<span class="sd">                             allowed chirp per F0</span>
+<span class="sd">                             </span>
+<span class="sd">    Outputs:</span>
+<span class="sd">        F0Table the vector containing the values of the fundamental</span>
+<span class="sd">                frequencies in Hertz (Hz) corresponding to the</span>
+<span class="sd">                harmonic combs in WF0, i.e. the columns of WF0</span>
+<span class="sd">        WF0     the basis matrix, where each column is a harmonic comb</span>
+<span class="sd">                generated by KLGLOTT88 (with a sinusoidal model, then</span>
+<span class="sd">                transformed into the spectral domain)</span>
+<span class="sd">    </span>
+<span class="sd">    20120828T2358 Horribly slow...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="s">&#39;octaveNr&#39;</span><span class="p">):</span>
+        <span class="n">lengthWindow</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">FFTLen</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">octaveNr</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span> 
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="s">&#39;cqtkernel&#39;</span><span class="p">):</span>
+        <span class="n">lengthWindow</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linFTLen</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">lengthWindow</span> <span class="o">=</span> <span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">freqbins</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span> <span class="c"># just to be sure</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s">&#39;There is something utterly wrong with the desired &#39;</span><span class="o">+</span>
+                <span class="s">&#39;TF representation...</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">+</span>
+                <span class="s">&#39;No freqbins attribute!&#39;</span><span class="p">)</span>
+    
+    <span class="c"># generating a filename to keep data:</span>
+    <span class="n">attributesToKeep</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;fmin&#39;</span><span class="p">,</span> <span class="s">&#39;fmax&#39;</span><span class="p">,</span> <span class="s">&#39;bins&#39;</span><span class="p">,</span> <span class="s">&#39;fs&#39;</span><span class="p">,</span> <span class="s">&#39;winFunc&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;freqbins&#39;</span><span class="p">,</span> <span class="s">&#39;atomHopFactor&#39;</span><span class="p">)</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">+</span><span class="s">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">attributesToKeep</span> <span class="ow">and</span>
+                                            <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">else</span>
+                   <span class="n">v</span><span class="o">.</span><span class="n">__name__</span> <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">attributesToKeep</span> <span class="ow">and</span>
+                                  <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">==</span><span class="nb">type</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">))</span> <span class="k">else</span>
+                   <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">transform</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+    <span class="n">significantAttributes</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># keeping only non-empty attributes</span>
+    <span class="k">for</span> <span class="n">att</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">att</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">significantAttributes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">att</span><span class="p">)</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="n">significantAttributes</span>
+    <span class="n">attributes</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">attributes</span> <span class="c">#DEBUG</span>
+    
+    <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;wf0_</span><span class="si">%s</span><span class="s">_&#39;</span> <span class="o">%</span><span class="n">transform</span><span class="o">.</span><span class="n">transformname</span><span class="p">,</span>
+                             <span class="s">&#39;_minF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">minF0</span><span class="p">),</span>
+                             <span class="s">&#39;_maxF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">maxF0</span><span class="p">),</span>
+                             <span class="s">&#39;_stepNotes-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">stepNotes</span><span class="p">)),</span>
+                             <span class="s">&#39;_Ot-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Ot</span><span class="p">),</span>
+                             <span class="s">&#39;_perF0-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">perF0</span><span class="p">)),</span>
+                             <span class="s">&#39;_depthChirp-&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">depthChirpInSemiTone</span><span class="p">),</span>
+                             <span class="s">&#39;_lengthWindow-</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span><span class="n">lengthWindow</span><span class="p">,</span>
+                             <span class="s">&#39;_&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attributes</span><span class="p">),</span>
+                              <span class="s">&#39;.npz&#39;</span><span class="p">])</span>
+    <span class="c">#filename = str(&#39;&#39;).join([&#39;wf0_%s_&#39; %transform.transformname,</span>
+    <span class="c">#                         &#39;_&#39;, str(&#39;_&#39;).join(attributes),</span>
+    <span class="c">#                         &#39;.npz&#39;])</span>
+    <span class="c">##np.savez(filename, test=None) # to check size of filename on write</span>
+    
+    <span class="c"># print len(filename), filename #DEBUG</span>
+    
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">and</span> <span class="n">loadWF0</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Reading WF0 and F0Table from stored arrays in </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">filename</span>
+        <span class="n">struc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;F0Table&#39;</span><span class="p">],</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;WF0&#39;</span><span class="p">],</span> <span class="n">struc</span><span class="p">[</span><span class="s">&#39;tft&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;No such file: </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">filename</span>
+        
+    
+    <span class="k">print</span> <span class="s">&quot;First time WF0 computed with these parameters, please wait...&quot;</span>
+    <span class="c"># converting to double arrays:</span>
+    <span class="n">minF0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">minF0</span><span class="p">)</span>
+    <span class="n">maxF0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">maxF0</span><span class="p">)</span>
+    <span class="n">Fs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>
+    <span class="n">stepNotes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">stepNotes</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="s">&#39;cqtkernel&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">cqtkernel</span><span class="p">,</span> <span class="s">&#39;linFTLen&#39;</span><span class="p">):</span>
+            <span class="n">Nfft</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linFTLen</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Nfft</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">FFTLen</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Nfft</span> <span class="o">=</span> <span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">freqbins</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">winFunc</span><span class="p">(</span><span class="n">lengthWindow</span><span class="p">)</span>
+    
+    <span class="c"># computing the F0 table:</span>
+    <span class="n">numberOfF0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="n">stepNotes</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">maxF0</span> <span class="o">/</span> <span class="n">minF0</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">F0Table</span> <span class="o">=</span> <span class="n">minF0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfF0</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span> \
+                           <span class="o">/</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="n">stepNotes</span><span class="p">)))</span>
+    
+    <span class="n">numberElementsInWF0</span> <span class="o">=</span> <span class="n">numberOfF0</span> <span class="o">*</span> <span class="n">perF0</span>
+    
+    <span class="c"># computing the desired WF0 matrix</span>
+    <span class="n">WF0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">transform</span><span class="o">.</span><span class="n">freqbins</span><span class="p">,</span>
+                    <span class="n">numberElementsInWF0</span><span class="p">],</span>
+                   <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    
+    <span class="c"># slow... try faster : concatenate the odgd, compute one big cqt of that</span>
+    <span class="c"># result and extract only the desired frames:</span>
+    <span class="c">##odgds = np.array([])</span>
+    <span class="k">for</span> <span class="n">fundamentalFrequency</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfF0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;    f0 n.&quot;</span><span class="p">,</span> <span class="n">fundamentalFrequency</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="n">numberOfF0</span>
+        <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpec</span> <span class="o">=</span> \
+              <span class="n">generate_ODGD_spec</span><span class="p">(</span><span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">],</span> <span class="n">Fs</span><span class="p">,</span> \
+                                 <span class="n">Ot</span><span class="o">=</span><span class="n">Ot</span><span class="p">,</span> <span class="n">lengthOdgd</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span> \
+                                 <span class="n">Nfft</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>\
+                                 <span class="n">analysisWindowType</span><span class="o">=</span><span class="n">analysisWindow</span><span class="p">)</span>
+        <span class="n">transform</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">odgd</span><span class="p">)</span>
+        <span class="c"># getting the cqt transform at the middle of the window:</span>
+        <span class="n">midindex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">transform</span><span class="o">.</span><span class="n">datalen_init</span> <span class="o">/</span> <span class="mf">2.</span>
+                              <span class="o">-</span> <span class="n">transform</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="k">print</span> <span class="n">midindex</span><span class="p">,</span> <span class="n">transform</span><span class="o">.</span><span class="n">transfo</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">WF0</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">WF0</span><span class="p">[:,</span><span class="n">fundamentalFrequency</span> <span class="o">*</span> <span class="n">perF0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">transfo</span><span class="p">[:,</span><span class="n">midindex</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c"># del mqt.transfo # maybe needed but might slow down even more...</span>
+        <span class="c">##odgds = np.concatenate([odgds, odgd/(np.abs(odgd).max()*1.2)])</span>
+        <span class="c">##print odgds.shape, odgd.shape</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="o">&gt;</span><span class="mi">10</span><span class="p">:</span> <span class="c"># super debug</span>
+            <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">transfo</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+            <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;ayayay&#39;</span><span class="p">)</span>
+            
+        <span class="k">for</span> <span class="n">chirpNumber</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">perF0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">F2</span> <span class="o">=</span> <span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">]</span> \
+                 <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">((</span><span class="n">chirpNumber</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">depthChirpInSemiTone</span> \
+                          <span class="o">/</span> <span class="p">(</span><span class="mf">12.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">perF0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))))</span>
+            <span class="c"># F0 is the mean of F1 and F2.</span>
+            <span class="n">F1</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">F0Table</span><span class="p">[</span><span class="n">fundamentalFrequency</span><span class="p">]</span> <span class="o">-</span> <span class="n">F2</span> 
+            <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpec</span> <span class="o">=</span> \
+                  <span class="n">generate_ODGD_spec_chirped</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> \
+                                             <span class="n">Ot</span><span class="o">=</span><span class="n">Ot</span><span class="p">,</span> \
+                                             <span class="n">lengthOdgd</span><span class="o">=</span><span class="n">lengthWindow</span><span class="p">,</span> \
+                                             <span class="n">Nfft</span><span class="o">=</span><span class="n">Nfft</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">odgd</span><span class="p">)</span>
+            <span class="c"># getting the cqt transform at the middle of the window:</span>
+            <span class="n">midindex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">transform</span><span class="o">.</span><span class="n">datalen_init</span> <span class="o">/</span> <span class="mf">2.</span>
+                                  <span class="o">-</span> <span class="n">transform</span><span class="o">.</span><span class="n">time_stamps</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">WF0</span><span class="p">[:,</span><span class="n">fundamentalFrequency</span> <span class="o">*</span> <span class="n">perF0</span> <span class="o">+</span> <span class="n">chirpNumber</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> \
+                                       <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">transfo</span><span class="p">[:,</span><span class="n">midindex</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="c"># del mqt.transfo # idem</span>
+            <span class="c">##odgds = np.concatenate([odgds, odgd/(np.abs(odgd).max()*1.2)])</span>
+    <span class="c">##hybt.computeHybrid(data=odgds)</span>
+    <span class="c">##midindex = np.argmin((lengthWindow / 2. + lengthWindow</span>
+    <span class="c">##                      * np.vstack(np.arange(numberElementsInWF0))</span>
+    <span class="c">##                      - hybt.time_stamps)**2, axis=1)</span>
+    <span class="c">##if verbose&gt;1: print midindex</span>
+    <span class="c">##WF0 = np.abs(hybt.spCQT[:,midindex]) ** 2</span>
+    
+    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">F0Table</span><span class="o">=</span><span class="n">F0Table</span><span class="p">,</span> <span class="n">WF0</span><span class="o">=</span><span class="n">WF0</span><span class="p">,</span> <span class="n">tft</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">F0Table</span><span class="p">,</span> <span class="n">WF0</span><span class="p">,</span> <span class="n">transform</span> <span class="c">#, hybt, odgds</span>
+</div>
+<div class="viewcode-block" id="generate_ODGD_spec"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec">[docs]</a><span class="k">def</span> <span class="nf">generate_ODGD_spec</span><span class="p">(</span><span class="n">F0</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> <span class="n">lengthOdgd</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">Nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">Ot</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> \
+                       <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">analysisWindowType</span><span class="o">=</span><span class="s">&#39;sinebell&#39;</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    generateODGDspec:</span>
+<span class="sd">    </span>
+<span class="sd">    generates a waveform ODGD and the corresponding spectrum,</span>
+<span class="sd">    using as analysis window the -optional- window given as</span>
+<span class="sd">    argument.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c"># converting input to double:</span>
+    <span class="n">F0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">F0</span><span class="p">)</span>
+    <span class="n">Fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Fs</span><span class="p">)</span>
+    <span class="n">Ot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Ot</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+    
+    <span class="c"># compute analysis window of given type:</span>
+    <span class="k">if</span> <span class="n">analysisWindowType</span><span class="o">==</span><span class="s">&#39;sinebell&#39;</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">sinebell</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">analysisWindowType</span><span class="o">==</span><span class="s">&#39;hanning&#39;</span> <span class="ow">or</span> \
+             <span class="n">analysisWindowType</span><span class="o">==</span><span class="s">&#39;hanning&#39;</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">hann</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">analysisWindowType</span><span class="o">==</span><span class="s">&#39;rectangular&#39;</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">analysisWindowType</span><span class="p">)</span><span class="o">==</span><span class="n">lengthOdgd</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">analysisWindowType</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Analysis window not understood.&quot;</span><span class="p">)</span>
+        
+    
+    <span class="c"># maximum number of partials in the spectral comb:</span>
+    <span class="n">partialMax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">Fs</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">F0</span><span class="p">)</span>
+    
+    <span class="c"># Frequency numbers of the partials:</span>
+    <span class="n">frequency_numbers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">partialMax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c"># intermediate value</span>
+    <span class="n">temp_array</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequency_numbers</span> <span class="o">*</span> <span class="n">Ot</span>
+    
+    <span class="c"># compute the amplitudes for each of the frequency peaks:</span>
+    <span class="n">amplitudes</span> <span class="o">=</span> <span class="n">F0</span> <span class="o">*</span> <span class="mi">27</span> <span class="o">/</span> <span class="mi">4</span> \
+                 <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">)</span> \
+                    <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">))</span> <span class="o">/</span> <span class="n">temp_array</span><span class="p">)</span> \
+                    <span class="o">-</span> <span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">))</span> \
+                       <span class="o">/</span> <span class="p">(</span><span class="n">temp_array</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span> \
+                       <span class="o">/</span> <span class="n">temp_array</span>
+    
+    <span class="c"># Time stamps for the time domain ODGD</span>
+    <span class="n">timeStamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span> <span class="o">/</span> <span class="n">Fs</span> <span class="o">+</span> <span class="n">t0</span> <span class="o">/</span> <span class="n">F0</span>
+    
+    <span class="c"># Time domain odgd:</span>
+    <span class="c">#print timeStamps.shape#DEBUG</span>
+    <span class="c">#print lengthOdgd#DEBUG</span>
+    <span class="n">odgd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">F0</span> <span class="o">*</span> <span class="n">frequency_numbers</span><span class="p">,</span> \
+                           <span class="n">timeStamps</span><span class="p">))</span> \
+                           <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">amplitudes</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">))</span>
+    <span class="n">odgd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">odgd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="c"># spectrum:</span>
+    <span class="n">odgdSpectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">odgd</span> <span class="o">*</span> <span class="n">analysisWindow</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="n">Nfft</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpectrum</span>
+</div>
+<div class="viewcode-block" id="generate_ODGD_spec_inharmo"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec_inharmo">[docs]</a><span class="k">def</span> <span class="nf">generate_ODGD_spec_inharmo</span><span class="p">(</span><span class="n">F0</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> <span class="n">lengthOdgd</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">Nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">Ot</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> \
+                               <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">analysisWindowType</span><span class="o">=</span><span class="s">&#39;sinebell&#39;</span><span class="p">,</span>
+                               <span class="n">inharmonicity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    generateODGDspec:</span>
+<span class="sd">    </span>
+<span class="sd">    generates a waveform ODGD and the corresponding spectrum,</span>
+<span class="sd">    using as analysis window the -optional- window given as</span>
+<span class="sd">    argument.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c"># converting input to double:</span>
+    <span class="n">F0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">F0</span><span class="p">)</span>
+    <span class="n">Fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Fs</span><span class="p">)</span>
+    <span class="n">Ot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Ot</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+    
+    <span class="c"># compute analysis window of given type:</span>
+    <span class="k">if</span> <span class="n">analysisWindowType</span><span class="o">==</span><span class="s">&#39;sinebell&#39;</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">sinebell</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">analysisWindowType</span><span class="o">==</span><span class="s">&#39;hanning&#39;</span> <span class="ow">or</span> \
+               <span class="n">analysisWindowType</span><span class="o">==</span><span class="s">&#39;hanning&#39;</span><span class="p">:</span>
+            <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">hann</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">analysisWindowType</span><span class="o">==</span><span class="s">&#39;rectangular&#39;</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Analysis window not understood.&quot;</span><span class="p">)</span>
+    
+    <span class="c"># maximum number of partials in the spectral comb:</span>
+    <span class="n">partialMax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">Fs</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">F0</span><span class="p">)</span>
+    
+    <span class="c"># Frequency numbers of the partials:</span>
+    <span class="n">frequency_numbers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">partialMax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c"># intermediate value</span>
+    <span class="n">temp_array</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequency_numbers</span> <span class="o">*</span> <span class="n">Ot</span>
+    
+    <span class="c"># compute the amplitudes for each of the frequency peaks:</span>
+    <span class="n">amplitudes</span> <span class="o">=</span> <span class="n">F0</span> <span class="o">*</span> <span class="mi">27</span> <span class="o">/</span> <span class="mi">4</span> \
+                 <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">)</span> \
+                    <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">))</span> <span class="o">/</span> <span class="n">temp_array</span><span class="p">)</span> \
+                    <span class="o">-</span> <span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">))</span> \
+                       <span class="o">/</span> <span class="p">(</span><span class="n">temp_array</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span> \
+                       <span class="o">/</span> <span class="n">temp_array</span>
+    
+    <span class="c"># Time stamps for the time domain ODGD</span>
+    <span class="n">timeStamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span> <span class="o">/</span> <span class="n">Fs</span> <span class="o">+</span> <span class="n">t0</span> <span class="o">/</span> <span class="n">F0</span>
+    
+    <span class="c"># Time domain odgd:</span>
+    <span class="n">odgd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">F0</span> <span class="o">*</span> <span class="n">frequency_numbers</span><span class="p">,</span> \
+                           <span class="n">timeStamps</span><span class="p">))</span> \
+                           <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">amplitudes</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">))</span>
+    <span class="n">odgd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">odgd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="c"># spectrum:</span>
+    <span class="n">odgdSpectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">odgd</span> <span class="o">*</span> <span class="n">analysisWindow</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="n">Nfft</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpectrum</span>
+</div>
+<div class="viewcode-block" id="generate_ODGD_spec_chirped"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.generate_ODGD_spec_chirped">[docs]</a><span class="k">def</span> <span class="nf">generate_ODGD_spec_chirped</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> <span class="n">lengthOdgd</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">Nfft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> \
+                               <span class="n">Ot</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> \
+                               <span class="n">analysisWindowType</span><span class="o">=</span><span class="s">&#39;sinebell&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    generateODGDspecChirped:</span>
+<span class="sd">    </span>
+<span class="sd">    generates a waveform ODGD and the corresponding spectrum,</span>
+<span class="sd">    using as analysis window the -optional- window given as</span>
+<span class="sd">    argument.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c"># converting input to double:</span>
+    <span class="n">F1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">F1</span><span class="p">)</span>
+    <span class="n">F2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">F2</span><span class="p">)</span>
+    <span class="n">F0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">F1</span> <span class="o">+</span> <span class="n">F2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">Fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Fs</span><span class="p">)</span>
+    <span class="n">Ot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">Ot</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
+    
+    <span class="c"># compute analysis window of given type:</span>
+    <span class="k">if</span> <span class="n">analysisWindowType</span> <span class="o">==</span> <span class="s">&#39;sinebell&#39;</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">sinebell</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">analysisWindowType</span> <span class="o">==</span> <span class="s">&#39;hanning&#39;</span> <span class="ow">or</span> \
+             <span class="n">analysisWindowType</span> <span class="o">==</span> <span class="s">&#39;hann&#39;</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">hann</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">analysisWindowType</span> <span class="o">==</span> <span class="s">&#39;rectangular&#39;</span><span class="p">:</span>
+        <span class="n">analysisWindow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Analysis window not understood.&quot;</span><span class="p">)</span>
+    
+    <span class="c"># maximum number of partials in the spectral comb:</span>
+    <span class="n">partialMax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">Fs</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">]))</span>
+    
+    <span class="c"># Frequency numbers of the partials:</span>
+    <span class="n">frequency_numbers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">partialMax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c"># intermediate value</span>
+    <span class="n">temp_array</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">frequency_numbers</span> <span class="o">*</span> <span class="n">Ot</span>
+    
+    <span class="c"># compute the amplitudes for each of the frequency peaks:</span>
+    <span class="n">amplitudes</span> <span class="o">=</span> <span class="n">F0</span> <span class="o">*</span> <span class="mi">27</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">*</span> \
+                 <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">)</span> \
+                  <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">))</span> <span class="o">/</span> <span class="n">temp_array</span><span class="p">)</span> \
+                  <span class="o">-</span> <span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_array</span><span class="p">))</span> \
+                     <span class="o">/</span> <span class="p">(</span><span class="n">temp_array</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span> \
+                  <span class="o">/</span> <span class="n">temp_array</span>
+    
+    <span class="c"># Time stamps for the time domain ODGD</span>
+    <span class="n">timeStamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">)</span> <span class="o">/</span> <span class="n">Fs</span> <span class="o">+</span> <span class="n">t0</span> <span class="o">/</span> <span class="n">F0</span>
+    
+    <span class="c"># Time domain odgd:</span>
+    <span class="n">odgd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> \
+                  <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">F1</span> <span class="o">*</span> <span class="n">frequency_numbers</span><span class="p">,</span><span class="n">timeStamps</span><span class="p">)</span> \
+                     <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">((</span><span class="n">F2</span> <span class="o">-</span> <span class="n">F1</span><span class="p">)</span> \
+                                <span class="o">*</span> <span class="n">frequency_numbers</span><span class="p">,</span><span class="n">timeStamps</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> \
+                     <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">lengthOdgd</span> <span class="o">/</span> <span class="n">Fs</span><span class="p">)))</span> \
+                     <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">amplitudes</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">lengthOdgd</span><span class="p">))</span>
+    <span class="n">odgd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">odgd</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="c"># spectrum:</span>
+    <span class="n">odgdSpectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">odgd</span> <span class="o">*</span> <span class="n">analysisWindow</span><span class="p">),</span> <span class="n">n</span><span class="o">=</span><span class="n">Nfft</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">odgd</span><span class="p">,</span> <span class="n">odgdSpectrum</span>
+</div>
+<span class="k">def</span> <span class="nf">generateHannBasis</span><span class="p">(</span><span class="n">numberFrequencyBins</span><span class="p">,</span> <span class="n">sizeOfFourier</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> \
+                      <span class="n">frequencyScale</span><span class="o">=</span><span class="s">&#39;linear&#39;</span><span class="p">,</span> <span class="n">numberOfBasis</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> \
+                      <span class="n">overlap</span><span class="o">=.</span><span class="mi">75</span><span class="p">):</span>
+    <span class="n">isScaleRecognized</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">frequencyScale</span> <span class="o">==</span> <span class="s">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="c"># number of windows generated:</span>
+        <span class="n">numberOfWindowsForUnit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">overlap</span><span class="p">))</span>
+        <span class="c"># recomputing the overlap to exactly fit the entire</span>
+        <span class="c"># number of windows:</span>
+        <span class="n">overlap</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">numberOfWindowsForUnit</span><span class="p">)</span>
+        <span class="c"># length of the sine window - that is also to say: bandwidth</span>
+        <span class="c"># of the sine window:</span>
+        <span class="n">lengthSineWindow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">numberFrequencyBins</span> \
+                                   <span class="o">/</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">overlap</span><span class="p">)</span> \
+                                      <span class="o">*</span> <span class="p">(</span><span class="n">numberOfBasis</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> \
+                                      <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">overlap</span><span class="p">))</span>
+        <span class="c"># even window length, for convenience:</span>
+        <span class="n">lengthSineWindow</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">lengthSineWindow</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> 
+        
+        <span class="c"># for later compatibility with other frequency scales:</span>
+        <span class="n">mappingFrequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberFrequencyBins</span><span class="p">)</span> 
+        
+        <span class="c"># size of the &quot;big&quot; window</span>
+        <span class="n">sizeBigWindow</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">numberFrequencyBins</span>
+        
+        <span class="c"># centers for each window</span>
+        <span class="c">## the first window is centered at, in number of window:</span>
+        <span class="n">firstWindowCenter</span> <span class="o">=</span> <span class="o">-</span><span class="n">numberOfWindowsForUnit</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="c">## and the last is at</span>
+        <span class="n">lastWindowCenter</span> <span class="o">=</span> <span class="n">numberOfBasis</span> <span class="o">-</span> <span class="n">numberOfWindowsForUnit</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="c">## center positions in number of frequency bins</span>
+        <span class="n">sineCenters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>\
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">firstWindowCenter</span><span class="p">,</span> <span class="n">lastWindowCenter</span><span class="p">)</span> \
+            <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">overlap</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">lengthSineWindow</span><span class="p">)</span> \
+            <span class="o">+</span> <span class="n">lengthSineWindow</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+        
+        <span class="c"># For future purpose: to use different frequency scales</span>
+        <span class="n">isScaleRecognized</span> <span class="o">=</span> <span class="bp">True</span>
+        
+    <span class="c"># For frequency scale in logarithm (such as ERB scales) </span>
+    <span class="k">if</span> <span class="n">frequencyScale</span> <span class="o">==</span> <span class="s">&#39;log&#39;</span><span class="p">:</span>
+        <span class="n">isScaleRecognized</span> <span class="o">=</span> <span class="bp">False</span>
+        
+    <span class="c"># checking whether the required scale is recognized</span>
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">isScaleRecognized</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;The desired feature for frequencyScale is not recognized yet...&quot;</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    
+    <span class="c"># the shape of one window:</span>
+    <span class="n">prototypeSineWindow</span> <span class="o">=</span> <span class="n">hann</span><span class="p">(</span><span class="n">lengthSineWindow</span><span class="p">)</span>
+    <span class="c"># adding zeroes on both sides, such that we do not need to check</span>
+    <span class="c"># for boundaries</span>
+    <span class="n">bigWindow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">sizeBigWindow</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">bigWindow</span><span class="p">[(</span><span class="n">sizeBigWindow</span> <span class="o">-</span> <span class="n">lengthSineWindow</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">):</span>\
+              <span class="p">(</span><span class="n">sizeBigWindow</span> <span class="o">+</span> <span class="n">lengthSineWindow</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)]</span> \
+              <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">prototypeSineWindow</span><span class="p">)</span>
+    
+    <span class="n">WGAMMA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">numberFrequencyBins</span><span class="p">,</span> <span class="n">numberOfBasis</span><span class="p">])</span>
+    
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">numberOfBasis</span><span class="p">):</span>
+        <span class="n">WGAMMA</span><span class="p">[:,</span> <span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">bigWindow</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">mappingFrequency</span> \
+                                                    <span class="o">-</span> <span class="n">sineCenters</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> \
+                                                    <span class="o">+</span> <span class="n">sizeBigWindow</span><span class="p">)])</span>
+        
+    <span class="k">return</span> <span class="n">WGAMMA</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

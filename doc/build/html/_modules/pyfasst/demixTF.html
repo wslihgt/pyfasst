@@ -1,0 +1,1184 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyfasst.demixTF &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyfasst.demixTF</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;DEMIX Python/NumPy implementation</span>
+
+<span class="sd">Description</span>
+<span class="sd">-----------</span>
+<span class="sd">DEMIX is an algorithm that counts the number of sources,</span>
+<span class="sd">based on their spatial cues, and returns the estimated parameters,</span>
+<span class="sd">which are related to the relative amplitudes between the channels,</span>
+<span class="sd">as well as the relative time shifts. The full description is given</span>
+<span class="sd">in::</span>
+
+<span class="sd">    Arberet, S.; Gribonval, R. &amp; Bimbot, F.</span>
+<span class="sd">        A Robust Method to Count and Locate Audio Sources in</span>
+<span class="sd">        a Multichannel Underdetermined Mixture</span>
+<span class="sd">    IEEE Transactions on Signal Processing, 2010, 58, 121 - 133</span>
+
+<span class="sd">This implementation is based on the MATLAB Toolbox provided</span>
+<span class="sd">by the authors of the above article.</span>
+
+<span class="sd">Additionally, this implementation further allows time-frequency</span>
+<span class="sd">representations other than the short-term Fourier transform (STFT). </span>
+
+<span class="sd">Copyright</span>
+<span class="sd">---------</span>
+<span class="sd">Jean-Louis Durrieu, EPFL-STI-IEL-LTS5</span>
+
+<span class="sd">jean DASH louis AT durrieu DOT ch</span>
+
+<span class="sd">2012-2013</span>
+
+<span class="sd">Reference</span>
+<span class="sd">---------</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">audioObject</span> <span class="kn">as</span> <span class="nn">ao</span>
+<span class="kn">import</span> <span class="nn">tftransforms.tft</span> <span class="kn">as</span> <span class="nn">tft</span>
+<span class="n">tfts</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;stft&#39;</span><span class="p">:</span> <span class="n">tft</span><span class="o">.</span><span class="n">STFT</span><span class="p">,</span>
+        <span class="s">&#39;cqt&#39;</span><span class="p">:</span> <span class="n">tft</span><span class="o">.</span><span class="n">CQTransfo</span><span class="p">,</span>
+        <span class="s">&#39;mqt&#39;</span><span class="p">:</span> <span class="n">tft</span><span class="o">.</span><span class="n">MinQTransfo</span><span class="p">,</span>
+        <span class="s">&#39;minqt&#39;</span><span class="p">:</span> <span class="n">tft</span><span class="o">.</span><span class="n">MinQTransfo</span><span class="p">,</span>
+        <span class="p">}</span>
+<span class="c"># to get the PCA for 2D vectors:</span>
+<span class="kn">import</span> <span class="nn">tools.signalTools</span> <span class="kn">as</span> <span class="nn">st</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-10</span>
+
+<span class="c"># global variables </span>
+<span class="n">uVarBound</span> <span class="o">=</span> <span class="mf">2.33</span> <span class="c"># 2.33 # 1.7 #2.33</span>
+<span class="n">uDistBound</span> <span class="o">=</span> <span class="mf">2.33</span> <span class="c"># 2.33 # 1.7 # 2.33</span>
+
+<span class="k">def</span> <span class="nf">decibel</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">20.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+<span class="c"># alias for above function:</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">decibel</span>
+
+<span class="k">def</span> <span class="nf">invdb</span><span class="p">(</span><span class="n">dbval</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">10.</span> <span class="o">**</span> <span class="p">(</span><span class="n">dbval</span> <span class="o">/</span> <span class="mf">20.</span><span class="p">)</span>
+
+<div class="viewcode-block" id="get_indices_peak"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.get_indices_peak">[docs]</a><span class="k">def</span> <span class="nf">get_indices_peak</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">ind_max</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;returns the indices of the peak around ind_max,</span>
+<span class="sd">    with values down to  ``threshold * sequence[ind_max]``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">thres_value</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">ind_max</span><span class="p">]</span> <span class="o">*</span> <span class="n">threshold</span>
+    <span class="c"># considering sequence is circular, we put ind_max to the center,</span>
+    <span class="c"># and find the bounds:</span>
+    <span class="n">lenSeq</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">size</span>
+    <span class="c">##midSeq = lenSeq / 2</span>
+    <span class="c">##indices = np.remainder(np.arange(lenSeq) - midSeq + ind_max, lenSeq)</span>
+    <span class="c">##</span>
+    <span class="c">#newseq = sequence[]</span>
+    <span class="n">indSup</span> <span class="o">=</span> <span class="n">ind_max</span>
+    <span class="n">indInf</span> <span class="o">=</span> <span class="n">ind_max</span>
+    <span class="k">while</span> <span class="n">sequence</span><span class="p">[</span><span class="n">indSup</span><span class="p">]</span><span class="o">&gt;</span><span class="n">thres_value</span><span class="p">:</span>
+        <span class="n">indSup</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">indSup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">remainder</span><span class="p">(</span><span class="n">indSup</span><span class="p">,</span> <span class="n">lenSeq</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">sequence</span><span class="p">[</span><span class="n">indInf</span><span class="p">]</span><span class="o">&gt;</span><span class="n">thres_value</span><span class="p">:</span>
+        <span class="n">indInf</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">indInf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">remainder</span><span class="p">(</span><span class="n">indInf</span><span class="p">,</span> <span class="n">lenSeq</span><span class="p">)</span>
+        
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">lenSeq</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">indInf</span> <span class="o">&lt;</span> <span class="n">indSup</span><span class="p">:</span>
+        <span class="n">indices</span><span class="p">[(</span><span class="n">indInf</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">indSup</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">indices</span><span class="p">[:</span><span class="n">indSup</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">indices</span><span class="p">[(</span><span class="n">indInf</span><span class="o">+</span><span class="mi">1</span><span class="p">):]</span> <span class="o">=</span> <span class="bp">True</span>
+    
+    <span class="k">return</span> <span class="n">indices</span>
+</div>
+<div class="viewcode-block" id="confidenceFromVar"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.confidenceFromVar">[docs]</a><span class="k">def</span> <span class="nf">confidenceFromVar</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the confidence, in dB, for a given number of</span>
+<span class="sd">    neighbours and a variance.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">## JLD: TODO check how this confidence is computed and how it can</span>
+    <span class="c">##be interpreted.</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">variance</span> <span class="o">*</span> <span class="p">(</span><span class="n">neighbors</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">variance</span> <span class="o">*</span> <span class="p">(</span><span class="n">neighbors</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">variance</span> <span class="o">*</span> <span class="p">(</span><span class="n">neighbors</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DEMIX"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX">[docs]</a><span class="k">class</span> <span class="nc">DEMIX</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;DEMIX algorithm, for 2 channels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">,</span>
+                 <span class="n">nsources</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                 <span class="n">wlen</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
+                 <span class="n">hopsize</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+                 <span class="n">neighbors</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">maxclusters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                 <span class="n">tfrepresentation</span><span class="o">=</span><span class="s">&#39;stft&#39;</span><span class="p">,</span>
+                 <span class="n">tffmin</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">tffmax</span><span class="o">=</span><span class="mi">18000</span><span class="p">,</span>
+                 <span class="n">tfbpo</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span>
+                 <span class="n">winFunc</span><span class="o">=</span><span class="n">tft</span><span class="o">.</span><span class="n">sqrt_blackmanharris</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;init function: DEMIX for 2 channels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsources</span> <span class="o">=</span> <span class="n">nsources</span>
+        <span class="k">if</span> <span class="n">nsources</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maxclusters</span> <span class="o">=</span> <span class="n">maxclusters</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">maxclusters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">maxclusters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsources</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span> <span class="o">=</span> <span class="n">neighbors</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">ao</span><span class="o">.</span><span class="n">AudioObject</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span> <span class="o">=</span> <span class="n">audio</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">AudioObject</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">audio</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;The provided audio parameter is&quot;</span><span class="o">+</span>
+                                 <span class="s">&quot;not a supported format.&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;wlen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wlen</span>      <span class="c"># window length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">nextpow2</span><span class="p">(</span><span class="n">wlen</span><span class="p">)</span> <span class="c"># Fourier length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;hopsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hopsize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tfrepresentation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tfrepresentation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;hopfactor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">1.</span> <span class="o">*</span> <span class="n">hopsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;wlen&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tftkwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;fmin&#39;</span><span class="p">:</span> <span class="n">tffmin</span><span class="p">,</span> <span class="s">&#39;fmax&#39;</span><span class="p">:</span> <span class="n">tffmax</span><span class="p">,</span> <span class="s">&#39;bins&#39;</span><span class="p">:</span> <span class="n">tfbpo</span><span class="p">,</span>
+            <span class="s">&#39;linFTLen&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">],</span>
+            <span class="s">&#39;fs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span><span class="p">,</span>
+            <span class="s">&#39;atomHopFactor&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;hopfactor&#39;</span><span class="p">],</span>
+            <span class="s">&#39;winFunc&#39;</span><span class="p">:</span> <span class="n">winFunc</span>
+            <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tft</span> <span class="o">=</span> <span class="n">tfts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tfrepresentation&#39;</span><span class="p">]](</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tftkwargs&#39;</span><span class="p">])</span>
+    
+<div class="viewcode-block" id="DEMIX.comp_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.comp_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">comp_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the time-frequency clusters, along with their centroids,</span>
+<span class="sd">        which contain the parameters of the mixing process - namely `theta`,</span>
+<span class="sd">        which parameterizes the relative amplitude, and `delta`, which is</span>
+<span class="sd">        homogeneous to a delay in samples between the two channels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp_sig_repr</span><span class="p">()</span> <span class="c"># the STFT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp_pcafeatures</span><span class="p">()</span> <span class="c"># PCA on the neighborhouds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comp_parameters</span><span class="p">()</span> <span class="c"># extract some parameters from the PCA features</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_subpts_set</span><span class="p">()</span> <span class="c"># initiate the mask of points to cluster to full</span>
+        
+        <span class="c"># now find the clusters...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nbRemainingPoints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subTFpointSet</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Computing the clusters... &quot;</span><span class="p">,</span> <span class="n">nbRemainingPoints</span><span class="p">,</span> <span class="s">&quot;TF points&quot;</span>
+        <span class="k">while</span> <span class="n">nbRemainingPoints</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxclusters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">4</span><span class="p">:</span> <span class="c">#DEBUG: tends to be a bit cumbersome</span>
+                <span class="k">print</span> <span class="s">&quot;Remaining points:&quot;</span><span class="p">,</span> <span class="n">nbRemainingPoints</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_max_confidence_point</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c">## attention: no delta in centroid yet...</span>
+                <span class="c"># print &quot;    centroid:&quot;, self.clusterCentroids[-1]</span>
+                <span class="k">print</span> <span class="s">&quot;    belongs to previous cluster:&quot;</span><span class="p">,</span>
+                <span class="k">print</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">ccc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index_freq</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index_time</span><span class="p">]</span> <span class="k">for</span>
+                              <span class="n">ccc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">])</span>
+            <span class="n">ind_cluster_theta_pts</span><span class="p">,</span> <span class="n">distBound</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">getTFpointsNearTheta_OneScale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;comp_clusters:&quot;</span>
+                <span class="k">print</span> <span class="s">&quot;    ind_cluster_theta_pts, theta&quot;</span><span class="p">,</span>
+                <span class="k">print</span> <span class="n">ind_cluster_theta_pts</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            
+            <span class="c">## already done in above getTFpointsNearTheta method: </span>
+            <span class="c"># ind_cluster_theta_pts *= self.subTFpointSet</span>
+            <span class="n">maxDelta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identify_deltaT</span><span class="p">(</span>
+                <span class="n">ind_cluster_pts</span><span class="o">=</span><span class="n">ind_cluster_theta_pts</span><span class="p">,</span>
+                <span class="n">centroid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">maxDelta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">maxDelta</span>
+                <span class="n">ind_cluster_theta_pts</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">getTFPointsNearDelta</span><span class="p">(</span>
+                    <span class="n">centroid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+                <span class="c"># keeping only the centroid in that cluster, then:</span>
+                <span class="n">ind_cluster_theta_pts</span> <span class="o">*=</span> <span class="bp">False</span>
+                <span class="n">ind_cluster_theta_pts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index_freq</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index_time</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;comp_clusters:&quot;</span>
+                <span class="k">print</span> <span class="s">&quot;    ind_cluster_theta_pts, delta&quot;</span><span class="p">,</span>
+                <span class="k">print</span> <span class="n">ind_cluster_theta_pts</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="k">print</span> <span class="s">&quot;    ***theta***:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">theta</span>
+                <span class="k">print</span> <span class="s">&quot;    ***delta***:&quot;</span><span class="p">,</span> <span class="n">maxDelta</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind_cluster_theta_pts</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;comp_clusters:&quot;</span>
+                <span class="k">print</span> <span class="s">&quot;    self.clusters[-1]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            
+            <span class="c"># removing the points that were just classified:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subTFpointSet</span> <span class="o">*=</span> <span class="p">(</span><span class="o">-</span><span class="n">ind_cluster_theta_pts</span><span class="p">)</span>
+            
+            <span class="n">nbRemainingPoints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subTFpointSet</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            </div>
+<div class="viewcode-block" id="DEMIX.refine_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.refine_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">refine_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Refining the clusters in order to verify that they are possible.</span>
+<span class="sd">        Additionally, if self.nsources is defined, this method only keeps</span>
+<span class="sd">        the required number. Otherwise, it is decided by choosing the most</span>
+<span class="sd">        likely centroids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reestimate_clusterCentroids</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c"># keeping only the best clusters, according to self.nsources</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keepBestClusters</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># estimate the active number of clusters:</span>
+            <span class="c">##distanceArray = self.get_centroid_distance()</span>
+            <span class="c">##clusterDistBounds = [cc.clusterDistBound() for</span>
+            <span class="c">##                     cc in self.clusterCentroids]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_weak_clusters</span><span class="p">(</span><span class="c">#distanceArray,</span>
+                                      <span class="c">#clusterDistBounds)</span>
+                <span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">reestimate_clusterCentroids</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.getTFpointsNearTheta_OneScale"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.getTFpointsNearTheta_OneScale">[docs]</a>    <span class="k">def</span> <span class="nf">getTFpointsNearTheta_OneScale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                      <span class="n">centroid_tfpoint</span><span class="p">,</span>
+                                      <span class="p">):</span><span class="c"># index_pts_to_classify # in self....</span>
+        <span class="sd">&quot;&quot;&quot;returns the TF points whose theta is close to that of the centroid,</span>
+<span class="sd">        among the points considered in index_pts_to_classify</span>
+<span class="sd">        </span>
+<span class="sd">        TODO: make the function for different scales, as in matlab toolbox</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thetaAll</span> <span class="o">-</span> <span class="n">centroid_tfpoint</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+        <span class="c">## globally set:</span>
+        <span class="c">#uVarBound = 2.33</span>
+        <span class="c">#uDistBound = 2.33</span>
+        <span class="n">distBound</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estim_bound_var_theta</span><span class="p">(</span><span class="n">centroid_tfpoint</span><span class="o">.</span><span class="n">confidence</span><span class="p">,</span>
+                                       <span class="n">infOrSup</span><span class="o">=</span><span class="s">&#39;sup&#39;</span><span class="p">,</span>
+                                       <span class="n">u</span><span class="o">=</span><span class="n">uVarBound</span><span class="p">)</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="n">uDistBound</span>
+        
+        <span class="c"># conversion to angle on the sphere (???)</span>
+        <span class="n">distBound</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">1</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">*</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(((</span><span class="n">distBound</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">(</span><span class="n">dist</span><span class="o">&lt;</span><span class="n">distBound</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">subTFpointSet</span><span class="p">,</span> <span class="n">distBound</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.identify_deltaT"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.identify_deltaT">[docs]</a>    <span class="k">def</span> <span class="nf">identify_deltaT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind_cluster_pts</span><span class="p">,</span> <span class="n">centroid</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns the delay maxDelta in samples that corresponds to the</span>
+<span class="sd">        largest peak of the cluster defined by the provided cluster index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">distBound</span> <span class="o">=</span> <span class="n">centroid</span><span class="o">.</span><span class="n">estimDeltaPhi</span><span class="p">()</span>
+        <span class="c"># max nb of samples in error interval:</span>
+        <span class="n">nbMaxSamples</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">7</span>
+        <span class="c"># max zoom for oversampling </span>
+        <span class="n">zoomMax</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">4</span>
+        
+        <span class="k">if</span> <span class="n">distBound</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span><span class="p">:</span>
+            <span class="n">zoom</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">nbMaxSamples</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">distBound</span><span class="p">))</span>
+            <span class="n">zoom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">zoom</span><span class="p">)</span>
+            <span class="n">zoom</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">zoom</span><span class="p">,</span> <span class="n">zoomMax</span><span class="p">)</span>
+            <span class="n">zoom</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">zoom</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">zoom</span> <span class="o">=</span> <span class="mi">1</span>
+            
+        <span class="n">ind_candidates</span> <span class="o">=</span> <span class="n">centroid</span><span class="o">.</span><span class="n">getPeakCandidateIndices</span><span class="p">(</span><span class="n">zoom</span><span class="o">=</span><span class="n">zoom</span><span class="p">,</span>
+                                                          <span class="n">distBound</span><span class="o">=</span><span class="n">distBound</span><span class="p">)</span>
+        
+        <span class="c"># Computing the detection function, with peaks at the correct delta:</span>
+        <span class="n">deltaDetFun</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_temporal</span><span class="p">(</span><span class="n">ind_cluster_pts</span><span class="o">=</span><span class="n">ind_cluster_pts</span><span class="p">,</span>
+                                            <span class="n">zoom</span><span class="o">=</span><span class="n">zoom</span><span class="p">)</span>
+        <span class="c"># invalidating non candidate peaks:</span>
+        <span class="n">deltaDetFun</span><span class="p">[</span><span class="o">-</span><span class="n">ind_candidates</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="c"># % x-axis values:</span>
+        <span class="n">Nft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]</span>
+        <span class="n">deltaAxis</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">Nft</span><span class="o">*</span><span class="n">zoom</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="o">=-</span><span class="n">Nft</span><span class="o">*</span><span class="n">zoom</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">zoom</span>
+        
+        <span class="n">indMaxDelta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">deltaDetFun</span><span class="p">)</span>
+        <span class="n">peakDelta</span> <span class="o">=</span> <span class="n">deltaDetFun</span><span class="p">[</span><span class="n">indMaxDelta</span><span class="p">]</span>
+        <span class="n">maxDelta</span> <span class="o">=</span> <span class="n">deltaAxis</span><span class="p">[</span><span class="n">indMaxDelta</span><span class="p">]</span>
+        <span class="n">indicePeak</span> <span class="o">=</span> <span class="n">get_indices_peak</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">deltaDetFun</span><span class="p">,</span>
+                                      <span class="n">ind_max</span><span class="o">=</span><span class="n">indMaxDelta</span><span class="p">,</span>
+                                      <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">distBound</span><span class="p">)</span> <span class="ow">and</span> \
+               <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">deltaDetFun</span><span class="p">[</span><span class="o">-</span><span class="n">indicePeak</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="o">*</span><span class="n">peakDelta</span><span class="p">):</span>
+            <span class="n">maxDelta</span> <span class="o">=</span> <span class="bp">None</span>
+        
+        <span class="k">return</span> <span class="n">maxDelta</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.getTFPointsNearDelta"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.getTFPointsNearDelta">[docs]</a>    <span class="k">def</span> <span class="nf">getTFPointsNearDelta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centroid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns a TF mask which is True if their corresponding value of</span>
+<span class="sd">        `delta` is close enough to the delta from the `centroid`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># the reduced frequencies:</span>
+        <span class="n">frequencies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">freqs</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span>
+        <span class="c"># at first used self.egv0, but actually, that&#39;s probably not</span>
+        <span class="c"># good, because of some sort of undeterminacies:</span>
+        <span class="c"># steering vectors for the TF plane:</span>
+        <span class="n">u0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thetaAll</span><span class="p">)</span>
+        <span class="n">u1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thetaAll</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">phiAll</span><span class="p">)</span>
+        <span class="c"># conjugated v centroid : hence the + in the complex exp</span>
+        <span class="n">v_centroid</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">freqs</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">centroid</span><span class="o">.</span><span class="n">theta</span><span class="p">),</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">centroid</span><span class="o">.</span><span class="n">delta</span> <span class="o">*</span> <span class="n">frequencies</span><span class="p">)</span> <span class="o">*</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">centroid</span><span class="o">.</span><span class="n">theta</span><span class="p">)])</span>
+            <span class="p">)</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span>
+                       <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">u0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">v_centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+                                   <span class="n">u1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">v_centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">))</span>
+                       <span class="c">##(1 - np.abs(self.egv0[0] * np.vstack(v_centroid[0]) +</span>
+                       <span class="c">##            self.egv0[1] * np.vstack(v_centroid[1]) ))</span>
+                       <span class="c"># if euclidean distance, should be np.real, no ?</span>
+                       <span class="p">)</span>
+        <span class="n">distBound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimDAOBound</span><span class="p">(</span><span class="n">confidence</span><span class="o">=</span><span class="n">centroid</span><span class="o">.</span><span class="n">confidence</span><span class="p">)</span>
+        <span class="c"># discarding points that have a higher confidence than centroid (ie</span>
+        <span class="c"># previously identified centroids)</span>
+        <span class="n">distBound</span><span class="p">[</span><span class="n">centroid</span><span class="o">.</span><span class="n">confidence</span><span class="o">&lt;</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ind_cluster_pts</span> <span class="o">=</span> <span class="p">(</span><span class="n">dist</span> <span class="o">&lt;</span> <span class="n">distBound</span><span class="p">)</span>
+        <span class="n">ind_cluster_pts</span><span class="p">[</span><span class="n">centroid</span><span class="o">.</span><span class="n">index_freq</span><span class="p">,</span> <span class="n">centroid</span><span class="o">.</span><span class="n">index_time</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="n">ind_cluster_pts</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.compute_temporal"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.compute_temporal">[docs]</a>    <span class="k">def</span> <span class="nf">compute_temporal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind_cluster_pts</span><span class="p">,</span> <span class="n">zoom</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This computes the inverse Fourier transform of the</span>
+<span class="sd">        estimated Steering Vectors, weighed by their inverse variance</span>
+<span class="sd">        </span>
+<span class="sd">        The result is a detection function that provides peaks at the</span>
+<span class="sd">        most likely delta - the delay in samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">thetaVars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thetaVarAll</span><span class="p">)</span>
+        <span class="n">thetaVars</span><span class="p">[</span><span class="n">thetaVars</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">eps</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">thetaVars</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">phiAll</span><span class="p">)</span>
+        <span class="c"># effectively removing points outside the set of cluster points:</span>
+        <span class="n">thetaVars</span><span class="p">[</span><span class="o">-</span><span class="n">ind_cluster_pts</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+        <span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="n">ind_cluster_pts</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="c"># normalizing each channel</span>
+        <span class="n">normalisation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">thetaVars</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">normalisation</span><span class="p">[</span><span class="n">normalisation</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">eps</span>
+        
+        <span class="c"># the following may not work for representations other than stft:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tfrepresentation&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="s">&#39;stft&#39;</span><span class="p">,</span> <span class="s">&#39;stftold&#39;</span><span class="p">):</span>
+            <span class="c">#raise NotImplementedError(</span>
+            <span class="c">#    &quot;The required representation is borken in DEMIX.&quot;)</span>
+            
+            <span class="c"># kernel to replace the Fourier Kernel (slower)</span>
+            <span class="n">K</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">zoom</span><span class="p">)</span>
+                       <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span> <span class="o">*</span> <span class="n">fp</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">fp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">freq_stamps</span><span class="p">])</span>
+            <span class="n">deltaDetFun</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">normalisation</span><span class="p">,</span>
+                                        <span class="n">K</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">deltaDetFun</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">normalisation</span><span class="p">,</span>
+                                       <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">zoom</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">deltaDetFun</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.comp_sig_repr"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.comp_sig_repr">[docs]</a>    <span class="k">def</span> <span class="nf">comp_sig_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the signal representation, stft</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="p">,</span> <span class="s">&#39;_data&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">_read</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot;Computing the chosen signal representation:&quot;</span><span class="p">)</span>
+        
+        <span class="n">nc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">channels</span>
+        <span class="k">if</span> <span class="n">nc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;This implementation only deals &quot;</span><span class="o">+</span>
+                             <span class="s">&quot;with stereo audio!&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="c"># if more than 1min of signal, take 1 min in the middle</span>
+        <span class="c"># better way : sample data so as to take randomly in the signal</span>
+        <span class="n">lengthData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">startData</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">endData</span> <span class="o">=</span> <span class="n">lengthData</span>
+        <span class="n">oneMinLenData</span> <span class="o">=</span> <span class="mi">60</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span>
+        <span class="n">oneMinLenData</span> <span class="o">*=</span> <span class="mi">2</span> <span class="c"># or more than 1min?</span>
+        
+        <span class="k">if</span> <span class="n">lengthData</span><span class="o">&gt;</span><span class="n">oneMinLenData</span><span class="p">:</span>
+            <span class="n">startData</span> <span class="o">=</span> <span class="p">(</span><span class="n">lengthData</span> <span class="o">-</span> <span class="n">oneMinLenData</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">endData</span> <span class="o">=</span> <span class="n">startData</span> <span class="o">+</span> <span class="n">oneMinLenData</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tfrepresentation&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;stftold&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startData</span><span class="p">:</span><span class="n">endData</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">window</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;wlen&#39;</span><span class="p">]),</span>
+                <span class="n">hopsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;hopsize&#39;</span><span class="p">],</span>
+                <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">],</span>
+                <span class="n">fs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span>
+                <span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startData</span><span class="p">:</span><span class="n">endData</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">window</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;wlen&#39;</span><span class="p">]),</span>
+                <span class="n">hopsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;hopsize&#39;</span><span class="p">],</span>
+                <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">],</span>
+                <span class="n">fs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startData</span><span class="p">:</span><span class="n">endData</span><span class="p">,</span><span class="mi">0</span><span class="p">],)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">transfo</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startData</span><span class="p">:</span><span class="n">endData</span><span class="p">,</span><span class="mi">1</span><span class="p">],)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">transfo</span>
+            <span class="n">freqs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">freq_stamps</span>
+                
+        <span class="c"># keeping the frequencies, not computing them each time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freqs</span> <span class="o">=</span> <span class="n">freqs</span>
+        
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">data</span>
+        </div>
+<div class="viewcode-block" id="DEMIX.comp_pcafeatures"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.comp_pcafeatures">[docs]</a>    <span class="k">def</span> <span class="nf">comp_pcafeatures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the PCA features</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;X0&#39;</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_sig_repr</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbd0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lbd1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">egv0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">egv1</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">prinComp2D</span><span class="p">(</span>
+            <span class="n">X0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">X1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">neighborNb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="mf">20.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lbd0</span> <span class="o">/</span>
+                                         <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lbd1</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
+        <span class="c"># issue with NaN ... :</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.</span> <span class="c"># is that ok?...</span>
+        <span class="c"># 20130208 DJL adding a weighting scheme to lower low energy</span>
+        <span class="c"># coeff influence:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span><span class="n">start</span><span class="p">:</span><span class="n">start</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">[</span><span class="n">energy</span><span class="o">&lt;</span><span class="n">energy</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mf">1e-6</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="c"># no need for the signal representation anymore, for now:</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">lbd0</span>
+        <span class="c"># del self.egv0 # needed in comp_parameters</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">egv1</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">lbd1</span>
+        </div>
+<div class="viewcode-block" id="DEMIX.comp_parameters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.comp_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">comp_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;comp_parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># removing first 2 bands, avoiding continuous components</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">[:</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">eps</span>
+        
+        <span class="c"># storing the data points following the chosen parameterization of the</span>
+        <span class="c"># steering vectors:</span>
+        <span class="c"># </span>
+        <span class="c">#    u_k = [cos(\theta_k) sin(\theta_k) exp(-j 2 \pi f \delta_k)]^T</span>
+        <span class="c">#</span>
+        <span class="c"># where \theta_k is an intensity parameter (IP),</span>
+        <span class="c">#       \delta_k is the time delay between the channels</span>
+        <span class="c">#       and k is the source index.</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phiAll</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">egv0</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">egv0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thetaAll</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">egv0</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">egv0</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thetaVarAll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estim_var_theta</span><span class="p">(</span><span class="n">confidence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">egv0</span>
+        </div>
+    <span class="k">def</span> <span class="nf">estim_var_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confidence</span><span class="p">):</span>
+        <span class="n">maxLim_confidence</span> <span class="o">=</span> <span class="mf">3073.</span>
+        <span class="n">thetaVarAll</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">confidence</span><span class="p">)</span>
+        <span class="n">indNotZeroConf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">confidence</span><span class="o">&gt;</span><span class="n">eps</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;estim_var_theta: indNotZeroConf&quot;</span><span class="p">,</span> <span class="n">indNotZeroConf</span>
+        <span class="c"># The confusing equations are because the values are stored as dBs...</span>
+        <span class="n">thetaVarAll</span><span class="p">[</span><span class="n">indNotZeroConf</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indNotZeroConf</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">confidence</span><span class="p">[</span><span class="n">indNotZeroConf</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indNotZeroConf</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">/</span> <span class="mf">20.</span><span class="p">)</span> <span class="o">/</span>
+            <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span>
+             <span class="p">(</span><span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="n">confidence</span><span class="p">[</span><span class="n">indNotZeroConf</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">indNotZeroConf</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">/</span> <span class="mf">20.</span><span class="p">)</span>
+              <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">thetaVarAll</span><span class="p">[</span><span class="n">confidence</span><span class="o">&gt;=</span><span class="n">maxLim_confidence</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">thetaVarAll</span><span class="p">[</span><span class="n">confidence</span><span class="o">&lt;=</span><span class="n">eps</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+        <span class="k">return</span> <span class="n">thetaVarAll</span>
+    
+    <span class="k">def</span> <span class="nf">estim_bound_var_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">infOrSup</span><span class="o">=</span><span class="s">&#39;sup&#39;</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="mf">2.33</span><span class="p">):</span>
+        <span class="n">minConfidence</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1600.</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">))</span>
+        
+        <span class="n">signInfSup</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;inf&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;sup&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+        <span class="n">confidence</span> <span class="o">+=</span> <span class="n">signInfSup</span><span class="p">[</span><span class="n">infOrSup</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="n">sigma</span>
+        <span class="n">confidence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">confidence</span><span class="p">,</span> <span class="n">minConfidence</span><span class="p">)</span>
+        <span class="n">confidence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">confidence</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;confidence&quot;</span><span class="p">,</span> <span class="n">confidence</span>
+        <span class="c"># the method below returns a 2D array, and therefore,</span>
+        <span class="c"># we only return the (only) element of it:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">confidence</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estim_var_theta</span><span class="p">(</span><span class="n">confidence</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estim_var_theta</span><span class="p">(</span><span class="n">confidence</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    
+<div class="viewcode-block" id="DEMIX.estimDAOBound"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.estimDAOBound">[docs]</a>    <span class="k">def</span> <span class="nf">estimDAOBound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">confidenceVal</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;computes the max distance between centroid and points</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">maxErrorTheta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estim_bound_var_theta</span><span class="p">(</span><span class="n">confidence</span><span class="o">=</span><span class="n">confidence</span><span class="p">,</span>
+                                                   <span class="n">u</span><span class="o">=</span><span class="n">uVarBound</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">confidenceVal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">thetaVarAll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estim_bound_var_theta</span><span class="p">(</span>
+                <span class="n">confidence</span><span class="o">=</span><span class="n">confidenceVal</span><span class="p">,</span>
+                <span class="n">u</span><span class="o">=</span><span class="n">uVarBound</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">thetaVarAll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thetaVarAll</span>
+            
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span> <span class="c"># DEBUG, lots of stuff written!</span>
+            <span class="k">print</span> <span class="s">&quot;daobound&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">thetaVarAll</span><span class="p">)</span> <span class="o">+</span>
+                               <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">maxErrorTheta</span><span class="p">))</span> <span class="o">*</span> <span class="n">uDistBound</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">thetaVarAll</span><span class="p">)</span> <span class="o">+</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">maxErrorTheta</span><span class="p">))</span> <span class="o">*</span> <span class="n">uDistBound</span>
+    </div>
+    <span class="k">def</span> <span class="nf">init_subpts_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">):</span>
+        <span class="c"># setting the &quot;mask&quot; for the</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subTFpointSet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;no lbd0 in object!&quot;</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">get_max_confidence_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">):</span>
+        <span class="n">tmpConfidence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">)</span>
+        <span class="c"># it should be a boolean array of the same size as self.confidence:</span>
+        <span class="n">tmpConfidence</span><span class="p">[(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">subTFpointSet</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">tmpConfidence</span><span class="o">.</span><span class="n">argmax</span><span class="p">(),</span> <span class="n">tmpConfidence</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">tmpConfidence</span>
+        <span class="k">return</span> <span class="n">TFPoint</span><span class="p">(</span><span class="n">demixinstance</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">index_freq</span><span class="o">=</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                       <span class="n">index_time</span><span class="o">=</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    
+<div class="viewcode-block" id="DEMIX.reestimate_clusterCentroids"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.reestimate_clusterCentroids">[docs]</a>    <span class="k">def</span> <span class="nf">reestimate_clusterCentroids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;reestimate cluster centroids</span>
+<span class="sd">        </span>
+<span class="sd">        considering all the cluster masks, reestimate the centroids,</span>
+<span class="sd">        discarding the clusters for which there was no well-defined delta.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;clusterCentroids&#39;</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_clusters</span><span class="p">()</span>
+        
+        <span class="c"># filtering out clusters for which we dont have a correct delay:</span>
+        <span class="n">ind_good_cluster</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">delta</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span> <span class="c">#DEBUG</span>
+            <span class="k">print</span> <span class="s">&quot;reestimate_clusterCentroids&quot;</span>
+            <span class="k">print</span> <span class="s">&quot;    ind_good_cluster&quot;</span><span class="p">,</span> <span class="n">ind_good_cluster</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="k">print</span> <span class="s">&quot;    [c.delta for c in self.clusterCentroids]&quot;</span>
+            <span class="k">print</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">delta</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">]</span>
+            <span class="k">print</span> <span class="s">&quot;   cluster sizes:&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;reestimate_clusterCentroids&quot;</span>
+            <span class="k">print</span> <span class="s">&quot;    constraining the clusters to the good ones&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ind_good_cluster</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ind_good_cluster</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;  reestimate_clusterCentroids: Computing exclusive clusters&quot;</span>
+        <span class="n">nbClusters</span> <span class="o">=</span> <span class="n">ind_good_cluster</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="c"># filtering out the Time-Freq points that are in several clusters:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_exclusive_clusters</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot;  reestimate_clusterCentroids: &quot;</span><span class="o">+</span>
+                   <span class="s">&quot;Computing thresholded clusters&quot;</span><span class="p">)</span>
+        <span class="c"># adaptive thresholding of clusters</span>
+        <span class="n">thresholdedClusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptive_thresholding_clusters</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;  reestimate_clusterCentroids: For each cluster, &quot;</span>
+            <span class="k">print</span> <span class="s">&quot;                               reestimate the centroid&quot;</span>
+        <span class="c"># estimation of centroids for each cluster</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">thresholdedClusters</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;    cluster&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;of&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">thresholdedClusters</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cluster</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c"># only the confidences for the current cluster:</span>
+                <span class="n">confidences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span>
+                <span class="n">thetas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thetaAll</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span>
+                <span class="n">variances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thetaVarAll</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span> <span class="c"># DEBUG</span>
+                    <span class="k">print</span> <span class="s">&quot;reestim_cluster: confidence&quot;</span><span class="p">,</span> <span class="n">confidences</span>
+                <span class="n">varBounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estim_bound_var_theta</span><span class="p">(</span><span class="n">confidence</span><span class="o">=</span><span class="n">confidences</span><span class="p">,</span>
+                                                       <span class="n">infOrSup</span><span class="o">=</span><span class="s">&#39;sup&#39;</span><span class="p">,</span>
+                                                       <span class="n">u</span><span class="o">=</span><span class="n">uVarBound</span><span class="p">)</span>
+                <span class="c"># normalisation coeff:</span>
+                <span class="n">varP</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">variances</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="c"># weighted mean of thetas, weight is varP/variance</span>
+                <span class="n">theta</span> <span class="o">=</span> <span class="n">varP</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">thetas</span> <span class="o">/</span> <span class="n">variances</span><span class="p">)</span>
+                <span class="c"># confidence of the estimation:</span>
+                <span class="n">varBound</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">varBounds</span><span class="p">)</span>
+                <span class="n">clusterConfidence</span> <span class="o">=</span> <span class="n">confidenceFromVar</span><span class="p">(</span><span class="n">varBound</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="p">)</span>
+                
+                <span class="c"># updating if the confidence of current estimation is better than</span>
+                <span class="c"># the original one:</span>
+                <span class="c"># NB even we use thresholdedClusters, the centroids should be</span>
+                <span class="c">#   the same as for self.clusters.</span>
+                <span class="k">if</span> <span class="n">clusterConfidence</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">confidence</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span>  <span class="n">clusterConfidence</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.create_exclusive_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.create_exclusive_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">create_exclusive_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        create_exclusive_clusters</span>
+<span class="sd">        </span>
+<span class="sd">        reconfigures the cluster indices in self.clusters such</span>
+<span class="sd">        that all the Time-Freq points that appear in more than</span>
+<span class="sd">        one cluster are dismissed from all computations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;clusters&#39;</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_clusters</span><span class="p">()</span>
+        
+        <span class="c"># JLD modifying this such that we keep the TF points in the cluster</span>
+        <span class="c"># with best confidence.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">):</span>
+            <span class="n">maskOnlyOneCluster</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;create_exclusive_clusters: no clusters anymore!&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">clustern</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">maskOnlyOneCluster</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">clustern</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">cluster</span> <span class="o">*=</span> <span class="p">(</span><span class="n">maskOnlyOneCluster</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="c"># original program : remove all common tf points</span>
+        <span class="c">##maskOnlyOneCluster = (np.sum(self.clusters, axis=0)==1)</span>
+        <span class="c">##for c in self.clusters:</span>
+        <span class="c">##    c *= maskOnlyOneCluster</span>
+        
+        <span class="c"># JDL: adding a control to discard empty clusters</span>
+        <span class="c">#    strange thing: this case never appeared in DEMIX in matlab...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_empty_clusters</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.get_centroid_distance"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.get_centroid_distance">[docs]</a>    <span class="k">def</span> <span class="nf">get_centroid_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;get_centroid_distance</span>
+<span class="sd">        </span>
+<span class="sd">        distance between the centroids</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nbClusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">nbFreqs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="c"># self.sig_repr[0].shape[0]#</span>
+        
+        <span class="n">distanceArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">nbClusters</span><span class="p">,</span> <span class="n">nbClusters</span><span class="p">])</span>
+        
+        <span class="c"># frequencies vector:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nbFreqs</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbClusters</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbClusters</span><span class="p">):</span>
+                <span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">theta</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">theta</span>
+                <span class="n">diffDelta</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span> <span class="o">-</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+                <span class="n">d2</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span> <span class="o">*</span>
+                                    <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.</span> <span class="o">+</span>
+                                            <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">theta</span><span class="p">)</span> <span class="o">+</span>
+                                            <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span>
+                                            <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">f</span> <span class="o">*</span> <span class="n">diffDelta</span><span class="p">)),</span>
+                                    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                            <span class="p">)</span>
+                      <span class="p">)</span>
+                <span class="n">distanceArray</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">distanceArray</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.adaptive_thresholding_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.adaptive_thresholding_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">adaptive_thresholding_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;compute for each cluster in self.clusters a threshold depending</span>
+<span class="sd">        on the other clusters, in order to keep only those points in cluster</span>
+<span class="sd">        that are close to the actual centroid, but not close to centroids of</span>
+<span class="sd">        other clusters.</span>
+<span class="sd">        </span>
+<span class="sd">        The returned clusters are the original clusters thresholded. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">distanceArray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_centroid_distance</span><span class="p">()</span>
+        <span class="n">nbClusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">thresholdedClusters</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="n">confidenceThreshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nbClusters</span><span class="p">)</span>
+        <span class="n">distTocluster</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nbClusters</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;adaptive thresholding the clusters&quot;</span>
+        
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbClusters</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;    cluster&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="s">&quot;of&quot;</span><span class="p">,</span> <span class="n">nbClusters</span>
+                
+            <span class="n">clustersMinusN</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbClusters</span><span class="p">)</span>
+            <span class="n">clustersMinusN</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">clustersMinusN</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">2</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span> <span class="c"># DEBUG</span>
+                    <span class="k">print</span> <span class="s">&quot;[min(n,m), max(n,m)]&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">)]</span>
+                <span class="n">dist_n_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">distanceArray</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">)])</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">2</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span> <span class="c"># DEBUG</span>
+                    <span class="k">print</span> <span class="s">&quot;dist_n_m&quot;</span><span class="p">,</span> <span class="n">dist_n_m</span>
+                <span class="c"># max erreurs sur l&#39;estimation des centroids:</span>
+                <span class="n">dist_centroid_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimDAOBound</span><span class="p">(</span>
+                    <span class="n">confidence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">confidence</span><span class="p">,</span>
+                    <span class="n">confidenceVal</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">Inf</span><span class="p">)</span>
+                
+                <span class="n">dist_centroid_m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimDAOBound</span><span class="p">(</span>
+                    <span class="n">confidence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">confidence</span><span class="p">,</span>
+                    <span class="n">confidenceVal</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">Inf</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">2</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span>  <span class="c"># DEBUG</span>
+                    <span class="k">print</span> <span class="s">&quot;  dist_centroid_n/m&quot;</span><span class="p">,</span><span class="n">dist_centroid_n</span><span class="p">,</span><span class="n">dist_centroid_m</span>
+                
+                <span class="n">dist_n_m</span> <span class="o">-=</span> <span class="p">(</span><span class="n">dist_centroid_n</span> <span class="o">+</span> <span class="n">dist_centroid_m</span><span class="p">)</span>
+                <span class="n">dist_n_m</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dist_n_m</span> <span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+                <span class="n">distTocluster</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dist_n_m</span><span class="p">,</span> <span class="n">distTocluster</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">2</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span> <span class="c"># DEBUG</span>
+                    <span class="k">print</span> <span class="s">&quot;distTocluster[n]&quot;</span><span class="p">,</span> <span class="n">distTocluster</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">distTocluster</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s">&quot;    nul dist for&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">)]</span>
+            <span class="c"># estimation of threshold</span>
+            <span class="n">confidenceThreshold</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">confidenceFromVar</span><span class="p">((</span><span class="n">distTocluster</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                                                       <span class="bp">self</span><span class="o">.</span><span class="n">neighbors</span><span class="p">)</span>
+            
+            <span class="c"># self.clusters[n] *= (self.confidence &gt;= confidenceThreshold[n])</span>
+            <span class="n">thresholdedClusters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span> <span class="o">&gt;=</span> <span class="n">confidenceThreshold</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span>
+            
+        <span class="c"># to avoid errors when considering empty clusters...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_empty_clusters</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">thresholdedClusters</span>
+    </div>
+    <span class="k">def</span> <span class="nf">keepBestClusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsources</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">nsources</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">nsources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsources</span>
+        <span class="k">if</span> <span class="n">nsources</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&#39;The nb of sources is not provided.&#39;</span><span class="p">)</span>
+        <span class="n">nclusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nclusters</span> <span class="o">&lt;</span> <span class="n">nsources</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;The number of clusters </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span><span class="n">nclusters</span> <span class="o">+</span>
+                          <span class="s">&quot;is different from the required</span><span class="se">\n</span><span class="s">number of sources&quot;</span> <span class="o">+</span>
+                          <span class="s">&quot; </span><span class="si">%d</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">nsources</span><span class="p">)</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">confidences</span> <span class="o">=</span> <span class="p">[</span><span class="n">cc</span><span class="o">.</span><span class="n">confidence</span> <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">]</span>
+            <span class="n">sortedIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">confidences</span><span class="p">)</span>
+            <span class="c"># indices of increasing values sorted: read upside down:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span>
+                 <span class="n">n</span> <span class="ow">in</span> <span class="n">sortedIndices</span><span class="p">[:</span><span class="o">-</span><span class="p">(</span><span class="n">nsources</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span>
+                 <span class="n">n</span> <span class="ow">in</span> <span class="n">sortedIndices</span><span class="p">[:</span><span class="o">-</span><span class="p">(</span><span class="n">nsources</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="p">)</span>
+    
+<div class="viewcode-block" id="DEMIX.remove_empty_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.remove_empty_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">remove_empty_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;remove_empty_clusters</span>
+<span class="sd">        </span>
+<span class="sd">        DJL: this did never happen in DEMIX Matlab version, have to contact</span>
+<span class="sd">        authors for explanations...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">clustersizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;remove_empty_clusters&quot;</span>
+            <span class="k">print</span> <span class="s">&quot;    cluster sizes:&quot;</span><span class="p">,</span> <span class="n">clustersizes</span>
+            <span class="k">print</span> <span class="s">&quot;    Removing&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">clustersizes</span><span class="o">==</span><span class="mi">0</span><span class="p">),</span> <span class="s">&quot;clusters&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;    cluster centroids:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">clustersizes</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">clustersizes</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+    </div>
+    <span class="k">def</span> <span class="nf">remove_weak_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distanceArray</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="n">clusterDistBounds</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">distanceArray</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">distanceArray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_centroid_distance</span><span class="p">()</span>
+            
+        <span class="k">if</span> <span class="n">clusterDistBounds</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">clusterDistBounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">cc</span><span class="o">.</span><span class="n">clusterDistBound</span><span class="p">()</span> <span class="k">for</span>
+                                 <span class="n">cc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">]</span>
+            
+        <span class="c"># removing clusters that are too close to the others:</span>
+        <span class="n">nbClusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="n">indGoodClusters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbClusters</span><span class="p">):</span>
+            <span class="n">clustersMinusN</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbClusters</span><span class="p">)</span>
+            <span class="n">clustersMinusN</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">isGoodCluster</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">clustersMinusN</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span> <span class="c"># DEBUG</span>
+                    <span class="k">print</span> <span class="s">&quot;[min(n,m), max(n,m)]&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">)]</span>
+                <span class="n">dist_n_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">distanceArray</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">)])</span>
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">confidence</span><span class="o">&gt;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">confidence</span><span class="p">):</span>
+                    <span class="n">dist_n_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+                <span class="n">isGoodCluster</span> <span class="o">*=</span> <span class="p">(</span><span class="n">dist_n_m</span><span class="o">&gt;</span><span class="n">clusterDistBounds</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">isGoodCluster</span><span class="p">:</span>
+                <span class="n">indGoodClusters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusters</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusters</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">indGoodClusters</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">indGoodClusters</span><span class="p">])</span>
+    
+<div class="viewcode-block" id="DEMIX.spatial_filtering"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.spatial_filtering">[docs]</a>    <span class="k">def</span> <span class="nf">spatial_filtering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;using optimal spatial filters to obtain separated signals</span>
+<span class="sd">        </span>
+<span class="sd">        this is a beamformer implementation.</span>
+<span class="sd">        MVDR or assuming the sources are normal, independent and</span>
+<span class="sd">        with same variance (not sure whether this does not mean that</span>
+<span class="sd">        we can&#39;t separate them...)</span>
+<span class="sd">        </span>
+<span class="sd">        From::</span>
+<span class="sd">        </span>
+<span class="sd">         Maazaoui, M.; Grenier, Y. &amp; Abed-Meraim, K.</span>
+<span class="sd">         ``Blind Source Separation for Robot Audition using</span>
+<span class="sd">         Fixed Beamforming with HRTFs&#39;&#39;, </span>
+<span class="sd">         in proc. of INTERSPEECH, 2011.</span>
+<span class="sd">        </span>
+<span class="sd">        per channel, the filter steering vector, source p:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">        </span>
+<span class="sd">            b(f,p) = \\frac{R_{aa,f}^{-1} a(f,p)}{a^{H}(f,p) R_{aa,f}^{-1} a(f,p)}</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">steeringVectorsFromCentroids</span><span class="p">()</span>
+        <span class="n">nsrc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">)</span>
+        <span class="n">Raa_00</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">A</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Raa_11</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">A</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Raa_01</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">A</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="c"># invert the matrices, in one pass, easy since 2D and hermitian:</span>
+        <span class="n">invRaa_00</span><span class="p">,</span> <span class="n">invRaa_01</span><span class="p">,</span> <span class="n">invRaa_11</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">invHermMat2D</span><span class="p">(</span><span class="n">Raa_00</span><span class="p">,</span> <span class="n">Raa_01</span><span class="p">,</span>
+                                                          <span class="n">Raa_11</span><span class="p">)</span>
+        <span class="c"># note: if all steering vectors are the same, then Raa is</span>
+        <span class="c"># degenerate, and the result might be unstable...</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;sig_repr&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_sig_repr</span><span class="p">()</span>
+        <span class="n">sep_src</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsrc</span><span class="p">):</span>
+            <span class="c"># the beamformer filter B is nfreqs x 2</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">invRaa_00</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">invRaa_01</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">1</span><span class="p">],</span>
+                           <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">invRaa_01</span><span class="p">)</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">invRaa_11</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">B</span> <span class="o">/=</span> <span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">B</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="c"># this is not in the formula of the cited paper,</span>
+            <span class="c"># but should be theoretically correct... TBC!</span>
+            <span class="n">S</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">B</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">B</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c"># ... and recreating the image given the mixing matrix A</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tfrepresentation&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;stftold&#39;</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span>
+                    <span class="n">X</span><span class="o">=</span><span class="n">S</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="n">window</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;wlen&#39;</span><span class="p">]),</span>
+                    <span class="n">analysisWindow</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                    <span class="n">hopsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;hopsize&#39;</span><span class="p">],</span>
+                    <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]))</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ao</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span>
+                    <span class="n">X</span><span class="o">=</span><span class="n">S</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">1</span><span class="p">]),</span>
+                    <span class="n">window</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;wlen&#39;</span><span class="p">]),</span>
+                    <span class="n">analysisWindow</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                    <span class="n">hopsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;hopsize&#39;</span><span class="p">],</span>
+                    <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">transfo</span> <span class="o">=</span> <span class="n">S</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">invertTransform</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">transfo</span> <span class="o">=</span> <span class="n">S</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">p</span><span class="p">,:,</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tft</span><span class="o">.</span><span class="n">invertTransform</span><span class="p">())</span>
+                
+            <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">sep_src</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sep_src</span>
+    </div>
+<div class="viewcode-block" id="DEMIX.steeringVectorsFromCentroids"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.steeringVectorsFromCentroids">[docs]</a>    <span class="k">def</span> <span class="nf">steeringVectorsFromCentroids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates the steering vectors a(p,f,c) for source p,</span>
+<span class="sd">        (reduced) freq f and channel c.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">        </span>
+<span class="sd">          a[p,f,0] = \\cos(\\theta_p)</span>
+<span class="sd">          </span>
+<span class="sd">          a[p,f,1] = \\sin(\\theta_p) \\exp(- 2 j \\pi f \\delta_p)</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># TODO: should check that</span>
+        <span class="c">#    * clusterCentroids exists,</span>
+        <span class="c">#    * nchannels of audioObject is 2</span>
+        <span class="c">#    * etc.</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;freqs&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comp_sig_repr</span><span class="p">()</span>
+        
+        <span class="n">thetas</span> <span class="o">=</span> <span class="p">[</span><span class="n">cc</span><span class="o">.</span><span class="n">theta</span> <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">]</span>
+        <span class="n">deltas</span> <span class="o">=</span> <span class="p">[</span><span class="n">cc</span><span class="o">.</span><span class="n">delta</span> <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">]</span>
+        <span class="c"># frequencies in reduced form (from 0 to 1/2)</span>
+        <span class="n">freqs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">freqs</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span>
+        <span class="n">nsrc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">)</span>
+        
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">nsrc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">freqs</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">channels</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nsrc</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="c"># left channel:</span>
+            <span class="n">A</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">thetas</span><span class="p">))</span>
+            <span class="c"># right channel:</span>
+            <span class="n">A</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">thetas</span><span class="p">))</span> <span class="o">*</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span>
+                               <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">deltas</span><span class="p">,</span>
+                                        <span class="n">freqs</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Caution: the number of sources is </span><span class="si">%d</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">nsrc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">A</span>
+    </div></div>
+<span class="k">class</span> <span class="nc">TFPoint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">demixinstance</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">thetaphidelta</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">index_scale</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_freq</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_time</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="n">demixinstance</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">thetaphidelta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">thetaphidelta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">thetaphidelta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">thetaphidelta</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="mf">100.</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_scale</span> <span class="o">=</span> <span class="n">index_scale</span> <span class="c"># for future integration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_freq</span> <span class="o">=</span> <span class="n">index_freq</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_time</span> <span class="o">=</span> <span class="n">index_time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">elif</span> <span class="n">demixinstance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">demixinstance</span><span class="o">.</span><span class="n">thetaAll</span><span class="p">[</span><span class="n">index_freq</span><span class="p">,</span>
+                                                <span class="n">index_time</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">demixinstance</span><span class="o">.</span><span class="n">phiAll</span><span class="p">[</span><span class="n">index_freq</span><span class="p">,</span>
+                                            <span class="n">index_time</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="n">demixinstance</span><span class="o">.</span><span class="n">confidence</span><span class="p">[</span><span class="n">index_freq</span><span class="p">,</span>
+                                                       <span class="n">index_time</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">index_freq</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">demixinstance</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_scale</span> <span class="o">=</span> <span class="n">index_scale</span> <span class="c"># for future integration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_freq</span> <span class="o">=</span> <span class="n">index_freq</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_time</span> <span class="o">=</span> <span class="n">index_time</span>
+            
+            <span class="c"># to be able to use general purpose methods like:</span>
+            <span class="c">#    estim_bound_var_theta</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">demixInst</span> <span class="o">=</span> <span class="n">demixinstance</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;TFPoint: generating dummy TFPoint&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+    
+    <span class="k">def</span> <span class="nf">estimDeltaPhi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Estimates a bound on the distance</span>
+<span class="sd">        confidence interval, in samples, to the TFpoint delta</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">## globally set:</span>
+        <span class="c">#uVarBound = 2.33</span>
+        <span class="c">#uDistBound = 2.33</span>
+        
+        <span class="n">dmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">demixInst</span><span class="o">.</span><span class="n">estim_bound_var_theta</span><span class="p">(</span>
+            <span class="n">confidence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">,</span>
+            <span class="n">infOrSup</span><span class="o">=</span><span class="s">&#39;sup&#39;</span><span class="p">,</span>
+            <span class="n">u</span><span class="o">=</span><span class="n">uVarBound</span><span class="p">)</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="n">uDistBound</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;dmax&quot;</span><span class="p">,</span> <span class="n">dmax</span>
+        
+        <span class="n">cos_ds</span> <span class="o">=</span> <span class="p">(</span><span class="n">dmax</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="c"># where does this come from...</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cos_ds</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">):</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">/</span> <span class="n">cos_ds</span><span class="p">)</span>
+            <span class="n">deltaPhi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">cos_ds</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span> <span class="o">/</span>
+                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">deltaPhi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+    
+    <span class="k">def</span> <span class="nf">getPeakCandidateIndices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">distBound</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;computes the indices of compatible delta bins</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">distBound</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">distBound</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">demixInst</span><span class="o">.</span><span class="n">getTFpointsNearTheta_OneScale</span><span class="p">(</span>
+                <span class="n">centroid_tfpoint</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="p">)</span>
+        
+        <span class="n">Nft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">demixInst</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">]</span>
+        
+        <span class="n">kmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span> <span class="o">*</span>
+                         <span class="n">Nft</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span>
+                         <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi</span><span class="p">))</span> <span class="o">/</span>
+                        <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+        
+        <span class="n">kmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">kmax</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">ks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">kmax</span><span class="p">,</span> <span class="n">kmax</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">centroidDeltas</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">ks</span><span class="p">)</span> <span class="o">/</span>
+            <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">deltaXiFFTmin</span> <span class="o">=</span> <span class="o">-</span> <span class="p">(</span><span class="n">Nft</span> <span class="o">*</span> <span class="n">zoom</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">deltaXiFFTmax</span> <span class="o">=</span> <span class="p">(</span><span class="n">Nft</span> <span class="o">*</span> <span class="n">zoom</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        
+        <span class="n">infBounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ks</span><span class="p">))</span>
+        <span class="n">supBounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ks</span><span class="p">))</span>
+        
+        <span class="n">bound1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">centroidDeltas</span> <span class="o">-</span> <span class="n">distBound</span><span class="p">)</span> <span class="o">*</span> <span class="n">zoom</span><span class="p">)</span>
+        <span class="n">bound2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">centroidDeltas</span> <span class="o">+</span> <span class="n">distBound</span><span class="p">)</span> <span class="o">*</span> <span class="n">zoom</span><span class="p">)</span>
+        
+        <span class="n">bound1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">deltaXiFFTmin</span><span class="p">,</span> <span class="n">bound1</span><span class="p">)</span>
+        <span class="n">bound1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">deltaXiFFTmax</span><span class="p">,</span> <span class="n">bound1</span><span class="p">)</span>
+        
+        <span class="n">bound2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">deltaXiFFTmin</span><span class="p">,</span> <span class="n">bound2</span><span class="p">)</span>
+        <span class="n">bound2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">deltaXiFFTmax</span><span class="p">,</span> <span class="n">bound2</span><span class="p">)</span>
+        
+        <span class="n">infBounds</span><span class="p">[</span><span class="n">bound1</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bound1</span><span class="p">[</span><span class="n">bound1</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">infBounds</span><span class="p">[</span><span class="n">bound1</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span>
+            <span class="n">bound1</span><span class="p">[</span><span class="n">bound1</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">deltaXiFFTmax</span> <span class="o">-</span> <span class="n">deltaXiFFTmin</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        
+        <span class="n">supBounds</span><span class="p">[</span><span class="n">bound2</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">bound2</span><span class="p">[</span><span class="n">bound2</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">supBounds</span><span class="p">[</span><span class="n">bound2</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span>
+            <span class="n">bound2</span><span class="p">[</span><span class="n">bound2</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">deltaXiFFTmax</span> <span class="o">-</span> <span class="n">deltaXiFFTmin</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">distBound</span><span class="p">):</span>
+            <span class="c"># return a True vector for all time bins:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indices_candidates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Nft</span> <span class="o">*</span> <span class="n">zoom</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indices_candidates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Nft</span> <span class="o">*</span> <span class="n">zoom</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ks</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">infBounds</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">supBounds</span><span class="p">[</span><span class="n">n</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">indices_candidates</span><span class="p">[</span><span class="n">infBounds</span><span class="p">[</span><span class="n">n</span><span class="p">]:(</span><span class="n">supBounds</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span><span class="o">=</span><span class="bp">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">indices_candidates</span><span class="p">[</span><span class="n">infBounds</span><span class="p">[</span><span class="n">n</span><span class="p">]:]</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">indices_candidates</span><span class="p">[:(</span><span class="n">supBounds</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">True</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices_candidates</span>
+    
+    <span class="k">def</span> <span class="nf">clusterDistBound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">):</span>
+        <span class="c"># this is a bit strange....</span>
+        <span class="c">#</span>
+        <span class="c"># %u_nbpPoints(1) &lt;=&gt; 200000pts,u_nbpPoints(2) &lt;=&gt; 400000pts...</span>
+        <span class="n">u_nbpPoints</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.33</span><span class="p">,</span> <span class="mf">2.58</span><span class="p">,</span> <span class="mf">2.72</span><span class="p">,</span> <span class="mf">2.81</span><span class="p">,</span> <span class="mf">2.88</span><span class="p">,</span> <span class="mf">2.93</span><span class="p">,</span> <span class="mf">2.98</span><span class="p">,</span> <span class="mf">3.05</span><span class="p">]</span>
+        <span class="n">indNbPts</span> <span class="o">=</span> <span class="mi">7</span> <span class="c"># dont get why this choice</span>
+        <span class="n">uVarBound</span> <span class="o">=</span> <span class="n">u_nbpPoints</span><span class="p">[</span><span class="n">indNbPts</span><span class="p">]</span>
+        <span class="n">uDistBound</span> <span class="o">=</span> <span class="n">u_nbpPoints</span><span class="p">[</span><span class="n">indNbPts</span><span class="p">]</span>
+        <span class="n">varBounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">demixInst</span><span class="o">.</span><span class="n">estim_bound_var_theta</span><span class="p">(</span>
+            <span class="n">confidence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">,</span>
+            <span class="n">infOrSup</span><span class="o">=</span><span class="s">&#39;sup&#39;</span><span class="p">,</span>
+            <span class="n">u</span><span class="o">=</span><span class="n">uVarBound</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">varBounds</span><span class="p">)</span> <span class="o">*</span> <span class="n">uDistBound</span> <span class="c"># distBound</span>
+    
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&quot;[confidence: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">confidence</span><span class="p">)</span><span class="o">+</span>
+                <span class="s">&quot;, delta: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;, &quot;</span><span class="o">+</span>
+                <span class="s">&quot;phi :&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi</span><span class="p">)</span><span class="o">+</span>
+                <span class="s">&quot;, theta: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;, &quot;</span><span class="o">+</span>
+                <span class="s">&quot;freq : &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;]&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

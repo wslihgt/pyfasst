@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyfasst.spatial.steering_vectors &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyfasst.spatial.steering_vectors</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">================</span>
+<span class="sd">STEERING VECTORS</span>
+<span class="sd">================</span>
+<span class="sd">generating steering vectors for arrays of sensors</span>
+
+<span class="sd">Content</span>
+<span class="sd">=======</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="gen_steer_vec_far_src_uniform_linear_array"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.steering_vectors.gen_steer_vec_far_src_uniform_linear_array">[docs]</a><span class="k">def</span> <span class="nf">gen_steer_vec_far_src_uniform_linear_array</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span>
+                                               <span class="n">nchannels</span><span class="p">,</span>
+                                               <span class="n">theta</span><span class="p">,</span>
+                                               <span class="n">distanceInterMic</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;generate steering vector with relative far source,</span>
+<span class="sd">    uniformly spaced sensor array</span>
+<span class="sd">    </span>
+<span class="sd">    **Description**:</span>
+<span class="sd">    </span>
+<span class="sd">    assuming the source is far (compared to the dimensions of the array)</span>
+<span class="sd">    The sensor array is also assumed to be a linear array, the direction of</span>
+<span class="sd">    arrival (DOA) theta is defined as in the following incredible ASCII</span>
+<span class="sd">    art drawing::</span>
+<span class="sd">    </span>
+<span class="sd">          theta</span>
+<span class="sd">        -----&gt;/              /</span>
+<span class="sd">        |    /              /</span>
+<span class="sd">        y   /              /</span>
+<span class="sd">           /              /</span>
+<span class="sd">        ^ /              /</span>
+<span class="sd">        |/              /</span>
+<span class="sd">        +---&gt; x</span>
+<span class="sd">        o    o    o    o    o    o</span>
+<span class="sd">        M1   M2   M3  ...</span>
+<span class="sd">        &lt;---&gt;</span>
+<span class="sd">          d = distanceInterMic</span>
+<span class="sd">    </span>
+<span class="sd">    That is more likely valid for electro-magnetic fields, for acoustic</span>
+<span class="sd">    wave fields, one should probably take into account the difference of</span>
+<span class="sd">    gain between the microphones (see :py:func:`gen_steer_vec_acous` )</span>
+<span class="sd">    </span>
+<span class="sd">    **Output**:</span>
+<span class="sd">    </span>
+<span class="sd">    a (nc, nfreqs) ndarray</span>
+<span class="sd">        contains the steering vectors, one for each channel, and</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span>
+               <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nchannels</span><span class="p">),</span>
+                        <span class="n">freqs</span><span class="p">)</span> <span class="o">*</span>
+               <span class="p">(</span><span class="n">distanceInterMic</span> <span class="o">/</span> <span class="n">soundCelerity</span><span class="p">)</span> <span class="o">*</span> 
+               <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">a</span>
+</div>
+<div class="viewcode-block" id="gen_steer_vec_acous"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.steering_vectors.gen_steer_vec_acous">[docs]</a><span class="k">def</span> <span class="nf">gen_steer_vec_acous</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span>
+                        <span class="n">dist_src_mic</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;generates a steering vector for the given frequencies and given</span>
+<span class="sd">    distances between the microphones and the source.</span>
+<span class="sd">    </span>
+<span class="sd">    To the difference with</span>
+<span class="sd">    :py:func:`gen_steer_vec_far_src_uniform_linear_array`, this function</span>
+<span class="sd">    also includes gains depending on the distance between the source and</span>
+<span class="sd">    the mics.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gains</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dist_src_mic</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">gains</span><span class="p">)</span> <span class="o">*</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">dist_src_mic</span><span class="p">,</span>
+                         <span class="n">freqs</span><span class="p">)</span> <span class="o">/</span>
+                <span class="n">soundCelerity</span>
+                <span class="p">)</span>
+         <span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span>
+</div>
+<div class="viewcode-block" id="dir_diag_stereo"><a class="viewcode-back" href="../../../spatial.html#pyfasst.spatial.steering_vectors.dir_diag_stereo">[docs]</a><span class="k">def</span> <span class="nf">dir_diag_stereo</span><span class="p">(</span><span class="n">Cx</span><span class="p">,</span>
+                    <span class="n">nft</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
+                    <span class="n">ntheta</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                    <span class="n">samplerate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span><span class="c">#Hz</span>
+                    <span class="n">distanceInterMic</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span><span class="c">#m</span>
+                    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the diagram of directivity for the input</span>
+<span class="sd">    short time Fourier transform second order statistics in Cx</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">    </span>
+<span class="sd">        C_x[0] = E[|x_0|^2]</span>
+<span class="sd">        </span>
+<span class="sd">        C_x[2] = E[|x_1|^2]</span>
+<span class="sd">        </span>
+<span class="sd">        C_x[1] = E[x_0 x_1^H]</span>
+<span class="sd">        </span>
+<span class="sd">    </span>
+<span class="sd">    **Method**:</span>
+<span class="sd">    </span>
+<span class="sd">    We use the Capon method, on each of the Fourier channel</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">    </span>
+<span class="sd">        \phi_k(\\theta) = a_k(\\theta)^H inv(Rxx) a_k(\\theta)</span>
+<span class="sd">    </span>
+<span class="sd">    The algorithm therefore returns one directivity graph for each</span>
+<span class="sd">    frequency band. </span>
+<span class="sd">    </span>
+<span class="sd">    **Remarks**:</span>
+<span class="sd">    </span>
+<span class="sd">    One can compute a summary directivity by adding the directivity functions</span>
+<span class="sd">    across all the frequency channels. The invert of the resulting array may</span>
+<span class="sd">    also be of interest (looking at peaks and not valleys to find directions)::</span>
+<span class="sd">    </span>
+<span class="sd">     &gt;&gt;&gt; directivity_diag = dir_diag_stereo(Cx)</span>
+<span class="sd">     &gt;&gt;&gt; summary_dir_diag = 1./directivity_diag.sum(axis=1)</span>
+<span class="sd">    </span>
+<span class="sd">    Some tests show that it is very important that the distance between the</span>
+<span class="sd">    microphone is known. Otherwise, little can be infered from the resulting</span>
+<span class="sd">    directivity measure...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nchannels</span> <span class="o">=</span> <span class="mi">2</span> <span class="c"># this function only works for stereo audio</span>
+    
+    <span class="c"># for capon, we need the average of Cx:</span>
+    <span class="n">meanCx_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">Cx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                            <span class="n">Cx</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)],</span>
+                           <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">meanCx_off</span>  <span class="o">=</span> <span class="n">Cx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c"># ... and its inverse:</span>
+    <span class="n">inv_mat_diag</span><span class="p">,</span> <span class="n">inv_mat_off</span><span class="p">,</span> <span class="n">det_mat</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">inv_mat</span><span class="p">(</span><span class="n">meanCx_diag</span><span class="p">,</span> <span class="n">meanCx_off</span><span class="p">)</span>
+        <span class="p">)</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">det_mat</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s">&quot;Not possible to compute directivity, singular covariance. &quot;</span><span class="o">+</span>
+            <span class="s">&quot;</span><span class="se">\n</span><span class="s">The channels are probably either identical or colinear.&quot;</span><span class="p">)</span>
+    
+    <span class="n">nfreqs</span> <span class="o">=</span> <span class="n">nft</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nfreqs</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">nft</span> <span class="o">*</span> <span class="n">samplerate</span>
+    
+    <span class="c"># now computing the directivity diagram, angle after angle</span>
+    <span class="n">directivity_diagram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">ntheta</span><span class="p">,</span> <span class="n">nfreqs</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="c"># theta from -pi/2 to +pi/2</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntheta</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">ntheta</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">2.</span>
+    <span class="k">for</span> <span class="n">nth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntheta</span><span class="p">):</span>
+        <span class="c"># Compute steering vectors for each frequency</span>
+        <span class="n">filt</span> <span class="o">=</span> <span class="n">gen_steer_vec_far_src_uniform_linear_array</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span>
+                                                          <span class="n">nchannels</span><span class="p">,</span>
+                                                          <span class="n">theta</span><span class="p">[</span><span class="n">nth</span><span class="p">],</span>
+                                                          <span class="n">distanceInterMic</span><span class="p">)</span>
+        
+        <span class="n">directivity_diagram</span><span class="p">[</span><span class="n">nth</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">inv_mat_diag</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">inv_mat_diag</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+            <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">filt</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span>
+                         <span class="n">inv_mat_off</span><span class="p">)</span>
+            <span class="c">#filt[0] * np.conjugate(filt[1]) * np.conjugate(inv_mat_off) +</span>
+            <span class="c">#np.conjugate(filt[0]) * filt[1] * inv_mat_off</span>
+            <span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">directivity_diagram</span><span class="p">,</span> <span class="n">theta</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

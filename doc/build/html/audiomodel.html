@@ -212,18 +212,19 @@ to the provided signal_representation flag</p>
 <dl class="method">
 <dt id="pyfasst.audioModel.FASST.compute_suff_stat">
 <tt class="descname">compute_suff_stat</tt><big>(</big><em>spat_comp_powers</em>, <em>mix_matrix</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#FASST.compute_suff_stat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST.compute_suff_stat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Outputs:
-hat_Rxx
+<dd><p>Outputs:</p>
+<blockquote>
+<div>hat_Rxx
 hat_Rxs
 hat_Rss
 hat_Ws
-loglik</p>
+loglik</div></blockquote>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyfasst.audioModel.FASST.estim_param_a_post_model">
 <tt class="descname">estim_param_a_post_model</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#FASST.estim_param_a_post_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST.estim_param_a_post_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Estimates the _a <a href="#id4"><span class="problematic" id="id5">posteriori_</span></a> model for the provided
+<dd><p>Estimates the <cite>a posteriori</cite> model for the provided
 audio signal. In particular, this runs self.iter_num times
 the Generalized Expectation-Maximisation algorithm to
 update the various parameters of the model, so as to
@@ -232,8 +233,8 @@ maximize the likelihood of the data given these parameters.</p>
 &#8220;hidden&#8221; or latent variables (here the spatial and spectral
 components) can be computed, leading to the estimation of the
 separated underlying sources.</p>
-<p>Consider using <tt class="docutils literal"><span class="pre">self.separate\_spat\_comps</span></tt> or
-<tt class="docutils literal"><span class="pre">self.separate\_spatial\_filter\_comp</span></tt> to obtain the separated time
+<p>Consider using <tt class="docutils literal"><span class="pre">self.separate_spat_comps</span></tt> or
+<tt class="docutils literal"><span class="pre">self.separate_spatial_filter_comp</span></tt> to obtain the separated time
 series, once the parameters have been estimated.</p>
 </dd></dl>
 
@@ -290,6 +291,8 @@ matrices <cite>W</cite> and <cite>H</cite>.</p>
 <tt class="descname">inv_herm_mat_2d</tt><big>(</big><em>sigma_x_diag</em>, <em>sigma_x_off</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#FASST.inv_herm_mat_2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST.inv_herm_mat_2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the inverse of 2D hermitian matrices.</p>
 <dl class="docutils">
+<dt><strong>Inputs</strong></dt>
+<dd><dl class="first last docutils">
 <dt>sigma_x_diag</dt>
 <dd><p class="first">ndarray, with (dim of axis=0) = 2</p>
 <p class="last">The diagonal elements of the matrices to invert.
@@ -303,12 +306,16 @@ sigma_x_diag[1] are the (1,1) ones.</p>
 the (1,0) element is the complex conjugate)</p>
 </dd>
 </dl>
-<dl class="docutils">
+</dd>
+<dt><strong>Outputs</strong></dt>
+<dd><dl class="first last docutils">
 <dt>inv_sigma_x_diag</dt>
 <dd><p class="first">ndarray, 2 x shape(sigma_x_off)</p>
 <p class="last">Diagonal elements of the inverse matrices.
 [0] &lt;-&gt; (0,0)
 [1] &lt;-&gt; (1,1)</p>
+</dd>
+</dl>
 </dd>
 <dt>inv_sigma_x_off</dt>
 <dd><p class="first">ndarray, shape(sigma_x_off)</p>
@@ -319,6 +326,7 @@ the (1,0) element is the complex conjugate)</p>
 <p class="last">For each inversion, the determinant of the matrix.</p>
 </dd>
 </dl>
+<p><strong>Remarks</strong></p>
 <p>The inversion is done explicitly, by computing the determinant
 (explicit formula for 2D matrices), then the elements of the
 inverse with the corresponding formulas.</p>
@@ -362,7 +370,7 @@ is the sum of all the spatial ranks for all the sources.</dd>
 the mixing matrices for each source</dd>
 <dt>rank_part_ind</dt>
 <dd>dictionary: each key is one source, and the values are the indices
-in <a href="#id2"><span class="problematic" id="id3">:py:attrs:`spat_comp_powers`</span></a> and <tt class="docutils literal"><span class="pre">mix_matrix</span></tt> that correspond to that source.
+in <tt class="docutils literal"><span class="pre">spat_comp_powers</span></tt> and <tt class="docutils literal"><span class="pre">mix_matrix</span></tt> that correspond to that source.
 If the spatial rank of source <tt class="docutils literal"><span class="pre">j</span></tt> is 2, then its spectra will appear
 twice in <tt class="docutils literal"><span class="pre">spat_comp_powers</span></tt>, with mixing parameters (potentially
 different one from the other) appearing in two sub-matrices of
@@ -483,76 +491,6 @@ divergence measure between SX and <tt class="docutils literal"><span class="pre"
 </dd></dl>
 
 <dl class="function">
-<dt id="pyfasst.audioModel.dir_diag_stereo">
-<tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">dir_diag_stereo</tt><big>(</big><em>Cx</em>, <em>nft=2048</em>, <em>ntheta=512</em>, <em>samplerate=44100</em>, <em>distanceInterMic=0.3</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#dir_diag_stereo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.dir_diag_stereo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the diagram of directivity for the input
-short time Fourier transform second order statistics in Cx</p>
-<div class="math">
-\[C_x[0] = E[|x_0|^2]\]\[C_x[2] = E[|x_1|^2]\]\[C_x[1] = E[x_0 x_1^H]\]</div>
-<p><strong>Method</strong>:</p>
-<p>We use the Capon method, on each of the Fourier channel</p>
-<div class="math">
-\[\phi_k(\theta) = a_k(\theta)^H inv(Rxx) a_k(\theta)\]</div>
-<p>The algorithm therefore returns one directivity graph for each
-frequency band.</p>
-<p><strong>Remarks</strong>:</p>
-<p>One can compute a summary directivity by adding the directivity functions
-across all the frequency channels. The invert of the resulting array may
-also be of interest (looking at peaks and not valleys to find directions):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">directivity_diag</span> <span class="o">=</span> <span class="n">dir_diag_stereo</span><span class="p">(</span><span class="n">Cx</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">summary_dir_diag</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">directivity_diag</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Some tests show that it is very important that the distance between the
-microphone is known. Otherwise, little can be infered from the resulting
-directivity measure...</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.audioModel.gen_steer_vec_acous">
-<tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">gen_steer_vec_acous</tt><big>(</big><em>freqs</em>, <em>dist_src_mic</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#gen_steer_vec_acous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.gen_steer_vec_acous" title="Permalink to this definition">¶</a></dt>
-<dd><p>generates a steering vector for the given frequencies and given
-distances between the microphones and the source.</p>
-<p>To the difference with
-<a class="reference internal" href="#pyfasst.audioModel.gen_steer_vec_far_src_uniform_linear_array" title="pyfasst.audioModel.gen_steer_vec_far_src_uniform_linear_array"><tt class="xref py py-func docutils literal"><span class="pre">gen_steer_vec_far_src_uniform_linear_array()</span></tt></a>, this function
-also includes gains depending on the distance between the source and
-the mics.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.audioModel.gen_steer_vec_far_src_uniform_linear_array">
-<tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">gen_steer_vec_far_src_uniform_linear_array</tt><big>(</big><em>freqs</em>, <em>nchannels</em>, <em>theta</em>, <em>distanceInterMic</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#gen_steer_vec_far_src_uniform_linear_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.gen_steer_vec_far_src_uniform_linear_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>generate steering vector with relative far source,
-uniformly spaced sensor array</p>
-<p><strong>Description</strong>:</p>
-<p>assuming the source is far (compared to the dimensions of the array)
-The sensor array is also assumed to be a linear array, the direction of
-arrival (DOA) theta is defined as in the following incredible ASCII
-art drawing:</p>
-<div class="highlight-python"><pre>  theta
------&gt;/              /
-|    /              /
-y   /              /
-   /              /
-^ /              /
-|/              /
-+---&gt; x
-o    o    o    o    o    o
-M1   M2   M3  ...
-&lt;---&gt;
-  d = distanceInterMic</pre>
-</div>
-<p>That is more likely valid for electro-magnetic fields, for acoustic
-wave fields, one should probably take into account the difference of
-gain between the microphones (see <a class="reference internal" href="#pyfasst.audioModel.gen_steer_vec_acous" title="pyfasst.audioModel.gen_steer_vec_acous"><tt class="xref py py-func docutils literal"><span class="pre">gen_steer_vec_acous()</span></tt></a> )</p>
-<p><strong>Output</strong>:</p>
-<dl class="docutils">
-<dt>a (nc, nfreqs) ndarray</dt>
-<dd>contains the steering vectors, one for each channel, and</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
 <dt id="pyfasst.audioModel.inv_mat">
 <tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">inv_mat</tt><big>(</big><em>mat_diag</em>, <em>mat_off</em><big>)</big><a class="reference internal" href="_modules/pyfasst/audioModel.html#inv_mat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.inv_mat" title="Permalink to this definition">¶</a></dt>
 <dd><p>invert 2D hermitian matrix</p>
@@ -577,14 +515,16 @@ well as with the components stored in the provided dictionary in
 <cite>instru2modelfile</cite></p>
 <dl class="docutils">
 <dt><cite>instrus</cite> is a list with labels:</dt>
-<dd><p class="first"><cite>&#8216;SourceFilter&#8217;</cite>: keep the intialized source filter model
-<cite>&#8216;Free_&lt;nb_comp&gt;&#8217;</cite>: initialize the model with an adaptable</p>
-<blockquote>
-<div>spectral component using <cite>nb_comp</cite> elements in the NMF
-frequency basis</div></blockquote>
-<dl class="last docutils">
-<dt><cite>&lt;key_in_instru2modelfile&gt;</cite>: initialize with the :py:class:GSMM</dt>
-<dd>available and stored in the archive npz with filename
+<dd><dl class="first last docutils">
+<dt><cite>&#8216;SourceFilter&#8217;</cite>:</dt>
+<dd>keep the intialized source filter model</dd>
+<dt><cite>&#8216;Free_&lt;nb_comp&gt;&#8217;</cite>:</dt>
+<dd>initialize the model with an adaptable
+spectral component using <cite>nb_comp</cite> elements in the NMF
+frequency basis</dd>
+<dt><cite>&lt;key_in_instru2modelfile&gt;</cite>:</dt>
+<dd>initialize with the :py:class:GSMM
+available and stored in the archive npz with filename
 <cite>instru2modelfile[key_in_instru2modelfile]</cite></dd>
 </dl>
 </dd>

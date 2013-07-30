@@ -55,12 +55,17 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-pyfasst.tftransforms.tft">
-<span id="time-frequency-transforms"></span><h1>Time-Frequency Transforms<a class="headerlink" href="#module-pyfasst.tftransforms.tft" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="time-frequency-transforms">
+<h1>Time-Frequency Transforms<a class="headerlink" href="#time-frequency-transforms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pyfasst.tftransforms.tft">
+<span id="tft-module"></span><h2>TFT module<a class="headerlink" href="#module-pyfasst.tftransforms.tft" title="Permalink to this headline">¶</a></h2>
 <p>Time-Frequency Transforms</p>
 <p>TODO: turn this into something more self-contained (like defining a super class
 for all the possible time-freq transforms)</p>
-<span class="target" id="module-pyfasst.tftransforms.stft"></span><dl class="function">
+</div>
+<div class="section" id="module-pyfasst.tftransforms.stft">
+<span id="stft-module"></span><h2>STFT module<a class="headerlink" href="#module-pyfasst.tftransforms.stft" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
 <dt>
 <tt class="descname">filter_conv_stft(data, W, analysisWindow=None, synthWindow=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
 <dt>
@@ -136,25 +141,38 @@ function stft</dd>
 <p>Computes the short time Fourier transform (STFT) of data.</p>
 <dl class="docutils">
 <dt>Inputs:</dt>
-<dd><p class="first">data                  : one-dimensional time-series to be analyzed
-window=sinebell(2048) : analysis window
-hopsize=1024.0        : hopsize for the analysis
-nfft=2048.0           : number of points for the Fourier computation</p>
-<blockquote>
-<div>(the user has to provide an even number)</div></blockquote>
-<p class="last">fs=44100.0            : sampling rate of the signal</p>
+<dd><dl class="first last docutils">
+<dt>data                  :</dt>
+<dd>one-dimensional time-series to be analyzed</dd>
+<dt>window=sinebell(2048) :</dt>
+<dd>analysis window</dd>
+<dt>hopsize=1024.0        :</dt>
+<dd>hopsize for the analysis</dd>
+<dt>nfft=2048.0           :</dt>
+<dd>number of points for the Fourier computation
+(the user has to provide an even number)</dd>
+<dt>fs=44100.0            :</dt>
+<dd>sampling rate of the signal</dd>
+</dl>
 </dd>
 <dt>Outputs:</dt>
-<dd><p class="first">X                     : STFT of data
-F                     : values of frequencies at each Fourier bins
-N                     : central time at the middle of each analysis</p>
-<blockquote class="last">
-<div>window</div></blockquote>
+<dd><dl class="first last docutils">
+<dt>X                     :</dt>
+<dd>STFT of data</dd>
+<dt>F                     :</dt>
+<dd>values of frequencies at each Fourier bins</dd>
+<dt>N                     :</dt>
+<dd>central time at the middle of each analysis
+window</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
 
-<span class="target" id="module-pyfasst.tftransforms.minqt"></span><p>Constant-Q transform after the work by C. Scholkhuber and A. Klapuri
+</div>
+<div class="section" id="module-pyfasst.tftransforms.minqt">
+<span id="minqtmodule"></span><h2>MinQTmodule<a class="headerlink" href="#module-pyfasst.tftransforms.minqt" title="Permalink to this headline">¶</a></h2>
+<p>Constant-Q transform after the work by C. Scholkhuber and A. Klapuri
 2010 [SK2010]</p>
 <p>Adaptation of the Constant Q transform as presented in
 .. [SK2010] Schoerkhuber, C. and Klapuri, A., &#8220;Constant-Q transform toolbox for music processing,&#8221;
@@ -165,7 +183,7 @@ code.</p>
 Jean-Louis Durrieu, EPFL, 2012 - 2013</p>
 <dl class="class">
 <dt id="pyfasst.tftransforms.minqt.CQTKernel">
-<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">CQTKernel</tt><big>(</big><em>fmax</em>, <em>bins</em>, <em>fs</em>, <em>q=1</em>, <em>atomHopFactor=0.25</em>, <em>thresh=0.0005</em>, <em>winFunc=&lt;function sqrt_blackmanharris at 0x1027637d0&gt;</em>, <em>perfRast=0</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tftransforms/minqt.html#CQTKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTKernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">CQTKernel</tt><big>(</big><em>fmax</em>, <em>bins</em>, <em>fs</em>, <em>q=1</em>, <em>atomHopFactor=0.25</em>, <em>thresh=0.0005</em>, <em>winFunc=&lt;function sqrt_blackmanharris at 0x1026455f0&gt;</em>, <em>perfRast=0</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tftransforms/minqt.html#CQTKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTKernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>The CQT Kernel contains everything that can be
 precomputed for Constant-Q transforms. This
 relies on [SK2010], and therefore computes a Kernel
@@ -223,6 +241,7 @@ q</div></blockquote>
 </dd></dl>
 
 </div>
+</div>
 
 
           </div>
@@ -230,6 +249,16 @@ q</div></blockquote>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Time-Frequency Transforms</a><ul>
+<li><a class="reference internal" href="#module-pyfasst.tftransforms.tft">TFT module</a></li>
+<li><a class="reference internal" href="#module-pyfasst.tftransforms.stft">STFT module</a></li>
+<li><a class="reference internal" href="#module-pyfasst.tftransforms.minqt">MinQTmodule</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="audiomodel.html"
                         title="previous chapter">audioModel</a></p>

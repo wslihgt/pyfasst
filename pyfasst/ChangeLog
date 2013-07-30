@@ -1,0 +1,8 @@
+2013-07-30  Jean-Louis Durrieu  <jean-louis.durrieu@epfl.ch>
+
+	* audioModel.py (NMF_decomposition): 
+	TODO: have to change the location for this function
+	(FASST.compute_suff_stat): 
+	modified the formulas, have to check that the computations 
+	still are correct.
+

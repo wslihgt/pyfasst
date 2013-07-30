@@ -3,3 +3,5 @@
 *.svn
 *.so
 *.o
+*.npz
+*.wav

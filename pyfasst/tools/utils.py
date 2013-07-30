@@ -1,9 +1,16 @@
-"""utils.py
+"""
+========
+utils.py
+========
 
 Useful functions for (audio) signal processing 
 
 2013 Jean-Louis Durrieu
+
 http://www.durrieu.ch
+
+Content
+=======
 """
 
 import numpy as np

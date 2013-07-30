@@ -118,13 +118,18 @@ def prinComp2D(X0, X1, neighborNb=10, verbose=0):
     return lambdaM, lambdam, vM, vm, #mu0_2, mu1_2, m01, cov0_2, cov1_2, cov01
 
 def invHermMat2D(a_00, a_01, a_11):
+    """This inverts a set of 2x2 Hermitian matrices
+
+    better check :py:func:`inv_herm_mat_2d` instead, and replace all
+    reference to this by the former.
+    """
     det = a_00 * a_11 - np.abs(a_01)**2
     if np.any(det==0):
         warnings.warn("The matrix is probably non invertible! %s"
                       %str(det[det==0]))
     return a_11/det, -a_01/det, a_00/det
     
-def inv_herm_mat_2d(self, sigma_x_diag, sigma_x_off):
+def inv_herm_mat_2d(sigma_x_diag, sigma_x_off, verbose=False):
     """Computes the inverse of 2D hermitian matrices.
 
     Inputs
@@ -175,13 +180,13 @@ def inv_herm_mat_2d(self, sigma_x_diag, sigma_x_off):
     #if len(sigma_x_diag.shape) != 3:
     #    raise ValueError("Something weird happened to sigma_x")
     det_sigma_x = np.prod(sigma_x_diag, axis=0) - np.abs(sigma_x_off)**2
-    if self.verbose:
+    if verbose:
         print "number of 0s in det ",(det_sigma_x==0.).sum()
     # issue when det sigma x is 0... 
     det_sigma_x = (
         np.sign(det_sigma_x + eps) *
         np.maximum(np.abs(det_sigma_x), eps))
-    if self.verbose:
+    if verbose:
         print "number of 0s left in det", (det_sigma_x==0.).sum()
     inv_sigma_x_diag = np.zeros_like(sigma_x_diag)
     inv_sigma_x_off = - sigma_x_off / det_sigma_x

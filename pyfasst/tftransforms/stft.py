@@ -9,18 +9,26 @@ def stft(data, window=sinebell(2048),
     Computes the short time Fourier transform (STFT) of data.
     
     Inputs:
-        data                  : one-dimensional time-series to be analyzed
-        window=sinebell(2048) : analysis window
-        hopsize=1024.0        : hopsize for the analysis
-        nfft=2048.0           : number of points for the Fourier computation
-                                (the user has to provide an even number)
-        fs=44100.0            : sampling rate of the signal
+        data                  :
+            one-dimensional time-series to be analyzed
+        window=sinebell(2048) :
+            analysis window
+        hopsize=1024.0        :
+            hopsize for the analysis
+        nfft=2048.0           :
+            number of points for the Fourier computation
+            (the user has to provide an even number)
+        fs=44100.0            :
+            sampling rate of the signal
         
     Outputs:
-        X                     : STFT of data
-        F                     : values of frequencies at each Fourier bins
-        N                     : central time at the middle of each analysis
-                                window
+        X                     :
+            STFT of data
+        F                     :
+            values of frequencies at each Fourier bins
+        N                     :
+            central time at the middle of each analysis
+            window
     """
     
     # window defines the size of the analysis windows

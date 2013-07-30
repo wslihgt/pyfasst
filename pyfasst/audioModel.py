@@ -45,9 +45,13 @@ import audioObject as ao
 import warnings, os
 
 import tools.signalTools as st
+from tools.signalTools import inv_herm_mat_2d
+from spatial.steering_vectors import gen_steer_vec_far_src_uniform_linear_array
 from SeparateLeadStereo import SeparateLeadStereoTF as SLS
 import demixTF as demix
 import tftransforms.tft as tft # loads the possible transforms
+
+from numpy.testing import assert_array_almost_equal # FOR DEBUG/DEV
 
 tftransforms = {
     'stftold': tft.TFTransform, # just making dummy, in FASST, not used
@@ -357,172 +361,6 @@ def SFNMF_decomp_init(SX, nbComps=10, nbFiltComps=10,
         Hres *= num / np.maximum(den, eps)
     
     return W, H.T, WFilt, HFilt.T, Wres, Hres
-    
-
-def inv_mat(mat_diag, mat_off):
-    """invert 2D hermitian matrix
-    """
-    det_mat = np.prod(mat_diag, axis=0) - np.abs(mat_off)**2
-    det_mat = (
-        np.sign(det_mat) *
-        np.maximum(np.abs(det_mat), eps)
-        )
-    
-    inv_mat_diag = np.zeros_like(mat_diag)
-    inv_mat_diag[0] = mat_diag[1] / det_mat
-    inv_mat_diag[1] = mat_diag[0] / det_mat
-    inv_mat_off = - mat_off / det_mat
-    
-    return inv_mat_diag, inv_mat_off, det_mat
-
-def gen_steer_vec_far_src_uniform_linear_array(freqs,
-                                               nchannels,
-                                               theta,
-                                               distanceInterMic):
-    """generate steering vector with relative far source,
-    uniformly spaced sensor array
-    
-    **Description**:
-    
-    assuming the source is far (compared to the dimensions of the array)
-    The sensor array is also assumed to be a linear array, the direction of
-    arrival (DOA) theta is defined as in the following incredible ASCII
-    art drawing::
-    
-          theta
-        ----->/              /
-        |    /              /
-        y   /              /
-           /              /
-        ^ /              /
-        |/              /
-        +---> x
-        o    o    o    o    o    o
-        M1   M2   M3  ...
-        <--->
-          d = distanceInterMic
-    
-    That is more likely valid for electro-magnetic fields, for acoustic
-    wave fields, one should probably take into account the difference of
-    gain between the microphones (see :py:func:`gen_steer_vec_acous` )
-    
-    **Output**:
-    
-    a (nc, nfreqs) ndarray
-        contains the steering vectors, one for each channel, and
-    
-    """
-    a = np.exp(- 1j * 2. * np.pi *
-               np.outer(np.arange(nchannels),
-                        freqs) *
-               (distanceInterMic / soundCelerity) * 
-               np.sin(theta))
-    return a
-
-def gen_steer_vec_acous(freqs,
-                        dist_src_mic):
-    """generates a steering vector for the given frequencies and given
-    distances between the microphones and the source.
-    
-    To the difference with
-    :py:func:`gen_steer_vec_far_src_uniform_linear_array`, this function
-    also includes gains depending on the distance between the source and
-    the mics.
-    
-    """
-    gains = 1 / (np.sqrt(4. * np.pi) * dist_src_mic)
-    a = (np.vstack(gains) *
-         np.exp(- 1j * 2. * np.pi *
-                np.outer(dist_src_mic,
-                         freqs) /
-                soundCelerity
-                )
-         )
-    return a
-
-def dir_diag_stereo(Cx,
-                    nft=2048,
-                    ntheta=512,
-                    samplerate=44100,#Hz
-                    distanceInterMic=0.3,#m
-                    ):
-    """Compute the diagram of directivity for the input
-    short time Fourier transform second order statistics in Cx
-    
-    .. math::
-    
-        C_x[0] = E[|x_0|^2]
-        
-        C_x[2] = E[|x_1|^2]
-        
-        C_x[1] = E[x_0 x_1^H]
-        
-    
-    **Method**:
-    
-    We use the Capon method, on each of the Fourier channel
-    
-    .. math::
-    
-        \phi_k(\\theta) = a_k(\\theta)^H inv(Rxx) a_k(\\theta)
-    
-    The algorithm therefore returns one directivity graph for each
-    frequency band. 
-    
-    **Remarks**:
-    
-    One can compute a summary directivity by adding the directivity functions
-    across all the frequency channels. The invert of the resulting array may
-    also be of interest (looking at peaks and not valleys to find directions)::
-    
-     >>> directivity_diag = dir_diag_stereo(Cx)
-     >>> summary_dir_diag = 1./directivity_diag.sum(axis=1)
-    
-    Some tests show that it is very important that the distance between the
-    microphone is known. Otherwise, little can be infered from the resulting
-    directivity measure...
-    """
-    nchannels = 2 # this function only works for stereo audio
-    
-    # for capon, we need the average of Cx:
-    meanCx_diag = np.array([Cx[0].mean(axis=1),
-                            Cx[2].mean(axis=1)],
-                           dtype=np.float64)
-    meanCx_off  = Cx[1].mean(axis=1)
-    # ... and its inverse:
-    inv_mat_diag, inv_mat_off, det_mat = (
-        inv_mat(meanCx_diag, meanCx_off)
-        )
-    
-    if not np.all(det_mat):
-        raise ValueError(
-            "Not possible to compute directivity, singular covariance. "+
-            "\nThe channels are probably either identical or colinear.")
-    
-    nfreqs = nft / 2 + 1
-    freqs = np.arange(nfreqs) * 1. / nft * samplerate
-    
-    # now computing the directivity diagram, angle after angle
-    directivity_diagram = np.zeros([ntheta, nfreqs], dtype=np.float64)
-    # theta from -pi/2 to +pi/2
-    theta = np.arange(1, ntheta+1) * np.pi / (ntheta + 1.) - np.pi / 2.
-    for nth in range(ntheta):
-        # Compute steering vectors for each frequency
-        filt = gen_steer_vec_far_src_uniform_linear_array(freqs,
-                                                          nchannels,
-                                                          theta[nth],
-                                                          distanceInterMic)
-        
-        directivity_diagram[nth] = (
-            (np.abs(filt[0]**2)) * inv_mat_diag[0] +
-            (np.abs(filt[1]**2)) * inv_mat_diag[1] +
-            2. * np.real((np.conjugate(filt[0]) * filt[1]) *
-                         inv_mat_off)
-            #filt[0] * np.conjugate(filt[1]) * np.conjugate(inv_mat_off) +
-            #np.conjugate(filt[0]) * filt[1] * inv_mat_off
-            )
-    
-    return directivity_diagram, theta
 
 ########## Filter generation functions   ##########
 
@@ -814,7 +652,7 @@ class FASST(object):
         del Xchan
     
     def estim_param_a_post_model(self,):
-        """Estimates the _a posteriori_ model for the provided
+        """Estimates the `a posteriori` model for the provided
         audio signal. In particular, this runs self.iter_num times
         the Generalized Expectation-Maximisation algorithm to
         update the various parameters of the model, so as to
@@ -825,8 +663,8 @@ class FASST(object):
         components) can be computed, leading to the estimation of the
         separated underlying sources.
 
-        Consider using ``self.separate\_spat\_comps`` or
-        ``self.separate\_spatial\_filter\_comp`` to obtain the separated time
+        Consider using ``self.separate_spat_comps`` or
+        ``self.separate_spatial_filter_comp`` to obtain the separated time
         series, once the parameters have been estimated.
         """
         
@@ -1053,16 +891,34 @@ class FASST(object):
         if self.verbose: print "    Computing sufficient statistics"
         nbspatcomp = spat_comp_powers.shape[0]
         
-        sigma_x_diag = np.zeros([2,
+        # CAUTION! non-initialized arrays !
+        sigma_x_diag = np.empty([2,
                                  self.nbFreqsSigRepr,
                                  self.nbFramesSigRepr])
-        sigma_x_off = np.zeros([self.nbFreqsSigRepr,
-                                self.nbFramesSigRepr], dtype=complex)
+        #sigma_x_off = np.empty([self.nbFreqsSigRepr,
+        #                        self.nbFramesSigRepr], dtype=complex)
+        
+        # setting the first element with spat_comp 0:
+        r = 0
+        sigma_x_diag[0] = (
+            np.vstack(np.abs(mix_matrix[r][0])**2) *
+            spat_comp_powers[r]
+            )
+        sigma_x_diag[1] = (
+            np.vstack(np.abs(mix_matrix[r][1])**2) *
+            spat_comp_powers[r]
+            )
+        sigma_x_off = (
+            np.vstack(mix_matrix[r][0] *
+                      np.conj(mix_matrix[r][1])) *
+            spat_comp_powers[r]
+            )
+        
         for n in range(2):
             sigma_x_diag[n] += np.vstack(self.noise['PSD'])
             # noise PSD should be of size nbFreqs
         
-        for r in range(nbspatcomp):
+        for r in range(1, nbspatcomp):
             sigma_x_diag[0] += (
                 np.vstack(np.abs(mix_matrix[r][0])**2) *
                 spat_comp_powers[r]
@@ -1078,7 +934,8 @@ class FASST(object):
                 )
             
         inv_sigma_x_diag, inv_sigma_x_off, det_sigma_x = (
-            self.inv_herm_mat_2d(sigma_x_diag, sigma_x_off))
+            inv_herm_mat_2d(sigma_x_diag, sigma_x_off,
+                            verbose=self.verbose))
         del sigma_x_diag, sigma_x_off
         
         # compute log likelihood
@@ -1088,51 +945,54 @@ class FASST(object):
                            2. * np.real(inv_sigma_x_off * np.conj(self.Cx[1]))
                            )
         # compute expectations of Rss and Ws sufficient statistics
-        Gs = {}
+        Gs = np.empty((2, nbspatcomp,
+                       self.nbFreqsSigRepr,
+                       self.nbFramesSigRepr)) # {}
         # one for each channel (stereo, here)
-        Gs[0] = {}
-        Gs[1] = {}
+        #Gs[0] = {}
+        #Gs[1] = {}
         for r in range(nbspatcomp):
-            Gs[0][r] = (
+            Gs[0, r] = (
                 (np.vstack(np.conj(mix_matrix[r][0])) * inv_sigma_x_diag[0] +
                  np.vstack(np.conj(mix_matrix[r][1])) *
                  np.conj(inv_sigma_x_off)) *
                 spat_comp_powers[r]
                 )
             
-            Gs[1][r] = (
+            Gs[1, r] = (
                 (np.vstack(np.conj(mix_matrix[r][0])) * inv_sigma_x_off +
                  np.vstack(np.conj(mix_matrix[r][1])) * inv_sigma_x_diag[1]) *
                 spat_comp_powers[r]
                 )
-            
-        hat_Rss = np.zeros([self.nbFreqsSigRepr,
+
+        # the following quantities are assigned later, so
+        # an empty allocation should do.
+        hat_Rss = np.empty([self.nbFreqsSigRepr,
                             nbspatcomp,
                             nbspatcomp],
                            dtype=complex)
-        hat_Ws = np.zeros([nbspatcomp,
+        hat_Ws = np.empty([nbspatcomp,
                            self.nbFreqsSigRepr,
                            self.nbFramesSigRepr])
-        hatRssLoc1 = np.zeros_like(self.Cx[0])
-        hatRssLoc2 = np.zeros_like(self.Cx[0])
-        hatRssLoc3 = np.zeros_like(self.Cx[0])
+        hatRssLoc1 = np.empty_like(self.Cx[0])
+        hatRssLoc2 = np.empty_like(self.Cx[0])
+        hatRssLoc3 = np.empty_like(self.Cx[0])
         for r1 in range(nbspatcomp):
             for r2 in range(nbspatcomp):
                 # TODO: could probably factor a bit more the following formula:
-                ## hatRssLoc1[:] = (Gs[0][r1] * np.conj(Gs[0][r2]) * self.Cx[0] + Gs[1][r1] * np.conj(Gs[1][r2]) * self.Cx[2] +Gs[0][r1] * np.conj(Gs[1][r2]) * self.Cx[1] +Gs[1][r1] * np.conj(Gs[0][r2]) *np.conj(self.Cx[1]) -(Gs[0][r1] * np.vstack(mix_matrix[r2][0]) + Gs[1][r1] * np.vstack(mix_matrix[r2][1])) *spat_comp_powers[r2]  )
                 hatRssLoc1[:] = np.copy(self.Cx[0])
-                hatRssLoc1 *= np.conj(Gs[0][r2])
-                hatRssLoc1 += (np.conj(Gs[1][r2]) * self.Cx[1])
-                hatRssLoc1 *= Gs[0][r1]
+                hatRssLoc1 *= np.conj(Gs[0,r2])
+                hatRssLoc1 += (np.conj(Gs[1,r2]) * self.Cx[1])
+                hatRssLoc1 *= Gs[0,r1]
                 
                 hatRssLoc2[:] = np.copy(self.Cx[2])
-                hatRssLoc2 *= np.conj(Gs[1][r2])
-                hatRssLoc2 += (np.conj(Gs[0][r2]) * np.conj(self.Cx[1]))
-                hatRssLoc2 *= Gs[1][r1]
+                hatRssLoc2 *= np.conj(Gs[1,r2])
+                hatRssLoc2 += (np.conj(Gs[0,r2] * self.Cx[1]))
+                hatRssLoc2 *= Gs[1,r1]
                 
-                hatRssLoc3[:] = np.copy(Gs[0][r1])
-                hatRssLoc3 *= np.vstack(mix_matrix[r2][0])
-                hatRssLoc3 += (Gs[1][r1] * np.vstack(mix_matrix[r2][1]))
+                hatRssLoc3[:] = np.copy(Gs[0,r1])
+                hatRssLoc3 *= np.vstack(mix_matrix[r2,0])
+                hatRssLoc3 += (Gs[1,r1] * np.vstack(mix_matrix[r2,1]))
                 hatRssLoc3 *= spat_comp_powers[r2]
                 
                 hatRssLoc1 += hatRssLoc2
@@ -1154,10 +1014,15 @@ class FASST(object):
                 
         # To assure hermitian symmetry:
         for f in range(self.nbFreqsSigRepr):
+            if self.verbose>10: # DEBUG
+                assert_array_almost_equal(
+                    hat_Rss[f],
+                    (hat_Rss[f] + np.conj(hat_Rss[f]).T) / 2.)
+                
             hat_Rss[f] = (hat_Rss[f] + np.conj(hat_Rss[f]).T) / 2.
             
         # Expectations of Rxs sufficient statistics
-        hat_Rxs = np.zeros([self.nbFreqsSigRepr,
+        hat_Rxs = np.empty([self.nbFreqsSigRepr,
                             2,
                             nbspatcomp],
                            dtype=complex)
@@ -1179,72 +1044,6 @@ class FASST(object):
         # hat_Rxx[]
         
         return hat_Rxx, hat_Rxs, hat_Rss, hat_Ws, loglik
-    
-    def inv_herm_mat_2d(self, sigma_x_diag, sigma_x_off):
-        """Computes the inverse of 2D hermitian matrices.
-
-        Inputs
-        ------
-        sigma_x_diag
-            ndarray, with (dim of axis=0) = 2
-            
-            The diagonal elements of the matrices to invert.
-            sigma_x_diag[0] are the (0,0) elements and
-            sigma_x_diag[1] are the (1,1) ones.
-            
-        sigma_x_off
-            ndarray, with the same dimensions as sigma_x_diag[0]
-            
-            The off-diagonal elements of the matrices, more precisely the
-            (0,1) element (since the matrices are assumed Hermitian,
-            the (1,0) element is the complex conjugate)
-        
-        Outputs
-        -------
-        inv_sigma_x_diag
-            ndarray, 2 x shape(sigma_x_off)
-
-            Diagonal elements of the inverse matrices.
-            [0] <-> (0,0)
-            [1] <-> (1,1)
-
-        inv_sigma_x_off
-            ndarray, shape(sigma_x_off)
-            
-            Off-diagonal (0,1) elements of the inverse matrices
-
-        det_sigma_x
-            ndarray, shape(sigma_x_off)
-            
-            For each inversion, the determinant of the matrix.
-        
-        Remarks
-        -------
-        The inversion is done explicitly, by computing the determinant
-        (explicit formula for 2D matrices), then the elements of the
-        inverse with the corresponding formulas.
-        
-        To deal with ill-conditioned matrices, a minimum (absolute) value of
-        the determinant is guaranteed. 
-        
-        """
-        #if len(sigma_x_diag.shape) != 3:
-        #    raise ValueError("Something weird happened to sigma_x")
-        det_sigma_x = np.prod(sigma_x_diag, axis=0) - np.abs(sigma_x_off)**2
-        if self.verbose:
-            print "number of 0s in det ",(det_sigma_x==0.).sum()
-        # issue when det sigma x is 0... 
-        det_sigma_x = (
-            np.sign(det_sigma_x + eps) *
-            np.maximum(np.abs(det_sigma_x), eps))
-        if self.verbose:
-            print "number of 0s left in det", (det_sigma_x==0.).sum()
-        inv_sigma_x_diag = np.zeros_like(sigma_x_diag)
-        inv_sigma_x_off = - sigma_x_off / det_sigma_x
-        inv_sigma_x_diag[0] = sigma_x_diag[1] / det_sigma_x
-        inv_sigma_x_diag[1] = sigma_x_diag[0] / det_sigma_x
-        
-        return inv_sigma_x_diag, inv_sigma_x_off, det_sigma_x
     
     def update_mix_matrix(self,hat_Rxs, hat_Rss, mix_matrix, rank_part_ind):
         """
@@ -1446,8 +1245,9 @@ class FASST(object):
         Raa_00 = np.mean(R_diag0, axis=0)
         Raa_11 = np.mean(R_diag1, axis=0)
         Raa_01 = np.mean(R_off, axis=0)
-        inv_Raa_diag, inv_Raa_off, det_mat = inv_mat([Raa_00, Raa_11],
-                                                     Raa_01)
+        inv_Raa_diag, inv_Raa_off, det_mat = inv_herm_mat_2d(
+            [Raa_00, Raa_11],
+            Raa_01, verbose=self.verbose)
         
         if not hasattr(self, 'files'):
             self.files = {}
@@ -1698,12 +1498,10 @@ class FASST(object):
         if self.verbose>1:
             print Cx
         
-        #inv_Cx_diag, inv_Cx_off, det_Cx = self.inv_herm_mat_2d([self.Cx[0],
-        #                                                        self.Cx[2]],
-        #                                                       self.Cx[1])
-        inv_Cx_diag, inv_Cx_off, det_Cx = self.inv_herm_mat_2d([Cx[0],
-                                                                Cx[2]],
-                                                               Cx[1])
+        inv_Cx_diag, inv_Cx_off, det_Cx = inv_herm_mat_2d(
+            [Cx[0], Cx[2]],
+            Cx[1],
+            verbose=self.verbose)
         freqs = (
             np.arange(self.nbFreqsSigRepr) * 1. /
             self.sig_repr_params['fsize'] * self.audioObject.samplerate
@@ -1857,7 +1655,8 @@ class FASST(object):
             # noise PSD should be of size nbFreqs
         
         inv_sigma_x_diag, inv_sigma_x_off, _ = (
-            self.inv_herm_mat_2d(sigma_x_diag, sigma_x_off))
+            inv_herm_mat_2d(sigma_x_diag, sigma_x_off,
+                            verbose=self.verbose))
         
         del sigma_x_diag, sigma_x_off
         
@@ -2767,12 +2566,10 @@ class MultiChanNMFInst_FASST(FASST):
                  spatial_rank=2,
                  **kwargs):
         """
-        DESCRIPTION
-        -----------
+        **DESCRIPTION**
         
         
-        ARGUMENTS
-        ---------
+        **ARGUMENTS**
         
         nbComps (int)
             The number of (spatial) components in FASST framework.
@@ -2941,8 +2738,7 @@ class multiChanSourceF0Filter(FASST):
                  sparsity=None,
                  **kwargs):
         """
-        DESCRIPTION
-        -----------
+        **DESCRIPTION**
         __init__(self, audio,
                  nbComps=3, ## nb of components
                  nbNMFResComps=3, ## nb of residual components
@@ -2954,8 +2750,7 @@ class multiChanSourceF0Filter(FASST):
                  sparsity=None,
                  **kwargs)
         
-        ARGUMENTS
-        ---------
+        **ARGUMENTS**
         
         nbComps (int)
             The number of (spatial) components in FASST framework.
@@ -3154,11 +2949,15 @@ class multiChanSourceF0Filter(FASST):
         `instru2modelfile`
         
         `instrus` is a list with labels:
-            `'SourceFilter'`: keep the intialized source filter model
-            `'Free_<nb_comp>'`: initialize the model with an adaptable
+            `'SourceFilter'`:
+                keep the intialized source filter model
+            `'Free_<nb_comp>'`:
+                initialize the model with an adaptable
                 spectral component using `nb_comp` elements in the NMF
                 frequency basis
-            `<key_in_instru2modelfile>`: initialize with the :py:class:GSMM
+                
+            `<key_in_instru2modelfile>`:
+                initialize with the :py:class:GSMM
                 available and stored in the archive npz with filename
                 `instru2modelfile[key_in_instru2modelfile]`
                 
@@ -3489,6 +3288,10 @@ class multichanLead(multiChanSourceF0Filter):
                   niter_nmf=20, niter_simm=30):
         """Running the scheme that should make me famous.
         """
+        # checking the folder for results
+        if not os.path.isdir(dir_results):
+            os.mkdir(dir_results)
+        
         # running some checks that the input is alright:
         for i in instrus:
             if not(i=='SourceFilter' or

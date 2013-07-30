@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Directivity Diagrams &mdash; pyFASST 0.1 documentation</title>
+    <title>Spatial Signal Models &mdash; pyFASST 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -55,8 +55,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="directivity-diagrams">
-<h1>Directivity Diagrams<a class="headerlink" href="#directivity-diagrams" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="spatial-signal-models">
+<h1>Spatial Signal Models<a class="headerlink" href="#spatial-signal-models" title="Permalink to this headline">¶</a></h1>
 <p>draws directivity diagrams for ULA assumption</p>
 <div class="section" id="module-pyfasst.spatial.dirdiag">
 <span id="contents"></span><h2>Contents<a class="headerlink" href="#module-pyfasst.spatial.dirdiag" title="Permalink to this headline">¶</a></h2>
@@ -66,7 +66,7 @@
 <a class="reference external" href="http://www.durrieu.ch">http://www.durrieu.ch</a></p>
 <dl class="function">
 <dt id="pyfasst.spatial.dirdiag.directivity_filter_diagram_ULA">
-<tt class="descclassname">pyfasst.spatial.dirdiag.</tt><tt class="descname">directivity_filter_diagram_ULA</tt><big>(</big><em>n_sensors=2</em>, <em>dist_inter_sensor=0.15</em>, <em>w_filter=None</em>, <em>theta_filter=0</em>, <em>freqs=None</em>, <em>thetas=None</em>, <em>nfreqs=256</em>, <em>nthetas=30</em>, <em>samplerate=8000.0</em>, <em>doplot='2d'</em>, <em>fig=None</em>, <em>subplot_number=(1</em>, <em>1</em>, <em>1)</em>, <em>dyn_func=&lt;function db at 0x102763578&gt;</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/dirdiag.html#directivity_filter_diagram_ULA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.dirdiag.directivity_filter_diagram_ULA" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.spatial.dirdiag.</tt><tt class="descname">directivity_filter_diagram_ULA</tt><big>(</big><em>n_sensors=2</em>, <em>dist_inter_sensor=0.15</em>, <em>w_filter=None</em>, <em>theta_filter=0</em>, <em>freqs=None</em>, <em>thetas=None</em>, <em>nfreqs=256</em>, <em>nthetas=30</em>, <em>samplerate=8000.0</em>, <em>doplot='2d'</em>, <em>fig=None</em>, <em>subplot_number=(1</em>, <em>1</em>, <em>1)</em>, <em>dyn_func=&lt;function db at 0x10212ecf8&gt;</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/dirdiag.html#directivity_filter_diagram_ULA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.dirdiag.directivity_filter_diagram_ULA" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes and displays the directivity diagram associated to
 the provided filter <tt class="docutils literal"><span class="pre">w_filter</span></tt> (optionally parameterized by the
 targetted direction <tt class="docutils literal"><span class="pre">theta_filter</span></tt>).</p>
@@ -90,7 +90,7 @@ signal parameters.</p>
 
 <dl class="function">
 <dt id="pyfasst.spatial.dirdiag.produceMVDRplots">
-<tt class="descclassname">pyfasst.spatial.dirdiag.</tt><tt class="descname">produceMVDRplots</tt><big>(</big><em>theta_filter=0.7853981633974483, freqs=None, n_freqs=256, thetas=None, n_thetas=30, samplerate=8000.0, n_sensors=2, dist_inter_sensors=0.15, dists=[0.15, 0.5, 1.0], doplot='2d', dyn_func=&lt;function db at 0x102763578&gt;, theta_interf=None, n_theta_interf=4</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/dirdiag.html#produceMVDRplots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.dirdiag.produceMVDRplots" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.spatial.dirdiag.</tt><tt class="descname">produceMVDRplots</tt><big>(</big><em>theta_filter=0.7853981633974483, freqs=None, n_freqs=256, thetas=None, n_thetas=30, samplerate=8000.0, n_sensors=2, dist_inter_sensors=0.15, dists=[0.15, 0.5, 1.0], doplot='2d', dyn_func=&lt;function db at 0x10212ecf8&gt;, theta_interf=None, n_theta_interf=4</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/dirdiag.html#produceMVDRplots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.dirdiag.produceMVDRplots" title="Permalink to this definition">¶</a></dt>
 <dd><p>MVDR gains for spatial filtering</p>
 <p><strong>Description</strong>:</p>
 <p>Minimum Variance - Distortionless Response</p>
@@ -115,11 +115,90 @@ signal parameters.</p>
 
 <dl class="function">
 <dt id="pyfasst.spatial.dirdiag.producePicDiagramAgainstDistNSensors">
-<tt class="descclassname">pyfasst.spatial.dirdiag.</tt><tt class="descname">producePicDiagramAgainstDistNSensors</tt><big>(</big><em>w_filter=None</em>, <em>theta_filter=0.7853981633974483</em>, <em>sensors=None</em>, <em>dists=None</em>, <em>samplerate=8000.0</em>, <em>doplot='2d'</em>, <em>dyn_func=&lt;function db at 0x102763578&gt;</em>, <em>thetas=None</em>, <em>nthetas=30</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/dirdiag.html#producePicDiagramAgainstDistNSensors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.dirdiag.producePicDiagramAgainstDistNSensors" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.spatial.dirdiag.</tt><tt class="descname">producePicDiagramAgainstDistNSensors</tt><big>(</big><em>w_filter=None</em>, <em>theta_filter=0.7853981633974483</em>, <em>sensors=None</em>, <em>dists=None</em>, <em>samplerate=8000.0</em>, <em>doplot='2d'</em>, <em>dyn_func=&lt;function db at 0x10212ecf8&gt;</em>, <em>thetas=None</em>, <em>nthetas=30</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/dirdiag.html#producePicDiagramAgainstDistNSensors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.dirdiag.producePicDiagramAgainstDistNSensors" title="Permalink to this definition">¶</a></dt>
 <dd><p>generate a drawing that shows the directivity diagrams for
 several values of distance between sensors and number of sensors.</p>
 </dd></dl>
 
+<span class="target" id="module-pyfasst.spatial.steering_vectors"></span><div class="section" id="steering-vectors">
+<h3>STEERING VECTORS<a class="headerlink" href="#steering-vectors" title="Permalink to this headline">¶</a></h3>
+<p>generating steering vectors for arrays of sensors</p>
+<div class="section" id="content">
+<h4>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h4>
+<dl class="function">
+<dt id="pyfasst.spatial.steering_vectors.dir_diag_stereo">
+<tt class="descclassname">pyfasst.spatial.steering_vectors.</tt><tt class="descname">dir_diag_stereo</tt><big>(</big><em>Cx</em>, <em>nft=2048</em>, <em>ntheta=512</em>, <em>samplerate=44100</em>, <em>distanceInterMic=0.3</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/steering_vectors.html#dir_diag_stereo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.steering_vectors.dir_diag_stereo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the diagram of directivity for the input
+short time Fourier transform second order statistics in Cx
+(this Cx is compatible with the attribute from an instantiation
+of <a class="reference internal" href="audiomodel.html#pyfasst.audioModel.FASST" title="pyfasst.audioModel.FASST"><tt class="xref py py-class docutils literal"><span class="pre">pyfasst.audioModel.FASST</span></tt></a>)</p>
+<div class="math">
+\[C_x[0] = E[|x_0|^2]\]\[C_x[2] = E[|x_1|^2]\]\[C_x[1] = E[x_0 x_1^H]\]</div>
+<p><strong>Method</strong>:</p>
+<p>We use the Capon method, on each of the Fourier channel <span class="math">\(k\)</span>:</p>
+<div class="math">
+\[\phi_k(\theta) = a_k(\theta)^H R_{xx}^{-1} a_k(\theta)\]</div>
+<p>The algorithm therefore returns one directivity graph for each
+frequency band.</p>
+<p><strong>Remarks</strong>:</p>
+<p>One can compute a summary directivity by adding the directivity functions
+across all the frequency channels. The invert of the resulting array may
+also be of interest (looking at peaks and not valleys to find directions):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">directivity_diag</span> <span class="o">=</span> <span class="n">dir_diag_stereo</span><span class="p">(</span><span class="n">Cx</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary_dir_diag</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">directivity_diag</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some tests show that it is very important that the distance between the
+microphone is known. Otherwise, little can be infered from the resulting
+directivity measure...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.spatial.steering_vectors.gen_steer_vec_acous">
+<tt class="descclassname">pyfasst.spatial.steering_vectors.</tt><tt class="descname">gen_steer_vec_acous</tt><big>(</big><em>freqs</em>, <em>dist_src_mic</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/steering_vectors.html#gen_steer_vec_acous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.steering_vectors.gen_steer_vec_acous" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates a steering vector for the given frequencies and given
+distances between the microphones and the source.</p>
+<p>To the difference with
+<a class="reference internal" href="#pyfasst.spatial.steering_vectors.gen_steer_vec_far_src_uniform_linear_array" title="pyfasst.spatial.steering_vectors.gen_steer_vec_far_src_uniform_linear_array"><tt class="xref py py-func docutils literal"><span class="pre">gen_steer_vec_far_src_uniform_linear_array()</span></tt></a>, this function
+also includes gains depending on the distance between the source and
+the mics.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.spatial.steering_vectors.gen_steer_vec_far_src_uniform_linear_array">
+<tt class="descclassname">pyfasst.spatial.steering_vectors.</tt><tt class="descname">gen_steer_vec_far_src_uniform_linear_array</tt><big>(</big><em>freqs</em>, <em>nchannels</em>, <em>theta</em>, <em>distanceInterMic</em><big>)</big><a class="reference internal" href="_modules/pyfasst/spatial/steering_vectors.html#gen_steer_vec_far_src_uniform_linear_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.spatial.steering_vectors.gen_steer_vec_far_src_uniform_linear_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>generate steering vector with relative far source,
+uniformly spaced sensor array</p>
+<p><strong>Description</strong>:</p>
+<p>assuming the source is far (compared to the dimensions of the array)
+The sensor array is also assumed to be a linear array, the direction of
+arrival (DOA) theta is defined as in the following incredible ASCII
+art drawing:</p>
+<div class="highlight-python"><pre>  theta
+-----&gt;/              /
+|    /              /
+y   /              /
+   /              /
+^ /              /
+|/              /
++---&gt; x
+o    o    o    o    o    o
+M1   M2   M3  ...
+&lt;---&gt;
+  d = distanceInterMic</pre>
+</div>
+<p>That is more likely valid for electro-magnetic fields, for acoustic
+wave fields, one should probably take into account the difference of
+gain between the microphones (see <a class="reference internal" href="#pyfasst.spatial.steering_vectors.gen_steer_vec_acous" title="pyfasst.spatial.steering_vectors.gen_steer_vec_acous"><tt class="xref py py-func docutils literal"><span class="pre">gen_steer_vec_acous()</span></tt></a> )</p>
+<p><strong>Output</strong>:</p>
+<dl class="docutils">
+<dt>a (nc, nfreqs) ndarray</dt>
+<dd>contains the steering vectors, one for each channel, and</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
 </div>
 </div>
 
@@ -131,8 +210,14 @@ several values of distance between sensors and number of sensors.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Directivity Diagrams</a><ul>
-<li><a class="reference internal" href="#module-pyfasst.spatial.dirdiag">Contents</a></li>
+<li><a class="reference internal" href="#">Spatial Signal Models</a><ul>
+<li><a class="reference internal" href="#module-pyfasst.spatial.dirdiag">Contents</a><ul>
+<li><a class="reference internal" href="#steering-vectors">STEERING VECTORS</a><ul>
+<li><a class="reference internal" href="#content">Content</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

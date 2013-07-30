@@ -895,7 +895,7 @@ class FASST(object):
         sigma_x_diag = np.empty([2,
                                  self.nbFreqsSigRepr,
                                  self.nbFramesSigRepr])
-        #sigma_x_off = np.empty([self.nbFreqsSigRepr,
+        #sigma_x_off = np.zeros([self.nbFreqsSigRepr,
         #                        self.nbFramesSigRepr], dtype=complex)
         
         # setting the first element with spat_comp 0:
@@ -947,7 +947,7 @@ class FASST(object):
         # compute expectations of Rss and Ws sufficient statistics
         Gs = np.empty((2, nbspatcomp,
                        self.nbFreqsSigRepr,
-                       self.nbFramesSigRepr)) # {}
+                       self.nbFramesSigRepr), dtype=np.complex) # {}
         # one for each channel (stereo, here)
         #Gs[0] = {}
         #Gs[1] = {}
@@ -1001,7 +1001,7 @@ class FASST(object):
                 #hatRssLoc = (Gs[0][r1] * np.conj(Gs[0][r2]) * self.Cx[0] +
                 #             Gs[1][r1] * np.conj(Gs[1][r2]) * self.Cx[2] +
                 #             Gs[0][r1] * np.conj(Gs[1][r2]) * self.Cx[1] +
-                #             Gs[1][r1] * np.conj(Gs[0][r2]) * np.conj(self.Cx[1]) -
+                #             Gs[1][r1]*np.conj(Gs[0][r2])*np.conj(self.Cx[1])-
                 #             (Gs[0][r1] * np.vstack(mix_matrix[r2][0]) +
                 #              Gs[1][r1] * np.vstack(mix_matrix[r2][1]))
                 #             * spat_comp_powers[r2]
@@ -2821,7 +2821,10 @@ class multiChanSourceF0Filter(FASST):
         self.sparsity = sparsity
         self._initialize_structures()
     
-    def _initialize_structures(self):
+    def _initialize_structures(self, seed=None):
+        """initialize the structures for the model.
+        """
+        np.random.seed(seed) # essential for DEBUG
         self.rank = self.spatial_rank
         nc = self.audioObject.channels
         sparsity = self.sparsity

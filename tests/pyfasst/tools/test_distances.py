@@ -11,6 +11,6 @@ import pyfasst.tools.distances as dist
 def test_ISDistortion():
     """ISDistortion is the Itakura Saito divergence
     """
-    assert_equal(dist.ISDistortion(1,1), 0)
-    assert_true(dist.ISDistortion(1,2))
+    assert_equal(dist.ISDistortion(1,1.), 0)
+    assert_true(dist.ISDistortion(1,2.))
 

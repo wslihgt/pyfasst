@@ -14,15 +14,15 @@ TBD
 Reference
 ---------
 
-    A. Ozerov, E. Vincent and F. Bimbot
+..[Ozerov2012] A. Ozerov, E. Vincent and F. Bimbot
     \"A General Flexible Framework for the Handling of Prior Information
     in Audio Source Separation,\" 
     IEEE Transactions on Audio, Speech and Signal Processing 20(4),
     pp. 1118-1133 (2012)                            
     Available: `Archive on HAL <http://hal.inria.fr/hal-00626962/>`_
     
-    Adapted from the Matlab toolbox available at
-    http://bass-db.gforge.inria.fr/fasst/
+Adapted from the Matlab toolbox available at
+http://bass-db.gforge.inria.fr/fasst/
 
 Copyright (TBD)
 ---------------
@@ -41,18 +41,22 @@ Reference
 """
 
 import numpy as np 
-import audioObject as ao
+from numpy.testing import assert_array_almost_equal # FOR DEBUG/DEV
 import warnings, os
+
+import audioObject as ao
+import demixTF as demix
+
+import SeparateLeadStereo.SeparateLeadStereoTF as SLS
+
+from sourcefilter.filter import generateHannBasis
+from spatial.steering_vectors import gen_steer_vec_far_src_uniform_linear_array
+
+import tftransforms.tft as tft # loads the possible transforms
 
 import tools.signalTools as st
 from tools.signalTools import inv_herm_mat_2d
 from tools.nmf import NMF_decomp_init, NMF_decomposition
-from spatial.steering_vectors import gen_steer_vec_far_src_uniform_linear_array
-from SeparateLeadStereo import SeparateLeadStereoTF as SLS
-import demixTF as demix
-import tftransforms.tft as tft # loads the possible transforms
-
-from numpy.testing import assert_array_almost_equal # FOR DEBUG/DEV
 
 tftransforms = {
     'stftold': tft.TFTransform, # just making dummy, in FASST, not used
@@ -66,89 +70,9 @@ eps = 1e-10
 log_prior_small_cst = 1e-70
 soundCelerity = 340. # m/s
 
-########## Filter generation functions   ##########
-
-def generateHannBasis(numberFrequencyBins, sizeOfFourier, Fs, \
-                      frequencyScale='linear', numberOfBasis=20, \
-                      overlap=.75):
-    isScaleRecognized = False
-    if frequencyScale == 'linear':
-        # number of windows generated:
-        numberOfWindowsForUnit = np.ceil(1.0 / (1.0 - overlap))
-        # recomputing the overlap to exactly fit the entire
-        # number of windows:
-        overlap = 1.0 - 1.0 / np.double(numberOfWindowsForUnit)
-        # length of the sine window - that is also to say: bandwidth
-        # of the sine window:
-        lengthSineWindow = np.ceil(numberFrequencyBins \
-                                   / ((1.0 - overlap) \
-                                      * (numberOfBasis - 1) + 1 \
-                                      - 2.0 * overlap))
-        # even window length, for convenience:
-        lengthSineWindow = 2.0 * np.floor(lengthSineWindow / 2.0) 
-        
-        # for later compatibility with other frequency scales:
-        mappingFrequency = np.arange(numberFrequencyBins) 
-        
-        # size of the "big" window
-        sizeBigWindow = 2.0 * numberFrequencyBins
-        
-        # centers for each window
-        ## the first window is centered at, in number of window:
-        firstWindowCenter = - numberOfWindowsForUnit + 1
-        ## and the last is at
-        lastWindowCenter = numberOfBasis - numberOfWindowsForUnit + 1
-        ## center positions in number of frequency bins
-        sineCenters = np.round(\
-            np.arange(firstWindowCenter, lastWindowCenter) \
-            * (1 - overlap) * np.double(lengthSineWindow) \
-            + lengthSineWindow / 2.0)
-        
-        # For future purpose: to use different frequency scales
-        isScaleRecognized = True
-        
-    # For frequency scale in logarithm (such as ERB scales) 
-    if frequencyScale == 'log':
-        isScaleRecognized = False
-        
-    # checking whether the required scale is recognized
-    if not(isScaleRecognized):
-        raise NotImplementedError("The desired feature for frequencyScale " + \
-                                  "is not recognized yet...")
-    
-    # the shape of one window:
-    prototypeSineWindow = np.hanning(lengthSineWindow)
-    # adding zeroes on both sides, such that we do not need to check
-    # for boundaries
-    bigWindow = np.zeros([sizeBigWindow * 2, 1])
-    bigWindow[(sizeBigWindow - lengthSineWindow / 2.0):\
-              (sizeBigWindow + lengthSineWindow / 2.0)] \
-              = np.vstack(prototypeSineWindow)
-    
-    WGAMMA = np.zeros([numberFrequencyBins, numberOfBasis])
-    
-    for p in np.arange(numberOfBasis):
-        WGAMMA[:, p] = np.hstack(bigWindow[np.int32(mappingFrequency \
-                                                    - sineCenters[p] \
-                                                    + sizeBigWindow)])
-        
-    return WGAMMA
-
-
 ########## Main classes for audio models ##########
-
 class FASST(object):
-    """**FASST audio model**, from::
-    
-     A. Ozerov, E. Vincent and F. Bimbot
-     \"A General Flexible Framework for the Handling of Prior Information
-     in Audio Source Separation,\"  
-     IEEE Transactions on Audio, Speech and Signal Processing 20(4),
-     pp. 1118-1133 (2012)                            
-     Available online: http://hal.inria.fr/hal-00626962/
-    
-    Adapted from the Matlab toolbox available at
-    http://bass-db.gforge.inria.fr/fasst/
+    """**FASST audio model**, from [Ozerov2012]_
     """
     # for now only stft:
     implemented_transf = ['stft','stftold', 'mqt', 'minqt', 'cqt']
@@ -863,12 +787,7 @@ class FASST(object):
         filter (i.e. the mixing parameters in self.spat_comps[j]['params'])
         
         In particular, we consider here the corresponding MVDR filter,
-        as exposed in::
-        
-         Maazaoui, M.; Grenier, Y. & Abed-Meraim, K.
-         ``Blind Source Separation for Robot Audition using
-         Fixed Beamforming with HRTFs'', 
-         in proc. of INTERSPEECH, 2011.
+        as exposed in [Maazaoui2011]_.
         
         per channel, the filter steering vector, source p:
         
@@ -891,6 +810,11 @@ class FASST(object):
             b(f,p) a(f,p)^H
             
         and the denominator therefore is the trace of the \"numerator\".
+        
+        .. [Maazaoui2011] Maazaoui, M.; Grenier, Y. and Abed-Meraim, K.
+           Blind Source Separation for Robot Audition using
+           Fixed Beamforming with HRTFs, 
+           in proc. of INTERSPEECH, 2011.
         
         """
         # grouping the indices by spatial component
@@ -1268,34 +1192,6 @@ class FASST(object):
                             n=self.sig_repr_params['fsize'],
                             axis=0)
     
-##    # separate individual components:
-##    def separate_spec_comp(self, sep_comp_ind, *args, **kwargs):
-##        """
-##        """
-##        return self.separate_comp(sep_comp_ind)
-    
-##    def separate_spat_comp(self, spat_comp_ind, *args, **kwargs):
-##        """
-##        ARGUMENTS
-##        ---------
-##        spat_comp_ind a list of the spatial components to separate
-##            the returned 
-##        """
-##        spec_comp_ind = []
-        
-##        for spec_ind, spec_comp in self.spec_comps:
-##            if spec_comp['spat_comp_ind'] in spat_comp_ind:
-##                spec_comp_ind.append(spec_ind)
-        
-##        return self.separate_comp(spec_comp_ind, *args, **kwargs)
-    
-##    def separate_comp(self, spec_comp_ind, filename):
-##        """computes the wiener gain for the source represented by
-##        the spectral components listed in spec_comp_ind, then
-##        computes the time series and writes the output to filename.
-##        """
-##        if len(spec_comp_ind):
-##            pass
     
     def compute_sigma_comp_2d(self, spat_ind, spec_comp_ind):
         """only for stereo case self.audioObject.channels==2
@@ -2807,71 +2703,6 @@ class multiChanSourceF0Filter(FASST):
                 for f in range(self.nbFreqsSigRepr):
                     spat_comp['params'][:,:,f] = (
                         np.atleast_2d(spat_comp_param_inst.T))
-                    
-##    def initializeConvParams(self, initMethod='demix'):
-##        """setting the spatial parameters
-##        """
-##        nc = self.audioObject.channels
-##        for spat_ind, spat_comp in self.spat_comps.items():
-##            if spat_comp['mix_type'] != 'inst':
-##                warnings.warn("Spatial component %d "%spat_ind+
-##                              "already not instantaneous, overwriting...")
-            
-##            # spat_comp['time_dep'] = 'indep'
-##            spat_comp['mix_type'] = 'conv'
-##            # spat_comp['frdm_prior'] = 'free'
-        
-##        if initMethod == 'demix':
-##            maxclusters = max(40, 10 * len(self.spat_comps))
-##            neighbours = 15
-            
-##            # default for demix to work best: #FIXME!!!
-##            wlen = self.demixParams['wlen']# 2048
-##            hopsize = self.demixParams['hopsize']
-            
-##            demixInst = demix.DEMIX(
-##                audio=self.audioObject.filename,
-##                nsources=len(self.spat_comps), # spatial comps for demix
-##                #wlen=wlen,
-##                #hopsize=hopsize,
-##                #neighbors=neighbours,
-##                verbose=self.verbose,
-##                maxclusters=maxclusters,
-##                **self.demixParams)
-            
-##            demixInst.comp_pcafeatures()
-##            demixInst.comp_parameters()
-##            demixInst.init_subpts_set()
-##            demixInst.comp_clusters()
-##            demixInst.refine_clusters()
-            
-##            # mixing parameters from DEMIX estimation:
-##            #     results in an nsrc x nfreqs x nc array
-##            A = demixInst.steeringVectorsFromCentroids()
-##            del demixInst
-##        elif 'rand' in initMethod:
-##            A = (
-##                np.random.randn(self.rank,
-##                                self.nbFreqsSigRepr,
-##                                nc,)
-##                + 1j * np.random.randn(self.rank,
-##                                self.nbFreqsSigRepr,
-##                                nc,)
-##                )
-##        else:
-##            raise ValueError("Init method not implemented.")
-            
-##        # filling the spatial components:
-##        for spat_ind, spat_comp in self.spat_comps.items():
-##            spat_comp_param_inst = spat_comp['params']
-##            spat_comp['params'] = np.zeros([self.rank,
-##                                            nc,
-##                                            self.nbFreqsSigRepr],
-##                                           dtype=np.complex)
-##            for r in range(self.rank):
-##                spat_comp['params'][r] = (
-##                    A[spat_ind].T
-##                    )
     
     def estim_param_a_post_model(self,):
         """estim_param_a_post_model
@@ -3190,7 +3021,7 @@ class multichanLead(multiChanSourceF0Filter):
         
         The lead source is assumed to be self.spec_comps[0]
         """
-
+        
         ##numCompAccomp = (
         ##        np.sum([spec_comp['factor'][0]['FB'].shape[1]
         ##                for ncomp, spec_comp in self.spec_comps.items()])-

@@ -7,9 +7,10 @@
 2010 [SK2010]_
 
 Adaptation of the Constant Q transform as presented in
-.. [SK2010] Schoerkhuber, C. and Klapuri, A., \
-\"Constant-Q transform toolbox for music processing,\"
-submitted to the 7th Sound and Music Computing Conference, Barcelona, Spain.
+
+.. [SK2010] Schoerkhuber, C. and Klapuri, A.,
+   \"Constant-Q transform toolbox for music processing,\"
+   submitted to the 7th Sound and Music Computing Conference, Barcelona, Spain.
 
 Comments beginning with '%' and '%%' are retained from the original Matlab
 code. 
@@ -22,7 +23,8 @@ import numpy as np
 import scipy.signal as spsig  # for the windows and filters
 # import scipy.sparse as spspa
 import scipy.interpolate as spinterp
-from .. import audioObject as ao # for the stft and istft
+# from .. import audioObject as ao # for the stft and istft
+from stft import stft, istft
 
 from ..tools.utils import nextpow2, sqrt_blackmanharris
 
@@ -246,6 +248,8 @@ class CQTKernel(object):
 
 
 class HybridCQTKernel(CQTKernel):
+    """Hybrid CQT/Linear kernel
+    """
     def __init__(self, **kwargs):
         super(HybridCQTKernel, self).__init__(**kwargs)
         self.computeMissingLinearFreqKernel()
@@ -317,6 +321,8 @@ class HybridCQTKernel(CQTKernel):
 
 
 class MinQTKernel(CQTKernel):
+    """Min Q Transform Kernel
+    """
     def __init__(self, bins, fmax, fs, linFTLen=2048,
                  **kwargs):
         """Initiates and computes the MinQT kernel,
@@ -408,6 +414,7 @@ class MinQTKernel(CQTKernel):
 
 
 class CQTransfo(object):
+    """Constant Q Transform"""
     transformname = 'cqt'
     def __init__(self,
                  fmin, fmax, bins, fs,
@@ -1077,6 +1084,7 @@ class CQTransfo(object):
         return True
 
 class HybridCQTransfo(CQTransfo):
+    """Hybrid Constant Q Transform"""
     def __init__(self, **kwargs):
         super(HybridCQTransfo, self).__init__(**kwargs)
         # but the cqtkernel is augmented as an hybrid kernel:
@@ -1373,6 +1381,7 @@ class HybridCQTransfo(CQTransfo):
         return np.concatenate([freqs, linfreqs])
 
 class MinQTransfo(CQTransfo):
+    """Minimum Q Transform"""
     transformname = 'minqt'
     def __init__(self, fmax, bins, linFTLen, fs, fmin=70,
                  **kwargs):
@@ -1430,11 +1439,11 @@ class MinQTransfo(CQTransfo):
         # since qo.stft centers the first frame on the first
         # sample of the data, we need to remove half a window:
         self.offsetSTFT = (self.cqtkernel.first_center)
-        X,F,N = ao.stft(data=x[self.offsetSTFT:],
-                        window=self.cqtkernel.linWindow,
-                        hopsize=self.cqtkernel.atomHOP,
-                        nfft=self.cqtkernel.linFTLen,
-                        fs=self.cqtkernel.fs)
+        X,F,N = stft(data=x[self.offsetSTFT:],
+                     window=self.cqtkernel.linWindow,
+                     hopsize=self.cqtkernel.atomHOP,
+                     nfft=self.cqtkernel.linFTLen,
+                     fs=self.cqtkernel.fs)
         # filling cellCQT, assuming same number of frames:
         self.cellCQT['linear'] = X[self.cqtkernel.Kmax:,
                                    :self.nframes[0] * self.cqtkernel.winNr]
@@ -1482,9 +1491,9 @@ class MinQTransfo(CQTransfo):
                       self.cellCQT['linear'].shape[1]],
                      dtype=np.complex)
         Y[self.cqtkernel.Kmax:] = self.cellCQT['linear']
-        y = ao.istft(X=Y, window=self.cqtkernel.linWindow,
-                     hopsize=self.cqtkernel.atomHOP,
-                     nfft=self.cqtkernel.linFTLen)
+        y = istft(X=Y, window=self.cqtkernel.linWindow,
+                  hopsize=self.cqtkernel.atomHOP,
+                  nfft=self.cqtkernel.linFTLen)
         y = y[(self.prefixZeros-self.offsetSTFT):]
         y = y[:self.datalen_init]
         return y

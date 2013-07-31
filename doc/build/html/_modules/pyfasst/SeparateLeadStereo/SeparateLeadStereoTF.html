@@ -87,7 +87,7 @@
 <span class="n">knownTransfos</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;stft&#39;</span><span class="p">,</span> <span class="s">&#39;hybridcqt&#39;</span><span class="p">,</span> <span class="s">&#39;minqt&#39;</span><span class="p">,</span>
                  <span class="s">&#39;cqt&#39;</span><span class="p">,</span> <span class="s">&#39;mqt&#39;</span><span class="p">]</span> <span class="c"># TODO: &#39;cqt&#39;, &#39;erb&#39;?</span>
 
-<div class="viewcode-block" id="SeparateLeadProcess"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess">[docs]</a><span class="k">class</span> <span class="nc">SeparateLeadProcess</span><span class="p">():</span>
+<div class="viewcode-block" id="SeparateLeadProcess"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess">[docs]</a><span class="k">class</span> <span class="nc">SeparateLeadProcess</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;SeparateLeadProcess</span>
 <span class="sd">    </span>
 <span class="sd">    class which implements the source separation algorithm, separating the</span>
@@ -557,7 +557,7 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">freeMemory</span> <span class="o">=</span> <span class="n">freeMemory</span>
     
-<div class="viewcode-block" id="SeparateLeadProcess.setOutputFileNames"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.setOutputFileNames">[docs]</a>    <span class="k">def</span> <span class="nf">setOutputFileNames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputDirSuffix</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.setOutputFileNames"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.setOutputFileNames">[docs]</a>    <span class="k">def</span> <span class="nf">setOutputFileNames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputDirSuffix</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If already loaded a wav file, at this point, we can redefine</span>
 <span class="sd">        where we want the output files to be written.</span>
@@ -604,7 +604,7 @@
         <span class="k">print</span> <span class="s">&quot;    estimated pitches       in&quot;</span><span class="p">,</span> \
               <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s">&#39;pitch_output_file&#39;</span><span class="p">]</span>
     </div>
-<div class="viewcode-block" id="SeparateLeadProcess.computeWF0"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeWF0">[docs]</a>    <span class="k">def</span> <span class="nf">computeWF0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.computeWF0"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeWF0">[docs]</a>    <span class="k">def</span> <span class="nf">computeWF0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the frequency basis for the source part of SIMM,</span>
 <span class="sd">        if tfrepresentation is a CQT, it also computes the cqt/hybridcqt</span>
 <span class="sd">        transform object. </span>
@@ -757,7 +757,7 @@
                     <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mqt</span><span class="o">.</span><span class="n">octaveNr</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
                     <span class="p">)</span> <span class="c"># 20130405T0355 DJL better maybe...</span>
     </div>
-<div class="viewcode-block" id="SeparateLeadProcess.computeMonoX"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeMonoX">[docs]</a>    <span class="k">def</span> <span class="nf">computeMonoX</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.computeMonoX"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeMonoX">[docs]</a>    <span class="k">def</span> <span class="nf">computeMonoX</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes and return SX, the mono channel or mean over the</span>
 <span class="sd">        channels of the power spectrum of the signal</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -796,7 +796,7 @@
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqt</span><span class="o">.</span><span class="n">transfo</span>
             <span class="k">return</span> <span class="n">SX</span>
         </div>
-<div class="viewcode-block" id="SeparateLeadProcess.computeNFrames"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeNFrames">[docs]</a>    <span class="k">def</span> <span class="nf">computeNFrames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.computeNFrames"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeNFrames">[docs]</a>    <span class="k">def</span> <span class="nf">computeNFrames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        compute Nb Frames: </span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1006,7 +1006,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">SIMMParams</span><span class="p">[</span><span class="s">&#39;WM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WM</span>
         <span class="k">del</span> <span class="n">SX</span>
 
-<div class="viewcode-block" id="SeparateLeadProcess.estimHF0"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimHF0">[docs]</a>    <span class="k">def</span> <span class="nf">estimHF0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.estimHF0"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimHF0">[docs]</a>    <span class="k">def</span> <span class="nf">estimHF0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        estimating and storing only HF0 for the whole excerpt,</span>
 <span class="sd">        with only </span>
@@ -1121,7 +1121,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">imageCanvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
             <span class="c"># self.imageCanvas.updateGeometry()</span>
     </div>
-<div class="viewcode-block" id="SeparateLeadProcess.computeChroma"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeChroma">[docs]</a>    <span class="k">def</span> <span class="nf">computeChroma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">3000</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.computeChroma"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeChroma">[docs]</a>    <span class="k">def</span> <span class="nf">computeChroma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">3000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the chroma matrix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;SIMMParams&#39;</span><span class="p">):</span>
@@ -1143,7 +1143,7 @@
                 <span class="n">n</span><span class="p">::(</span><span class="mi">12</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">SIMMParams</span><span class="p">[</span><span class="s">&#39;stepNotes&#39;</span><span class="p">])]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chroma</span> <span class="o">/=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chroma</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
         </div>
-<div class="viewcode-block" id="SeparateLeadProcess.determineTuning"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.determineTuning">[docs]</a>    <span class="k">def</span> <span class="nf">determineTuning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.determineTuning"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.determineTuning">[docs]</a>    <span class="k">def</span> <span class="nf">determineTuning</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Determine Tuning by checking the peaks corresponding</span>
 <span class="sd">        to all possible patterns</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1177,7 +1177,7 @@
         <span class="k">return</span> <span class="n">scoresPerTuning</span><span class="p">,</span> <span class="n">bestTuning</span><span class="p">,</span> \
                <span class="n">bestKey</span><span class="p">,</span> <span class="n">patterns</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">bestPattern</span><span class="p">]</span>
     </div>
-<div class="viewcode-block" id="SeparateLeadProcess.automaticMelodyAndSeparation"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.automaticMelodyAndSeparation">[docs]</a>    <span class="k">def</span> <span class="nf">automaticMelodyAndSeparation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.automaticMelodyAndSeparation"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.automaticMelodyAndSeparation">[docs]</a>    <span class="k">def</span> <span class="nf">automaticMelodyAndSeparation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fully automated estimation of melody and separation of signals.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;This function does not work well with framed &quot;</span> <span class="o">+</span> 
@@ -1189,7 +1189,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">estimStereoSUIMMParams</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writeSeparatedSignalsWithUnvoice</span><span class="p">()</span>
     </div>
-<div class="viewcode-block" id="SeparateLeadProcess.autoMelSepAndWrite"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.autoMelSepAndWrite">[docs]</a>    <span class="k">def</span> <span class="nf">autoMelSepAndWrite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.autoMelSepAndWrite"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.autoMelSepAndWrite">[docs]</a>    <span class="k">def</span> <span class="nf">autoMelSepAndWrite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fully automated estimation of melody and separation of signals.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">estimHF0</span><span class="p">(</span><span class="n">maxFrames</span><span class="o">=</span><span class="n">maxFrames</span><span class="p">)</span>
@@ -1417,7 +1417,7 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">SIMMParams</span><span class="p">[</span><span class="s">&#39;HF00&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HF00</span>
     
-<div class="viewcode-block" id="SeparateLeadProcess.estimStereoSIMMParamsWriteSeps"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimStereoSIMMParamsWriteSeps">[docs]</a>    <span class="k">def</span> <span class="nf">estimStereoSIMMParamsWriteSeps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.estimStereoSIMMParamsWriteSeps"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimStereoSIMMParamsWriteSeps">[docs]</a>    <span class="k">def</span> <span class="nf">estimStereoSIMMParamsWriteSeps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Estimates the parameters little by little, by chunks,</span>
 <span class="sd">        and sequentially writes the signals. In the end, concatenates all these</span>
 <span class="sd">        separated signals into the desired output files</span>
@@ -1617,7 +1617,7 @@
                   <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
                   <span class="n">data</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">lengthData</span><span class="p">,:])</span>
     
-<div class="viewcode-block" id="SeparateLeadProcess.estimStereoSUIMMParamsWriteSeps"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimStereoSUIMMParamsWriteSeps">[docs]</a>    <span class="k">def</span> <span class="nf">estimStereoSUIMMParamsWriteSeps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.estimStereoSUIMMParamsWriteSeps"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimStereoSUIMMParamsWriteSeps">[docs]</a>    <span class="k">def</span> <span class="nf">estimStereoSUIMMParamsWriteSeps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;same as estimStereoSIMMParamsWriteSeps, but adds the unvoiced</span>
 <span class="sd">        element in HF0</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1794,7 +1794,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">SIMMParams</span><span class="p">[</span><span class="s">&#39;betaR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">betaR</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">SIMMParams</span><span class="p">[</span><span class="s">&#39;betaL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">betaL</span>
     
-<div class="viewcode-block" id="SeparateLeadProcess.writeSeparatedSignals"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignals">[docs]</a>    <span class="k">def</span> <span class="nf">writeSeparatedSignals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s">&#39;.wav&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.writeSeparatedSignals"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignals">[docs]</a>    <span class="k">def</span> <span class="nf">writeSeparatedSignals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s">&#39;.wav&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Writes the separated signals to the files in self.files.</span>
 <span class="sd">        If suffix contains &#39;VUIMM&#39;, then this method will take</span>
 <span class="sd">        the WF0 and HF0 that contain the estimated unvoiced elements.</span>
@@ -1905,14 +1905,14 @@
         
         <span class="k">del</span> <span class="n">mestR</span><span class="p">,</span> <span class="n">mestL</span>
     </div>
-<div class="viewcode-block" id="SeparateLeadProcess.writeSeparatedSignalsWithUnvoice"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignalsWithUnvoice">[docs]</a>    <span class="k">def</span> <span class="nf">writeSeparatedSignalsWithUnvoice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.writeSeparatedSignalsWithUnvoice"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignalsWithUnvoice">[docs]</a>    <span class="k">def</span> <span class="nf">writeSeparatedSignalsWithUnvoice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A wrapper to give a decent name to the function: simply</span>
 <span class="sd">        calling self.writeSeparatedSignals with the</span>
 <span class="sd">        &#39;_VUIMM.wav&#39; suffix.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writeSeparatedSignals</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s">&#39;_VUIMM.wav&#39;</span><span class="p">)</span>
     </div>
-<div class="viewcode-block" id="SeparateLeadProcess.checkChunkSize"><a class="viewcode-back" href="../../../separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.checkChunkSize">[docs]</a>    <span class="k">def</span> <span class="nf">checkChunkSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="p">):</span>
+<div class="viewcode-block" id="SeparateLeadProcess.checkChunkSize"><a class="viewcode-back" href="../../../reference/separateleadstereo.html#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.checkChunkSize">[docs]</a>    <span class="k">def</span> <span class="nf">checkChunkSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the number of chunks of size maxFrames, and</span>
 <span class="sd">        changes maxFrames in case it does not provide long enough</span>
 <span class="sd">        chunks (especially the last chunk). </span>

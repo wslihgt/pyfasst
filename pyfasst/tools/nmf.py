@@ -14,7 +14,7 @@ Relevant references:
    With application to music analysis,
    Neural Computation, vol. 21 (3), pp. 793-830, March 2009.
    [`pdf <http://www.unice.fr/cfevotte/publications/journals/neco09_is-nmf.pdf>`_]
- 
+
 """
 
 def NMF_decomposition(SX, nbComps=10, niter=10, verbose=0):

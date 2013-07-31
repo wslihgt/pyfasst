@@ -12,15 +12,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
    
-   description	
-   audiomodel
-   tftransforms
-   demix
-   spatial
-   separateleadstereo
-   separateleadfunctions
-   tools
-
+   description
+   reference
 
 Indices and tables
 ==================

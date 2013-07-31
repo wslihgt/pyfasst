@@ -61,7 +61,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="kn">as</span> <span class="nn">spsig</span>  <span class="c"># for the windows</span>
 
-<div class="viewcode-block" id="db"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.utils.db">[docs]</a><span class="k">def</span> <span class="nf">db</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+<div class="viewcode-block" id="db"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.utils.db">[docs]</a><span class="k">def</span> <span class="nf">db</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    db(positiveValue)</span>
 <span class="sd">    </span>
@@ -69,12 +69,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="ident"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.utils.ident">[docs]</a><span class="k">def</span> <span class="nf">ident</span><span class="p">(</span><span class="n">energy</span><span class="p">):</span>
+<div class="viewcode-block" id="ident"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.utils.ident">[docs]</a><span class="k">def</span> <span class="nf">ident</span><span class="p">(</span><span class="n">energy</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;ident : identity function, return the inputs unchanged</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">return</span> <span class="n">energy</span>
 </div>
-<div class="viewcode-block" id="nextpow2"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.utils.nextpow2">[docs]</a><span class="k">def</span> <span class="nf">nextpow2</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+<div class="viewcode-block" id="nextpow2"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.utils.nextpow2">[docs]</a><span class="k">def</span> <span class="nf">nextpow2</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find :math:`2^n` that is equal to or greater than.</span>
 <span class="sd">    </span>
@@ -86,7 +86,7 @@
         <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
     <span class="k">return</span> <span class="n">n</span>
 </div>
-<div class="viewcode-block" id="sinebell"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.utils.sinebell">[docs]</a><span class="k">def</span> <span class="nf">sinebell</span><span class="p">(</span><span class="n">lengthWindow</span><span class="p">):</span>
+<div class="viewcode-block" id="sinebell"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.utils.sinebell">[docs]</a><span class="k">def</span> <span class="nf">sinebell</span><span class="p">(</span><span class="n">lengthWindow</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    window = sinebell(lengthWindow)</span>
 <span class="sd">    </span>
@@ -102,7 +102,7 @@
     <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lengthWindow</span><span class="p">)))</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">lengthWindow</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">window</span>
 </div>
-<div class="viewcode-block" id="hann"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.utils.hann">[docs]</a><span class="k">def</span> <span class="nf">hann</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="hann"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.utils.hann">[docs]</a><span class="k">def</span> <span class="nf">hann</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    window = hann(args)</span>
 <span class="sd">    </span>
@@ -110,7 +110,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="sqrt_blackmanharris"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.utils.sqrt_blackmanharris">[docs]</a><span class="k">def</span> <span class="nf">sqrt_blackmanharris</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+<div class="viewcode-block" id="sqrt_blackmanharris"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.utils.sqrt_blackmanharris">[docs]</a><span class="k">def</span> <span class="nf">sqrt_blackmanharris</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A root-squared Blackman-Harris window function.</span>
 <span class="sd">    </span>
 <span class="sd">    For use in scholkhuber and klapuri&#39;s framework.</span>

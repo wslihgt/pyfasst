@@ -111,7 +111,7 @@
 <span class="k">def</span> <span class="nf">invdb</span><span class="p">(</span><span class="n">dbval</span><span class="p">):</span>
     <span class="k">return</span> <span class="mf">10.</span> <span class="o">**</span> <span class="p">(</span><span class="n">dbval</span> <span class="o">/</span> <span class="mf">20.</span><span class="p">)</span>
 
-<div class="viewcode-block" id="get_indices_peak"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.get_indices_peak">[docs]</a><span class="k">def</span> <span class="nf">get_indices_peak</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">ind_max</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+<div class="viewcode-block" id="get_indices_peak"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.get_indices_peak">[docs]</a><span class="k">def</span> <span class="nf">get_indices_peak</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">ind_max</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;returns the indices of the peak around ind_max,</span>
 <span class="sd">    with values down to  ``threshold * sequence[ind_max]``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -141,7 +141,7 @@
     
     <span class="k">return</span> <span class="n">indices</span>
 </div>
-<div class="viewcode-block" id="confidenceFromVar"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.confidenceFromVar">[docs]</a><span class="k">def</span> <span class="nf">confidenceFromVar</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">):</span>
+<div class="viewcode-block" id="confidenceFromVar"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.confidenceFromVar">[docs]</a><span class="k">def</span> <span class="nf">confidenceFromVar</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="n">neighbors</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Computes the confidence, in dB, for a given number of</span>
 <span class="sd">    neighbours and a variance.</span>
 <span class="sd">    </span>
@@ -155,7 +155,7 @@
         <span class="p">)</span>
     <span class="k">return</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="DEMIX"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX">[docs]</a><span class="k">class</span> <span class="nc">DEMIX</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX">[docs]</a><span class="k">class</span> <span class="nc">DEMIX</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;DEMIX algorithm, for 2 channels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">audio</span><span class="p">,</span>
@@ -204,7 +204,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tft</span> <span class="o">=</span> <span class="n">tfts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tfrepresentation&#39;</span><span class="p">]](</span>
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;tftkwargs&#39;</span><span class="p">])</span>
     
-<div class="viewcode-block" id="DEMIX.comp_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.comp_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">comp_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.comp_clusters"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.comp_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">comp_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the time-frequency clusters, along with their centroids,</span>
 <span class="sd">        which contain the parameters of the mixing process - namely `theta`,</span>
 <span class="sd">        which parameterizes the relative amplitude, and `delta`, which is</span>
@@ -276,7 +276,7 @@
             
             <span class="n">nbRemainingPoints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subTFpointSet</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
             </div>
-<div class="viewcode-block" id="DEMIX.refine_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.refine_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">refine_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.refine_clusters"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.refine_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">refine_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Refining the clusters in order to verify that they are possible.</span>
 <span class="sd">        Additionally, if self.nsources is defined, this method only keeps</span>
 <span class="sd">        the required number. Otherwise, it is decided by choosing the most</span>
@@ -297,7 +297,7 @@
             
         <span class="bp">self</span><span class="o">.</span><span class="n">reestimate_clusterCentroids</span><span class="p">()</span>
     </div>
-<div class="viewcode-block" id="DEMIX.getTFpointsNearTheta_OneScale"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.getTFpointsNearTheta_OneScale">[docs]</a>    <span class="k">def</span> <span class="nf">getTFpointsNearTheta_OneScale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="DEMIX.getTFpointsNearTheta_OneScale"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.getTFpointsNearTheta_OneScale">[docs]</a>    <span class="k">def</span> <span class="nf">getTFpointsNearTheta_OneScale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                       <span class="n">centroid_tfpoint</span><span class="p">,</span>
                                       <span class="p">):</span><span class="c"># index_pts_to_classify # in self....</span>
         <span class="sd">&quot;&quot;&quot;returns the TF points whose theta is close to that of the centroid,</span>
@@ -323,7 +323,7 @@
         
         <span class="k">return</span> <span class="p">(</span><span class="n">dist</span><span class="o">&lt;</span><span class="n">distBound</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">subTFpointSet</span><span class="p">,</span> <span class="n">distBound</span>
     </div>
-<div class="viewcode-block" id="DEMIX.identify_deltaT"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.identify_deltaT">[docs]</a>    <span class="k">def</span> <span class="nf">identify_deltaT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind_cluster_pts</span><span class="p">,</span> <span class="n">centroid</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.identify_deltaT"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.identify_deltaT">[docs]</a>    <span class="k">def</span> <span class="nf">identify_deltaT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind_cluster_pts</span><span class="p">,</span> <span class="n">centroid</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;returns the delay maxDelta in samples that corresponds to the</span>
 <span class="sd">        largest peak of the cluster defined by the provided cluster index</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -369,7 +369,7 @@
         
         <span class="k">return</span> <span class="n">maxDelta</span>
     </div>
-<div class="viewcode-block" id="DEMIX.getTFPointsNearDelta"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.getTFPointsNearDelta">[docs]</a>    <span class="k">def</span> <span class="nf">getTFPointsNearDelta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centroid</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.getTFPointsNearDelta"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.getTFPointsNearDelta">[docs]</a>    <span class="k">def</span> <span class="nf">getTFPointsNearDelta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centroid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;returns a TF mask which is True if their corresponding value of</span>
 <span class="sd">        `delta` is close enough to the delta from the `centroid`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -401,7 +401,7 @@
         <span class="n">ind_cluster_pts</span><span class="p">[</span><span class="n">centroid</span><span class="o">.</span><span class="n">index_freq</span><span class="p">,</span> <span class="n">centroid</span><span class="o">.</span><span class="n">index_time</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="k">return</span> <span class="n">ind_cluster_pts</span>
     </div>
-<div class="viewcode-block" id="DEMIX.compute_temporal"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.compute_temporal">[docs]</a>    <span class="k">def</span> <span class="nf">compute_temporal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind_cluster_pts</span><span class="p">,</span> <span class="n">zoom</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.compute_temporal"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.compute_temporal">[docs]</a>    <span class="k">def</span> <span class="nf">compute_temporal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind_cluster_pts</span><span class="p">,</span> <span class="n">zoom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This computes the inverse Fourier transform of the</span>
 <span class="sd">        estimated Steering Vectors, weighed by their inverse variance</span>
 <span class="sd">        </span>
@@ -439,7 +439,7 @@
         
         <span class="k">return</span> <span class="n">deltaDetFun</span>
     </div>
-<div class="viewcode-block" id="DEMIX.comp_sig_repr"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.comp_sig_repr">[docs]</a>    <span class="k">def</span> <span class="nf">comp_sig_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.comp_sig_repr"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.comp_sig_repr">[docs]</a>    <span class="k">def</span> <span class="nf">comp_sig_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the signal representation, stft</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="p">,</span> <span class="s">&#39;_data&#39;</span><span class="p">):</span>
@@ -497,7 +497,7 @@
         
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">data</span>
         </div>
-<div class="viewcode-block" id="DEMIX.comp_pcafeatures"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.comp_pcafeatures">[docs]</a>    <span class="k">def</span> <span class="nf">comp_pcafeatures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.comp_pcafeatures"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.comp_pcafeatures">[docs]</a>    <span class="k">def</span> <span class="nf">comp_pcafeatures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the PCA features</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;X0&#39;</span><span class="p">)):</span>
@@ -526,7 +526,7 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">egv1</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">lbd1</span>
         </div>
-<div class="viewcode-block" id="DEMIX.comp_parameters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.comp_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">comp_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.comp_parameters"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.comp_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">comp_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;comp_parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># removing first 2 bands, avoiding continuous components</span>
@@ -580,7 +580,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estim_var_theta</span><span class="p">(</span><span class="n">confidence</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
     
-<div class="viewcode-block" id="DEMIX.estimDAOBound"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.estimDAOBound">[docs]</a>    <span class="k">def</span> <span class="nf">estimDAOBound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">confidenceVal</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.estimDAOBound"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.estimDAOBound">[docs]</a>    <span class="k">def</span> <span class="nf">estimDAOBound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">confidence</span><span class="p">,</span> <span class="n">confidenceVal</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes the max distance between centroid and points</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">maxErrorTheta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estim_bound_var_theta</span><span class="p">(</span><span class="n">confidence</span><span class="o">=</span><span class="n">confidence</span><span class="p">,</span>
@@ -615,7 +615,7 @@
                        <span class="n">index_freq</span><span class="o">=</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                        <span class="n">index_time</span><span class="o">=</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     
-<div class="viewcode-block" id="DEMIX.reestimate_clusterCentroids"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.reestimate_clusterCentroids">[docs]</a>    <span class="k">def</span> <span class="nf">reestimate_clusterCentroids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.reestimate_clusterCentroids"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.reestimate_clusterCentroids">[docs]</a>    <span class="k">def</span> <span class="nf">reestimate_clusterCentroids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;reestimate cluster centroids</span>
 <span class="sd">        </span>
 <span class="sd">        considering all the cluster masks, reestimate the centroids,</span>
@@ -688,7 +688,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span>  <span class="n">clusterConfidence</span>
     </div>
-<div class="viewcode-block" id="DEMIX.create_exclusive_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.create_exclusive_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">create_exclusive_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.create_exclusive_clusters"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.create_exclusive_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">create_exclusive_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        create_exclusive_clusters</span>
 <span class="sd">        </span>
@@ -718,7 +718,7 @@
         <span class="c">#    strange thing: this case never appeared in DEMIX in matlab...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_empty_clusters</span><span class="p">()</span>
     </div>
-<div class="viewcode-block" id="DEMIX.get_centroid_distance"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.get_centroid_distance">[docs]</a>    <span class="k">def</span> <span class="nf">get_centroid_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.get_centroid_distance"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.get_centroid_distance">[docs]</a>    <span class="k">def</span> <span class="nf">get_centroid_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get_centroid_distance</span>
 <span class="sd">        </span>
 <span class="sd">        distance between the centroids</span>
@@ -749,7 +749,7 @@
                 <span class="n">distanceArray</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">distanceArray</span>
     </div>
-<div class="viewcode-block" id="DEMIX.adaptive_thresholding_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.adaptive_thresholding_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">adaptive_thresholding_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.adaptive_thresholding_clusters"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.adaptive_thresholding_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">adaptive_thresholding_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;compute for each cluster in self.clusters a threshold depending</span>
 <span class="sd">        on the other clusters, in order to keep only those points in cluster</span>
 <span class="sd">        that are close to the actual centroid, but not close to centroids of</span>
@@ -832,7 +832,7 @@
                  <span class="n">n</span> <span class="ow">in</span> <span class="n">sortedIndices</span><span class="p">[:</span><span class="o">-</span><span class="p">(</span><span class="n">nsources</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
                 <span class="p">)</span>
     
-<div class="viewcode-block" id="DEMIX.remove_empty_clusters"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.remove_empty_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">remove_empty_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.remove_empty_clusters"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.remove_empty_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">remove_empty_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;remove_empty_clusters</span>
 <span class="sd">        </span>
 <span class="sd">        DJL: this did never happen in DEMIX Matlab version, have to contact</span>
@@ -881,7 +881,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clusterCentroids</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">indGoodClusters</span><span class="p">])</span>
     
-<div class="viewcode-block" id="DEMIX.spatial_filtering"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.spatial_filtering">[docs]</a>    <span class="k">def</span> <span class="nf">spatial_filtering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.spatial_filtering"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.spatial_filtering">[docs]</a>    <span class="k">def</span> <span class="nf">spatial_filtering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;using optimal spatial filters to obtain separated signals</span>
 <span class="sd">        </span>
 <span class="sd">        this is a beamformer implementation.</span>
@@ -954,7 +954,7 @@
             <span class="n">sep_src</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sep_src</span>
     </div>
-<div class="viewcode-block" id="DEMIX.steeringVectorsFromCentroids"><a class="viewcode-back" href="../../demix.html#pyfasst.demixTF.DEMIX.steeringVectorsFromCentroids">[docs]</a>    <span class="k">def</span> <span class="nf">steeringVectorsFromCentroids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DEMIX.steeringVectorsFromCentroids"><a class="viewcode-back" href="../../reference/demix.html#pyfasst.demixTF.DEMIX.steeringVectorsFromCentroids">[docs]</a>    <span class="k">def</span> <span class="nf">steeringVectorsFromCentroids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generates the steering vectors a(p,f,c) for source p,</span>
 <span class="sd">        (reduced) freq f and channel c.</span>
 

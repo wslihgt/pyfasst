@@ -41,73 +41,85 @@ class SeparateLeadProcess():
     task (the 'lead' voice becomes the most energetic one), or can be manually
     told what the 'lead' is (through the melody line).
     
-    Attributes
-    ----------
-    dataType : dtype
+    **Attributes**
+     dataType : dtype
         this is the input data type (usually the same as the audio encoding)
     
-    displayEvolution : boolean
+     displayEvolution : boolean
         display the evolution of the arrays (notably HF0)
     
-    F, N : integer, integer
+     F, N : integer, integer
         F the number of frequency bins in the time-frequency representation
-            (this is half the Fourier bins, + 1)
+          (this is half the Fourier bins, + 1)
+          
         N the number of analysis input frames
     
-    files : dictionary containing the filenames of the output files for the
+     files :
+        dictionary containing the filenames of the output files for the
         separated signals, with the following keys (after initialization)
         
-            'inputAudioFilename' : the input filename
+            'inputAudioFilename' : input filename
+            
             'mus_output_file' : output filename for the estimated
-                'accompaniment', appending '_acc.wav' to the radical. 
+            'accompaniment', appending '_acc.wav' to the radical.
+                
             'outputDirSuffix' : the subfolder name to be appended to the path
-                of the directory of the input file, the output files will be
-                written in that subfolder
+            of the directory of the input file, the output files will be
+            written in that subfolder
+                
             'outputDir' : the full path of the output files directory
-            'pathBaseName' : base name for the output files (full path +
-                radical for all output files)
+            
+            'pathBaseName' : base name for the output files
+            (full path + radical for all output files)
+            
             'pitch_output_file' : output filename for the estimated melody line
-                appending '_pitches.txt' to the radical.
+            appending '_pitches.txt' to the radical.
+                
             'voc_output_file' : output filename for the estimated 'lead
-                instrument', appending '_voc.wav' to the radical.
+            instrument', appending '_voc.wav' to the radical.
         
         Additionally, the estimated 'accompaniment' and 'lead' with unvoiced
         parts estimation are written to the corresponding filename without
         these unvoiced parts, to which '_VUIMM.wav' is appended.
         
-    imageCanvas : instance from MplCanvas or MplCanvas3Axes
+     imageCanvas : instance from MplCanvas or MplCanvas3Axes
         canvas used to draw the image of HF0
         
-    scaleData : double
+     scaleData : double
         maximum value of the input data array.
         With scipy.io.wavfile, the data array type is integer, and does not
         fit well with the algorithm, so we need this scaleData parameter to
         navigate back and forth between the double and integer representation.
         
-    scopeAllowedHF0 : double
+     scopeAllowedHF0 : double
         scope of allowed F0s around the estimated/given melody line 
     
-    stftParams : dictionary with the parameters for the time-frequency
-        representation (Short-Time Fourier Transform - STFT), with the keys:
+     stftParams : dictionary with the parameters for the time-frequency
+     representation (Short-Time Fourier Transform - STFT), with the keys:
             
             'hopsize' : the step, in number of samples, between analysis
-                frames for the STFT
+            frames for the STFT
+            
             'NFT' : the number of Fourier bins on which the Fourier transforms
-                are computed.
+            are computed.
+            
             'windowSizeInSamples' : analysis frame length, in samples
     
-    SIMMParams : dictionary with the parameters of the SIMM model
-        (Smoothed Instantaneous Mixture Model [DRDF2010]), with following keys:
+     SIMMParams : dictionary with the parameters of the SIMM model
+     (Smoothed Instantaneous Mixture Model [DRDF2010]_), with following keys:
             
             'alphaL', 'alphaR' : double
                 stereo model, panoramic parameters for the lead part
+                
             'betaL', 'betaR' : (R,) ndarray
                 stereo model, panoramic parameters for each of the component of
                 the accompaniment part.
+                
             
             'chirpPerF0' : integer
                 number of F0s between two 'stable' F0s, modelled
-                as chirps. 
+                as chirps.
+                
             'F0Table' : (NF0,) ndarray
                 frequency in Hz for each of the F0s appearing in WF0
             
@@ -115,15 +127,19 @@ class SeparateLeadProcess():
                 amplitude array corresponding to the different F0s (this is
                 what you want if you want the visualisation representation of
                 the pitch saliances).
+                
             'HF00' : (NF0*chirpPerF0, N) ndarray, *estimated*
                 amplitude array HF0, after being zeroed everywhere outside
                 the given scope from the estimated melody
+                
             'HGAMMA' : (P, K) ndarray, *estimated*
                 amplitude array corresponding to the different smooth shapes,
                 decomposition of the filters on the smooth shapes in WGAMMA
+                
             'HM' : (R, N) ndarray, *estimated*
                 amplitude array corresponding to the decomposition of the
                 accompaniment on the spectral shapes in WM
+                
             'HPHI' : (K, N) ndarray, *estimated*
                 amplitude array corresponding to the decomposition of the
                 filter part on the filter spectral shapes in WPHI, defined
@@ -131,91 +147,110 @@ class SeparateLeadProcess():
             
             'K' : integer
                 number of filters for the filter part decomposition
+
             'maxF0' : double
                 the highest F0 candidate
+
             'minF0' : double
                 the lowest F0 candidate
+
             'NF0' : integer
                 number of F0s in total
+
             'niter' : integer
                 number of iterations for the estimation algorithm
+
             'P' : integer
                 number of smooth spectral shapes for the filter part (in WGAMMA)
+
             'R' : integer
                 number of spectral shapes for the accompaniment part (in WM)
+
             'stepNotes' : integer
                 number of F0s between two semitones
             
             'WF0' : (F, NF0*chirpPerF0) ndarray, *fixed*
                 'dictionary' of harmonic spectral shapes for the F0 candidates
                 generated thanks to the KLGLOTT88 model [DRDF2010]
+
             'WGAMMA' : (F, P) ndarray, *fixed*
                 'dictionary' of smooth spectral shapes for the filter part
+
             'WM' : (F, R) ndarray, *estimated*
                 array of spectral shapes that are directly *estimated* on the
                 signal
                 
-    verbose : boolean
+     verbose : boolean
         if True, the program writes some information about what is happening
     
-    wavCanvas : instance from MplCanvas or MplCanvas3Axes
+     wavCanvas : instance from MplCanvas or MplCanvas3Axes
         the canvas that is going to be used to draw the input audio waveform
         
     
-    XL, XR : (F, N) ndarray
+     XL, XR : (F, N) ndarray
         resp. left and right channel STFT arrays
     
-    Methods
-    -------
-    Constructor : reads the input audio file, computes the STFT,
+    **Methods**
+    
+     Constructor : reads the input audio file, computes the STFT,
         generates the different dictionaries (for the source part,
         harmonic patterns WF0, and for the filter part, smooth
         patterns WGAMMA).
-    automaticMelodyAndSeparation :
+        
+     automaticMelodyAndSeparation :
         launches sequence of methods to estimate the parameters, estimate the
         melody, then re-estimate the parameters and at last separate the
         lead from the rest, considering the lead is the most energetic source
         of the mixture (with some continuity regularity)
-    estimSIMMParams :
+        
+     estimSIMMParams :
         estimates the parameters of the SIMM, i.e. HF0, HPHI, HGAMMA, HM and WM
-    estimStereoSIMMParams :
+        
+     estimStereoSIMMParams :
         estimates the parameters of the stereo version of the SIMM,
         i.e. same parameters as estimSIMMParams, with the alphas and betas 
-    estimStereoSUIMMParams :
+
+     estimStereoSUIMMParams :
         same as above, but first adds 'noise' components to the source part
-    initiateHF0WithIndexBestPath :
+
+     initiateHF0WithIndexBestPath :
         computes the initial HF0, before the estimation, given the melody line
         (estimated or not)
-    runViterbi :
+
+     runViterbi :
         estimates the melody line from HF0, the energies of each F0 candidates
-    setOutputFileNames :
+
+     setOutputFileNames :
         triggered when the text fields are changed, changing the output
         filenames
-    writeSeparatedSignals :
+
+     writeSeparatedSignals :
         computing and writing the adaptive Wiener filtered separated files
-    writeSeparatedSignalsWithUnvoice :
+
+     :py:func:`writeSeparatedSignalsWithUnvoice` :
         computing and writing the adaptive Wiener filtered separated files,
         unvoiced parts.
     
-    References
-    ----------
+    **References**
+    
     This is a class that encapsulates our work on source separation,
     published as:
-        [DDR2011] J.-L. Durrieu, B. David and G. Richard,
-            A Musically Motivated Mid-Level Representation
-            For Pitch Estimation And Musical Audio Source Separation,
-        IEEE Journal of Selected Topics on Signal Processing,
-        October 2011, Vol. 5 (6), pp. 1180 - 1191.
+    
+    .. [DDR2011] J.-L. Durrieu, B. David and G. Richard,
+       A Musically Motivated Mid-Level Representation
+       For Pitch Estimation And Musical Audio Source Separation,
+       IEEE Journal of Selected Topics on Signal Processing,
+       October 2011, Vol. 5 (6), pp. 1180 - 1191.
         
-        and
+    and
         
-        [DRDF2010] J.-L. Durrieu, G. Richard, B. David and C. F\'evotte,
-            Source/Filter Model for Main Melody Extraction
-            From Polyphonic Audio Signals,
-        IEEE Transactions on Audio, Speech and Language Processing,
-        special issue on Signal Models and Representations of Musical
-        and Environmental Sounds, March 2010, vol. 18 (3), pp. 564 -- 575.
-        
+    .. [DRDF2010] J.-L. Durrieu, G. Richard, B. David and C. F\'evotte,
+       Source/Filter Model for Main Melody Extraction
+       From Polyphonic Audio Signals,
+       IEEE Transactions on Audio, Speech and Language Processing,
+       special issue on Signal Models and Representations of Musical
+       and Environmental Sounds, March 2010, vol. 18 (3), pp. 564 -- 575.
+       
     As of 3/1/2012, available at http://www.durrieu.ch/research
     
     """
@@ -249,38 +284,38 @@ class SeparateLeadProcess():
         """During init, process is initiated, STFTs are computed,
         and the parameters are stored.
         
-        Parameters
-        ----------
-        inputAudioFilename : string
+        **Parameters**
+        
+         inputAudioFilename : string
             filename of the input audio file
-        windowSize : double, optional
+         windowSize : double, optional
             analysis frame ('windows') size, in s. By default, 0.0464s
-        nbIter : integer, optional
+         nbIter : integer, optional
             number of iterations for the estimation algorithm. By default, 10
-        numCompAccomp : integer, optional
+         numCompAccomp : integer, optional
             number of components for the accompaniment, default = 40
-        minF0 : double/integer, optional
+         minF0 : double/integer, optional
             lowest F0 candidate (in Hz), default=60Hz
-        maxF0 : double/integer, optional
+         maxF0 : double/integer, optional
             highest F0 candidate (in Hz), default=2000Hz
-        stepNotes : integer, optional
+         stepNotes : integer, optional
             number of F0 candidates in one semitone, default=16 F0s/semitone
-        K_numFilters : integer, optional
+         K_numFilters : integer, optional
             number of filter spectral shapes, default=4
-        P_numAtomFilters : integer, optional
+         P_numAtomFilters : integer, optional
             number of atomic filter smooth spectral shapes, default=30
-        imageCanvas : MplCanvas/MplCanvas3Axes, optional
+         imageCanvas : MplCanvas/MplCanvas3Axes, optional
             an instance of the MplCanvas/MplCanvas3Axes, giving access to the
             axes where to draw the HF0 image. By default=None
-        wavCanvas : MplCanvas/MplCanvas3Axes, optional
+         wavCanvas : MplCanvas/MplCanvas3Axes, optional
             an instance of the MplCanvas/MplCanvas3Axes, giving access to the
             axes to draw the waveform of the input signal.
-        progressBar : boolean, optional ???
+         progressBar : boolean, optional ???
             ???
-        verbose : boolean, optional
+         verbose : boolean, optional
             Whether to write out or not information about the evolution of the
             algorithm. By default=False.
-        outputDirSuffix : string, optional
+         outputDirSuffix : string, optional
             the subfolder name (to be appended to the full path to the audio
             signal), where the output files are going to be written. By default
             ='/'
@@ -624,44 +659,6 @@ class SeparateLeadProcess():
                 self.mqt.cqtkernel.linFTLen
                 * (2 **(self.mqt.octaveNr-1))
                 ) # 20130405T0355 DJL should guarantee better for chunk sizes
-        elif self.tfrepresentation in ['cqt'] and False:
-            self.mqt = minqt.CQTransfo(
-                fmin=self.stftParams['cqtfmin'],
-                fmax=self.stftParams['cqtfmax'],
-                bins=self.stftParams['cqtbins'],
-                fs=self.fs,
-                q=1,
-                atomHopFactor=self.stftParams['cqtAtomHopFactor'],
-                thresh=0.0005, 
-                winFunc=self.stftParams['cqtWinFunc'],
-                perfRast=0,
-                verbose=self.verbose
-                )
-            self.SIMMParams['F0Table'], WF0, self.mqt = (
-                slf.generate_WF0_TR_chirped(
-                    transform=self.mqt,
-                    minF0=self.SIMMParams['minF0'],
-                    maxF0=self.SIMMParams['maxF0'],
-                    stepNotes=self.SIMMParams['stepNotes'],
-                    Ot=0.5, perF0=self.SIMMParams['chirpPerF0'], 
-                    depthChirpInSemiTone=0.5, loadWF0=True,
-                    verbose=self.verbose))
-            self.SIMMParams['WF0'] = WF0 / np.sum(WF0, axis=0)
-            
-            # number of harmonic combs
-            self.SIMMParams['NF0'] = self.SIMMParams['F0Table'].size
-            # self.F is different from the STFT one, resetting it:
-            self.F = WF0.shape[0]
-            
-            self.stftParams['hopsize'] = self.mqt.cqtkernel.atomHOP
-            self.stftParams['NFT'] = self.mqt.cqtkernel.FFTLen
-            #self.stftParams['windowSizeInSamples'] = (
-            #    self.mqt.cqtkernel.Nk_max
-            #    * self.mqt.octaveNr) # to be ckeched...
-            self.stftParams['windowSizeInSamples'] = (
-                self.mqt.cqtkernel.FFTLen
-                * (2**(self.mqt.octaveNr-1))
-                ) # 20130405T0355 DJL better maybe...
         else:
             self.mqt = tft.tftransforms[self.tfrepresentation](
                 fmin=self.stftParams['cqtfmin'],

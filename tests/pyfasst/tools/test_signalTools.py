@@ -8,6 +8,22 @@ from ...testing import * # is this really legal?
 import numpy as np
 import pyfasst.tools.signalTools as st
 
+def test_medianFilter():
+    """median filtering an all 0 array, with one different value in the middle
+    """
+    inputArray = np.zeros(100)
+    inputArray[50] = 2
+    outputArray = st.medianFilter(inputArray)
+    assert_array_equal(outputArray, np.zeros(100))
+
+def test_medianFilter_withNaN():
+    """median filtering an all 0 array, with one NaN value
+    """
+    inputArray = np.zeros(100)
+    inputArray[50] = np.NaN
+    outputArray = st.medianFilter(inputArray)
+    assert_array_equal(outputArray, np.zeros(100))
+
 # some Hermitian matrix coming from a run of audioModel.multichanLead
 sigma_x_diag = np.array(
     [[ 0.00977917,  0.01021195,  0.00949931,  0.01081156,  0.00982221,
@@ -32,6 +48,8 @@ inv_sigma_x_off_ref = np.array(
      -4515.47989766+0.j])
 
 def test_inv_herm_mat_2d():
+    """invert a 2D Hermitian matrix
+    """
     inv_sigma_x_diag, inv_sigma_x_off, det_sigma_x = (
         st.inv_herm_mat_2d(sigma_x_diag, sigma_x_off))
     assert_array_almost_equal(

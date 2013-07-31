@@ -92,7 +92,7 @@
 <span class="c">##def sqrt_blackmanharris(M):</span>
 <span class="c">##    return np.sqrt(spsig.blackmanharris(M))</span>
 
-<div class="viewcode-block" id="CQTKernel"><a class="viewcode-back" href="../../../tftransforms.html#pyfasst.tftransforms.minqt.CQTKernel">[docs]</a><span class="k">class</span> <span class="nc">CQTKernel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="CQTKernel"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTKernel">[docs]</a><span class="k">class</span> <span class="nc">CQTKernel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;The CQT Kernel contains everything that can be</span>
 <span class="sd">    precomputed for Constant-Q transforms. This</span>
 <span class="sd">    relies on [SK2010]_, and therefore computes a Kernel</span>
@@ -299,12 +299,12 @@
         <span class="k">return</span> <span class="n">description</span>
 
 </div>
-<span class="k">class</span> <span class="nc">HybridCQTKernel</span><span class="p">(</span><span class="n">CQTKernel</span><span class="p">):</span>
+<div class="viewcode-block" id="HybridCQTKernel"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTKernel">[docs]</a><span class="k">class</span> <span class="nc">HybridCQTKernel</span><span class="p">(</span><span class="n">CQTKernel</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HybridCQTKernel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">computeMissingLinearFreqKernel</span><span class="p">()</span>
         
-    <span class="k">def</span> <span class="nf">computeMissingLinearFreqKernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HybridCQTKernel.computeMissingLinearFreqKernel"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTKernel.computeMissingLinearFreqKernel">[docs]</a>    <span class="k">def</span> <span class="nf">computeMissingLinearFreqKernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the missing (high) frequency</span>
 <span class="sd">        components, and make a similar Kernel for them.</span>
 <span class="sd">        </span>
@@ -369,8 +369,8 @@
         <span class="n">sparKernel</span> <span class="o">*=</span> <span class="n">weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">linearSparKernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">sparKernel</span><span class="p">)</span>
 
-
-<span class="k">class</span> <span class="nc">MinQTKernel</span><span class="p">(</span><span class="n">CQTKernel</span><span class="p">):</span>
+</div></div>
+<div class="viewcode-block" id="MinQTKernel"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTKernel">[docs]</a><span class="k">class</span> <span class="nc">MinQTKernel</span><span class="p">(</span><span class="n">CQTKernel</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">fmax</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">linFTLen</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initiates and computes the MinQT kernel,</span>
@@ -396,7 +396,7 @@
         <span class="c">## legacy: don&#39;t use the following kernel, this is too slow!</span>
         <span class="c"># self.computeMissingLinearFreqKernel()</span>
         
-    <span class="k">def</span> <span class="nf">computeMissingLinearFreqKernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MinQTKernel.computeMissingLinearFreqKernel"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTKernel.computeMissingLinearFreqKernel">[docs]</a>    <span class="k">def</span> <span class="nf">computeMissingLinearFreqKernel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the missing (high) frequency</span>
 <span class="sd">        components, and make a similar Kernel for them.</span>
 <span class="sd">        </span>
@@ -460,8 +460,8 @@
         <span class="n">sparKernel</span> <span class="o">*=</span> <span class="n">weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">linearSparKernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">sparKernel</span><span class="p">)</span>
 
-
-<span class="k">class</span> <span class="nc">CQTransfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</div></div>
+<div class="viewcode-block" id="CQTransfo"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo">[docs]</a><span class="k">class</span> <span class="nc">CQTransfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">transformname</span> <span class="o">=</span> <span class="s">&#39;cqt&#39;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span>
@@ -524,11 +524,11 @@
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span> <span class="c"># more general from subclasses</span>
             
-    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="CQTransfo.computeTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo.computeTransform">[docs]</a>    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the desired transform</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">computeCQT</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    
+    </div>
     <span class="k">def</span> <span class="nf">computeCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="c"># %% calculate CQT</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span> <span class="k">print</span> <span class="s">&quot;Computing CQT&quot;</span>
@@ -837,7 +837,7 @@
                                  <span class="s">&quot;requesting any of its representation&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">True</span>
     
-    <span class="k">def</span> <span class="nf">invertFromSpCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CQTransfo.invertFromSpCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo.invertFromSpCQT">[docs]</a>    <span class="k">def</span> <span class="nf">invertFromSpCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Assuming we have self.spCQT, and not self.cellCQT, we recompute</span>
 <span class="sd">        self.cellCQT from self.spCQT, and then invert as usual.</span>
 <span class="sd">        </span>
@@ -851,8 +851,8 @@
             <span class="k">print</span> <span class="s">&quot;... and then computing the inverse from the newly &quot;</span><span class="o">+</span>\
                   <span class="s">&quot;generated cells.&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">invertFromCellCQT</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">invertFromSpCQTRast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="CQTransfo.invertFromSpCQTRast"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo.invertFromSpCQTRast">[docs]</a>    <span class="k">def</span> <span class="nf">invertFromSpCQTRast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;this inverts the transform, if perfRast, then this means</span>
 <span class="sd">        we can invert each hop of the different octaves. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -927,8 +927,8 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixZeros</span><span class="p">:]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">datalen_init</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">y</span>
-    
-    <span class="k">def</span> <span class="nf">cellCQT2spCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="CQTransfo.cellCQT2spCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo.cellCQT2spCQT">[docs]</a>    <span class="k">def</span> <span class="nf">cellCQT2spCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;compute the full cqt from self.cellCQT&quot;&quot;&quot;</span>
         <span class="c"># compute the full cqt from self.cellCQT</span>
         <span class="c"># nb of frames for spCQT, as in cask.</span>
@@ -1006,8 +1006,8 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_spCQT</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">xint</span><span class="p">]</span> <span class="o">=</span> <span class="n">oldspcqt</span>
         <span class="c"># resizing spCQT to fit original size:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spCQT</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spCQT</span><span class="p">[:,:</span><span class="n">spCQTframes</span><span class="p">]))</span>
-    
-    <span class="k">def</span> <span class="nf">spCQT2CellCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="CQTransfo.spCQT2CellCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo.spCQT2CellCQT">[docs]</a>    <span class="k">def</span> <span class="nf">spCQT2CellCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; generates self.cellCQT from self.spCQT</span>
 <span class="sd">        </span>
 <span class="sd">        NB: after transformation of spCQT (by filtering, for instance),</span>
@@ -1070,14 +1070,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">cellCQT</span><span class="p">[</span><span class="n">noct</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cellCQT</span><span class="p">[</span><span class="n">noct</span><span class="p">][:,:</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">[</span><span class="n">noct</span><span class="p">]])</span>
                 <span class="p">)</span>
-            
-    <span class="k">def</span> <span class="nf">invertTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            </div>
+<div class="viewcode-block" id="CQTransfo.invertTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo.invertTransform">[docs]</a>    <span class="k">def</span> <span class="nf">invertTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Invert the desired transform, here invert CQT</span>
 <span class="sd">        from the cell CQT: like the original from [Schorkhuber2010]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">invertFromCellCQT</span><span class="p">()</span>
-    
-    <span class="k">def</span> <span class="nf">invertFromCellCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="CQTransfo.invertFromCellCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo.invertFromCellCQT">[docs]</a>    <span class="k">def</span> <span class="nf">invertFromCellCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;inverting the Cell CQT </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_attr_inversion</span><span class="p">()</span>
@@ -1114,7 +1114,7 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixZeros</span><span class="p">:]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">datalen_init</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">y</span>
-    
+    </div>
     <span class="k">def</span> <span class="nf">_check_attr_inversion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;a function that raises an error if any of the needed</span>
 <span class="sd">        attributes are not there, before trying to invert the transform</span>
@@ -1129,8 +1129,8 @@
                     <span class="s">&quot;Missing attribute to compute the inverse &quot;</span><span class="o">+</span>\
                     <span class="s">&quot;transform: </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span><span class="n">attr</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">True</span>
-
-<span class="k">class</span> <span class="nc">HybridCQTransfo</span><span class="p">(</span><span class="n">CQTransfo</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="HybridCQTransfo"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo">[docs]</a><span class="k">class</span> <span class="nc">HybridCQTransfo</span><span class="p">(</span><span class="n">CQTransfo</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HybridCQTransfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c"># but the cqtkernel is augmented as an hybrid kernel:</span>
@@ -1148,7 +1148,7 @@
         <span class="k">if</span> <span class="s">&#39;data&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">computeLinearPart</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">])</span>
     
-    <span class="k">def</span> <span class="nf">cellCQT2spCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HybridCQTransfo.cellCQT2spCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo.cellCQT2spCQT">[docs]</a>    <span class="k">def</span> <span class="nf">cellCQT2spCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;the spCQT is computed from self.cellCQT</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># this computes the cellCQT for the octaves of the CQT:</span>
@@ -1203,21 +1203,21 @@
                 <span class="c"># might raise a bound error here...</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cellCQT</span><span class="p">[</span><span class="s">&#39;linear&#39;</span><span class="p">][:,</span><span class="nb">int</span><span class="p">(</span><span class="n">drop</span><span class="p">):]</span>
                 <span class="p">)</span>
-            
-    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+            </div>
+<div class="viewcode-block" id="HybridCQTransfo.computeTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo.computeTransform">[docs]</a>    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the desired transform</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HybridCQTransfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">computeLinearPart</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">computeHybrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="HybridCQTransfo.computeHybrid"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo.computeHybrid">[docs]</a>    <span class="k">def</span> <span class="nf">computeHybrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;calculates a hybrid CQT/FT representation of a sound stored in data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">computeCQT</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
         <span class="c"># compute linear freqs part:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">computeLinearPart</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">computeLinearPart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="HybridCQTransfo.computeLinearPart"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo.computeLinearPart">[docs]</a>    <span class="k">def</span> <span class="nf">computeLinearPart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Same as computeCQT, except it uses the linear frequency components</span>
 <span class="sd">        in cqtkernel.linearSparKernel</span>
 <span class="sd">        </span>
@@ -1324,13 +1324,13 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_spCQT</span><span class="p">[</span><span class="n">b</span><span class="p">,:(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spCQT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">drop</span><span class="p">))]</span><span class="o">=</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_spCQT</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">drop</span><span class="p">):]</span>
                     <span class="p">)</span>
-                
-    <span class="k">def</span> <span class="nf">invertTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                </div>
+<div class="viewcode-block" id="HybridCQTransfo.invertTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo.invertTransform">[docs]</a>    <span class="k">def</span> <span class="nf">invertTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;invert the desired transform</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">invertHybridCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-                
-    <span class="k">def</span> <span class="nf">invertHybridCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                </div>
+<div class="viewcode-block" id="HybridCQTransfo.invertHybridCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo.invertHybridCQT">[docs]</a>    <span class="k">def</span> <span class="nf">invertHybridCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Invert the hybrid transform.</span>
 <span class="sd">        </span>
 <span class="sd">        Linearity allows to perform the cqt inverse first, and add the inverse</span>
@@ -1339,8 +1339,8 @@
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invertFromCellCQT</span><span class="p">()</span>
         <span class="n">y</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invertLinearPart</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">y</span>
-    
-    <span class="k">def</span> <span class="nf">invertLinearPart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="HybridCQTransfo.invertLinearPart"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo.invertLinearPart">[docs]</a>    <span class="k">def</span> <span class="nf">invertLinearPart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This inverts the linear part of the hybrid transform</span>
 <span class="sd">        </span>
 <span class="sd">        NB: as for the computation of this part in transform, a windowed</span>
@@ -1371,7 +1371,7 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixZeros</span><span class="p">:]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">datalen_init</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">y</span>
-
+</div>
     <span class="k">def</span> <span class="nf">spCQT2CellCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c"># populating the CQT part of cellCQT</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HybridCQTransfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">spCQT2CellCQT</span><span class="p">()</span>
@@ -1425,8 +1425,8 @@
             <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmax</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">bins</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">freqs</span><span class="p">,</span> <span class="n">linfreqs</span><span class="p">])</span>
-
-<span class="k">class</span> <span class="nc">MinQTransfo</span><span class="p">(</span><span class="n">CQTransfo</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="MinQTransfo"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo">[docs]</a><span class="k">class</span> <span class="nc">MinQTransfo</span><span class="p">(</span><span class="n">CQTransfo</span><span class="p">):</span>
     <span class="n">transformname</span> <span class="o">=</span> <span class="s">&#39;minqt&#39;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmax</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">linFTLen</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1460,13 +1460,13 @@
         <span class="k">if</span> <span class="s">&#39;data&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">computeLinearPart</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">])</span>
     
-    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="MinQTransfo.computeTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo.computeTransform">[docs]</a>    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the desired transform</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MinQTransfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">computeTransform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">computeLinearPart</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-        
-    <span class="k">def</span> <span class="nf">computeLinearPart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        </div>
+<div class="viewcode-block" id="MinQTransfo.computeLinearPart"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo.computeLinearPart">[docs]</a>    <span class="k">def</span> <span class="nf">computeLinearPart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute the linear frequency part with an STFT, and</span>
 <span class="sd">        taking only the desired frequencies.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1507,8 +1507,8 @@
             <span class="c">##            :self._spCQT.shape[1]-int(drop)] = (</span>
             <span class="c">##    self.cellCQT[&#39;linear&#39;][:,int(drop):]</span>
             <span class="c">##    )</span>
-    
-    <span class="k">def</span> <span class="nf">invertTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="MinQTransfo.invertTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo.invertTransform">[docs]</a>    <span class="k">def</span> <span class="nf">invertTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;invert the desired transform</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">perfRast</span><span class="p">:</span>
@@ -1517,15 +1517,15 @@
             <span class="k">return</span> <span class="n">y</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">invertFromSpCQTRast</span><span class="p">()</span>
-    
-    <span class="k">def</span> <span class="nf">invertFromSpCQTRast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="MinQTransfo.invertFromSpCQTRast"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo.invertFromSpCQTRast">[docs]</a>    <span class="k">def</span> <span class="nf">invertFromSpCQTRast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MinQTransfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">invertFromSpCQTRast</span><span class="p">()</span>
         <span class="n">y</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invertLinearPart</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">y</span>
-    
-    <span class="k">def</span> <span class="nf">invertLinearPart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="MinQTransfo.invertLinearPart"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo.invertLinearPart">[docs]</a>    <span class="k">def</span> <span class="nf">invertLinearPart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This inverts the linear part of the hybrid transform</span>
 <span class="sd">        </span>
 <span class="sd">        NB: as for the computation of this part in transform, a windowed</span>
@@ -1542,7 +1542,7 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixZeros</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetSTFT</span><span class="p">):]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">datalen_init</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">y</span>
-    
+    </div>
     <span class="k">def</span> <span class="nf">_compute_frequencies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">freqs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MinQTransfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_compute_frequencies</span><span class="p">()</span>
         <span class="n">linfreqs</span> <span class="o">=</span> <span class="p">(</span>
@@ -1556,7 +1556,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">freqs</span><span class="p">,</span> <span class="n">linfreqs</span><span class="p">])</span>
     
-    <span class="k">def</span> <span class="nf">spCQT2CellCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MinQTransfo.spCQT2CellCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo.spCQT2CellCQT">[docs]</a>    <span class="k">def</span> <span class="nf">spCQT2CellCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reverting spCQT (matrix form of the transform) back into</span>
 <span class="sd">        the (original?) cellCQT (one matrix per octave, one for the linear</span>
 <span class="sd">        part of the transform). </span>
@@ -1582,15 +1582,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cellCQT</span><span class="p">[</span><span class="s">&#39;linear&#39;</span><span class="p">][:,:(</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span>
                                            <span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">winNr</span><span class="p">)])</span>
             <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">cellCQT2spCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="MinQTransfo.cellCQT2spCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo.cellCQT2spCQT">[docs]</a>    <span class="k">def</span> <span class="nf">cellCQT2spCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;converts the cellCQT into a spCQT (matrix form)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># computing the self._spCQT from the CQT cellCQT cells:</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MinQTransfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cellCQT2spCQT</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">linCellCQT2LinSpCQT</span><span class="p">()</span>
-        
-    <span class="k">def</span> <span class="nf">linCellCQT2LinSpCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        </div>
+<div class="viewcode-block" id="MinQTransfo.linCellCQT2LinSpCQT"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo.linCellCQT2LinSpCQT">[docs]</a>    <span class="k">def</span> <span class="nf">linCellCQT2LinSpCQT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;converts cellCQT[&#39;linear&#39;] into the corresponding bins in</span>
 <span class="sd">        self._spCQT</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1606,7 +1606,7 @@
                     <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_spCQT</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">drop</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cellCQT</span><span class="p">[</span><span class="s">&#39;linear&#39;</span><span class="p">][:,</span><span class="nb">int</span><span class="p">(</span><span class="n">drop</span><span class="p">):]</span>
             <span class="p">)</span>
-        
+        </div></div>
 </pre></div>
 
           </div>

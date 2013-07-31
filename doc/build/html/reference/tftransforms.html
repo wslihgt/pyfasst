@@ -1,0 +1,563 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Time-Frequency Transforms &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Reference" href="../reference.html" />
+    <link rel="next" title="TOOLS" href="tools.html" />
+    <link rel="prev" title="Spatial Signal Models" href="spatial.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="TOOLS"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spatial.html" title="Spatial Signal Models"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" accesskey="U">Reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="time-frequency-transforms">
+<h1>Time-Frequency Transforms<a class="headerlink" href="#time-frequency-transforms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pyfasst.tftransforms.tft">
+<span id="tft-module"></span><h2>TFT module<a class="headerlink" href="#module-pyfasst.tftransforms.tft" title="Permalink to this headline">¶</a></h2>
+<p>Time-Frequency Transforms</p>
+<p>TODO: turn this into something more self-contained (like defining a super class
+for all the possible time-freq transforms)</p>
+</div>
+<div class="section" id="module-pyfasst.tftransforms.stft">
+<span id="stft-module"></span><h2>STFT module<a class="headerlink" href="#module-pyfasst.tftransforms.stft" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<tt class="descname">filter_conv_stft(data, W, analysisWindow=None, synthWindow=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), hopsize=256.0, nfft=2048.0, fs=44100.0, verbose=0)</tt></dt>
+<dd><p>Sequentially compute Fourier transfo, filter and overlap-add</p>
+<p>INPUTS</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>W</dt>
+<dd>M x F x N (or M x F) filter for the data, which should be single channel</dd>
+<dt>data</dt>
+<dd>T (number of samples, number of channels)</dd>
+</dl>
+<p>...</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">filter_stft(data, W, analysisWindow=None, synthWindow=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), hopsize=256.0, nfft=2048.0, fs=44100.0)</tt></dt>
+<dd><p>Sequentially compute Fourier transfo, filter and overlap-add</p>
+<p>W is the M x M x F x N filter for the data, which should be T x M
+data T x M (number of samples, number of channels)</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">istft(X, window=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), analysisWindow=None, hopsize=256.0, nfft=2048.0)</tt></dt>
+<dd><p>data = istft(X,window=sinebell(2048),hopsize=1024.0,nfft=2048.0,fs=44100)</p>
+<p>Computes an inverse of the short time Fourier transform (STFT),
+here, the overlap-add procedure is implemented.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><dl class="first last docutils">
+<dt>X                     :</dt>
+<dd>STFT of the signal, to be &#8220;inverted&#8221;</dd>
+<dt>window=sinebell(2048) :</dt>
+<dd>synthesis window
+(should be the &#8220;complementary&#8221; window
+for the analysis window)</dd>
+<dt>hopsize=1024.0        :</dt>
+<dd>hopsize for the analysis</dd>
+<dt>nfft=2048.0           :</dt>
+<dd>number of points for the Fourier computation
+(the user has to provide an even number)</dd>
+</dl>
+</dd>
+<dt>Outputs:</dt>
+<dd><dl class="first last docutils">
+<dt>data                  :</dt>
+<dd>time series corresponding to the given STFT
+the first half-window is removed, complying
+with the STFT computation given in the
+function stft</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">stft(data, window=array([ 0.        ,  0.00153398,  0.00306796, ...,  0.00460193,</tt></dt>
+<dt>
+<tt class="descname">0.00306796,  0.00153398]), hopsize=256.0, nfft=2048.0, fs=44100.0)</tt></dt>
+<dd><dl class="docutils">
+<dt>X, F, N = stft(data,window=sinebell(2048),hopsize=1024.0,</dt>
+<dd>nfft=2048.0,fs=44100)</dd>
+</dl>
+<p>Computes the short time Fourier transform (STFT) of data.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><dl class="first last docutils">
+<dt>data                  :</dt>
+<dd>one-dimensional time-series to be analyzed</dd>
+<dt>window=sinebell(2048) :</dt>
+<dd>analysis window</dd>
+<dt>hopsize=1024.0        :</dt>
+<dd>hopsize for the analysis</dd>
+<dt>nfft=2048.0           :</dt>
+<dd>number of points for the Fourier computation
+(the user has to provide an even number)</dd>
+<dt>fs=44100.0            :</dt>
+<dd>sampling rate of the signal</dd>
+</dl>
+</dd>
+<dt>Outputs:</dt>
+<dd><dl class="first last docutils">
+<dt>X                     :</dt>
+<dd>STFT of data</dd>
+<dt>F                     :</dt>
+<dd>values of frequencies at each Fourier bins</dd>
+<dt>N                     :</dt>
+<dd>central time at the middle of each analysis
+window</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyfasst.tftransforms.minqt">
+<span id="minqtmodule"></span><h2>MinQTmodule<a class="headerlink" href="#module-pyfasst.tftransforms.minqt" title="Permalink to this headline">¶</a></h2>
+<p>Constant-Q transform after the work by C. Scholkhuber and A. Klapuri
+2010 <a class="reference internal" href="#sk2010">[SK2010]</a></p>
+<p>Adaptation of the Constant Q transform as presented in</p>
+<table class="docutils citation" frame="void" id="sk2010" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[SK2010]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> Schoerkhuber, C. and Klapuri, A.,
+&#8220;Constant-Q transform toolbox for music processing,&#8221;
+submitted to the 7th Sound and Music Computing Conference, Barcelona, Spain.</td></tr>
+</tbody>
+</table>
+<p>Comments beginning with &#8216;%&#8217; and &#8216;%%&#8217; are retained from the original Matlab
+code.</p>
+<p>Python/Numpy/Scipy by
+Jean-Louis Durrieu, EPFL, 2012 - 2013</p>
+<dl class="class">
+<dt id="pyfasst.tftransforms.minqt.CQTKernel">
+<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">CQTKernel</tt><big>(</big><em>fmax</em>, <em>bins</em>, <em>fs</em>, <em>q=1</em>, <em>atomHopFactor=0.25</em>, <em>thresh=0.0005</em>, <em>winFunc=&lt;function sqrt_blackmanharris at 0x10260c7d0&gt;</em>, <em>perfRast=0</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>The CQT Kernel contains everything that can be
+precomputed for Constant-Q transforms. This
+relies on <a class="reference internal" href="#sk2010">[SK2010]</a>, and therefore computes a Kernel
+for a single octave. It is then efficiently used to
+compute the decomposition on the different octaves by
+downsampling the signal.</p>
+<p>Parameters:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>fmax</dt>
+<dd>The maximum desired central frequency</dd>
+<dt>bins</dt>
+<dd>The number of bins per octave</dd>
+<dt>fs</dt>
+<dd>Sampling rate of the audio files</dd>
+<dt>q</dt>
+<dd>parameter that controls the quality</dd>
+<dt>atomHopFactor</dt>
+<dd>hopsize rate (0.25 is a hopsize of 25% the size of the windows)
+between successive analysis windows</dd>
+<dt>thresh</dt>
+<dd>threshold value for sparsifying the kernel
+(Note: in this implementation, we do not use the sparsity, more
+efficiency could be achieved by considering it)</dd>
+<dt>winFunc (python function that outputs an array)</dt>
+<dd>the analysis window function</dd>
+<dt>perfRast</dt>
+<dd>whether computing rasterized version or not
+(if so, the decompositions at all scales will have the same
+number of frames, otherwise, each lower analysis octave will have
+half as many frames as the direct upper analysis octave.)</dd>
+</dl>
+</div></blockquote>
+<p>Attributes:</p>
+<blockquote>
+<div>sparKernel
+weight
+atomHOP
+FFTLen
+fftOLP
+fftHOP
+bins
+winNr
+Nk_max
+Q 
+fmin
+fmax
+frequencies
+perfRast
+first_center
+fs 
+winFunc
+thresh
+q</div></blockquote>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo">
+<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">CQTransfo</tt><big>(</big><em>fmin</em>, <em>fmax</em>, <em>bins</em>, <em>fs</em>, <em>q=1</em>, <em>atomHopFactor=0.25</em>, <em>thresh=0.0005</em>, <em>winFunc=&lt;function sqrt_blackmanharris at 0x10260c7d0&gt;</em>, <em>perfRast=0</em>, <em>cqtkernel=None</em>, <em>lowPassCoeffs=None</em>, <em>data=None</em>, <em>verbose=0</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTransfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant Q Transform</p>
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.cellCQT2spCQT">
+<tt class="descname">cellCQT2spCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTransfo.cellCQT2spCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.cellCQT2spCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the full cqt from self.cellCQT</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.computeTransform">
+<tt class="descname">computeTransform</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTransfo.computeTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.computeTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the desired transform</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.freq_stamps">
+<tt class="descname">freq_stamps</tt><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.freq_stamps" title="Permalink to this definition">¶</a></dt>
+<dd><p>frequency stamps for spCQT</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.invertFromCellCQT">
+<tt class="descname">invertFromCellCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTransfo.invertFromCellCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.invertFromCellCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>inverting the Cell CQT</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.invertFromSpCQT">
+<tt class="descname">invertFromSpCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTransfo.invertFromSpCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.invertFromSpCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assuming we have self.spCQT, and not self.cellCQT, we recompute
+self.cellCQT from self.spCQT, and then invert as usual.</p>
+<p>NB: here, self.cellCQT is written over, if it existed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.invertFromSpCQTRast">
+<tt class="descname">invertFromSpCQTRast</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTransfo.invertFromSpCQTRast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.invertFromSpCQTRast" title="Permalink to this definition">¶</a></dt>
+<dd><p>this inverts the transform, if perfRast, then this means
+we can invert each hop of the different octaves.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.invertTransform">
+<tt class="descname">invertTransform</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTransfo.invertTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.invertTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invert the desired transform, here invert CQT
+from the cell CQT: like the original from [Schorkhuber2010]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.qValues">
+<tt class="descname">qValues</tt><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.qValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>$Q$ values, approximated</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.spCQT">
+<tt class="descname">spCQT</tt><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.spCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>spCQT: the constant Q transform, in a readable format.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.spCQT2CellCQT">
+<tt class="descname">spCQT2CellCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#CQTransfo.spCQT2CellCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.spCQT2CellCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>generates self.cellCQT from self.spCQT</p>
+<p>NB: after transformation of spCQT (by filtering, for instance),
+this method only keeps downsampled versions of each CQT representation
+for each octave. More elaborated computations may be necessary to
+take into account more precise time variations at low frequency
+octaves.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.time_stamps">
+<tt class="descname">time_stamps</tt><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.time_stamps" title="Permalink to this definition">¶</a></dt>
+<dd><p>time stamps for spCQT</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyfasst.tftransforms.minqt.CQTransfo.transfo">
+<tt class="descname">transfo</tt><a class="headerlink" href="#pyfasst.tftransforms.minqt.CQTransfo.transfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the computed transform</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTKernel">
+<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">HybridCQTKernel</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hybrid CQT/Linear kernel</p>
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTKernel.computeMissingLinearFreqKernel">
+<tt class="descname">computeMissingLinearFreqKernel</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTKernel.computeMissingLinearFreqKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTKernel.computeMissingLinearFreqKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the missing (high) frequency
+components, and make a similar Kernel for them.</p>
+<p>We can use this for the first octave (the highest frequency octave)
+to extend the high frequencies. Actually, this can be used to compute
+a hybrid CQT transform on the low frequencies, while keeping linear
+freqs in the high spectrum, and still benefiting from the invertibility
+of the CQT transform by Schoerkhuber and Klapuri</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTransfo">
+<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">HybridCQTransfo</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTransfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTransfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hybrid Constant Q Transform</p>
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTransfo.cellCQT2spCQT">
+<tt class="descname">cellCQT2spCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTransfo.cellCQT2spCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTransfo.cellCQT2spCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>the spCQT is computed from self.cellCQT</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTransfo.computeHybrid">
+<tt class="descname">computeHybrid</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTransfo.computeHybrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTransfo.computeHybrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculates a hybrid CQT/FT representation of a sound stored in data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTransfo.computeLinearPart">
+<tt class="descname">computeLinearPart</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTransfo.computeLinearPart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTransfo.computeLinearPart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as computeCQT, except it uses the linear frequency components
+in cqtkernel.linearSparKernel</p>
+<p>NB: since this should be equivalent to computing an FFT after windowing
+each frame, there may be a faster way of implementing this function.
+For now, keeping the same rules as the original CQT implementation,
+for consistency and also for avoiding problems with window synchrony</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTransfo.computeTransform">
+<tt class="descname">computeTransform</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTransfo.computeTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTransfo.computeTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the desired transform</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTransfo.invertHybridCQT">
+<tt class="descname">invertHybridCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTransfo.invertHybridCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTransfo.invertHybridCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invert the hybrid transform.</p>
+<p>Linearity allows to perform the cqt inverse first, and add the inverse
+of the linear freqs part thereafter (or the other way around).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTransfo.invertLinearPart">
+<tt class="descname">invertLinearPart</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTransfo.invertLinearPart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTransfo.invertLinearPart" title="Permalink to this definition">¶</a></dt>
+<dd><p>This inverts the linear part of the hybrid transform</p>
+<p>NB: as for the computation of this part in transform, a windowed
+version
+of a plain FFT should do the same job, and faster.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.HybridCQTransfo.invertTransform">
+<tt class="descname">invertTransform</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#HybridCQTransfo.invertTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.HybridCQTransfo.invertTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>invert the desired transform</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyfasst.tftransforms.minqt.MinQTKernel">
+<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">MinQTKernel</tt><big>(</big><em>bins</em>, <em>fmax</em>, <em>fs</em>, <em>linFTLen=2048</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Min Q Transform Kernel</p>
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTKernel.computeMissingLinearFreqKernel">
+<tt class="descname">computeMissingLinearFreqKernel</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTKernel.computeMissingLinearFreqKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTKernel.computeMissingLinearFreqKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the missing (high) frequency
+components, and make a similar Kernel for them.</p>
+<p>We can use this for the first octave (the highest frequency octave)
+to extend the high frequencies. Actually, this can be used to compute
+a hybrid CQT transform on the low frequencies, while keeping linear
+freqs in the high spectrum, and still benefiting from the invertibility
+of the CQT transform by Schoerkhuber and Klapuri</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo">
+<em class="property">class </em><tt class="descclassname">pyfasst.tftransforms.minqt.</tt><tt class="descname">MinQTransfo</tt><big>(</big><em>fmax</em>, <em>bins</em>, <em>linFTLen</em>, <em>fs</em>, <em>fmin=70</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimum Q Transform</p>
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo.cellCQT2spCQT">
+<tt class="descname">cellCQT2spCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo.cellCQT2spCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo.cellCQT2spCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts the cellCQT into a spCQT (matrix form)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo.computeLinearPart">
+<tt class="descname">computeLinearPart</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo.computeLinearPart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo.computeLinearPart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the linear frequency part with an STFT, and
+taking only the desired frequencies.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo.computeTransform">
+<tt class="descname">computeTransform</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo.computeTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo.computeTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the desired transform</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo.invertFromSpCQTRast">
+<tt class="descname">invertFromSpCQTRast</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo.invertFromSpCQTRast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo.invertFromSpCQTRast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo.invertLinearPart">
+<tt class="descname">invertLinearPart</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo.invertLinearPart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo.invertLinearPart" title="Permalink to this definition">¶</a></dt>
+<dd><p>This inverts the linear part of the hybrid transform</p>
+<p>NB: as for the computation of this part in transform, a windowed
+version
+of a plain FFT should do the same job, and faster.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo.invertTransform">
+<tt class="descname">invertTransform</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo.invertTransform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo.invertTransform" title="Permalink to this definition">¶</a></dt>
+<dd><p>invert the desired transform</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo.linCellCQT2LinSpCQT">
+<tt class="descname">linCellCQT2LinSpCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo.linCellCQT2LinSpCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo.linCellCQT2LinSpCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>converts cellCQT[&#8216;linear&#8217;] into the corresponding bins in
+self._spCQT</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.tftransforms.minqt.MinQTransfo.spCQT2CellCQT">
+<tt class="descname">spCQT2CellCQT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/tftransforms/minqt.html#MinQTransfo.spCQT2CellCQT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tftransforms.minqt.MinQTransfo.spCQT2CellCQT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reverting spCQT (matrix form of the transform) back into
+the (original?) cellCQT (one matrix per octave, one for the linear
+part of the transform).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Time-Frequency Transforms</a><ul>
+<li><a class="reference internal" href="#module-pyfasst.tftransforms.tft">TFT module</a></li>
+<li><a class="reference internal" href="#module-pyfasst.tftransforms.stft">STFT module</a></li>
+<li><a class="reference internal" href="#module-pyfasst.tftransforms.minqt">MinQTmodule</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spatial.html"
+                        title="previous chapter">Spatial Signal Models</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">TOOLS</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/tftransforms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="TOOLS"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spatial.html" title="Spatial Signal Models"
+             >previous</a> |</li>
+        <li><a href="../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" >Reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

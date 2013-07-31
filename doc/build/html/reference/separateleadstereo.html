@@ -1,0 +1,421 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SeparateLeadStereo &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Reference" href="../reference.html" />
+    <link rel="next" title="separateLeadFunctions" href="separateleadfunctions.html" />
+    <link rel="prev" title="demix" href="demix.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="separateleadfunctions.html" title="separateLeadFunctions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="demix.html" title="demix"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" accesskey="U">Reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pyfasst.SeparateLeadStereo.SeparateLeadStereoTF">
+<span id="separateleadstereo"></span><h1>SeparateLeadStereo<a class="headerlink" href="#module-pyfasst.SeparateLeadStereo.SeparateLeadStereoTF" title="Permalink to this headline">¶</a></h1>
+<p>SeparateLeadStereo, with Time-Frequency choice</p>
+<p>Provides a class (<tt class="docutils literal"><span class="pre">SeparateLeadProcess</span></tt>) within which several
+processings can be run on an audio file, in order to extract the
+lead instrument/main voice from a (stereophonic) audio mixture.</p>
+<p>copyright (C) 2011 - 2013 Jean-Louis Durrieu</p>
+<dl class="class">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess">
+<em class="property">class </em><tt class="descclassname">pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.</tt><tt class="descname">SeparateLeadProcess</tt><big>(</big><em>inputAudioFilename</em>, <em>windowSize=0.0464</em>, <em>hopsize=None</em>, <em>NFT=None</em>, <em>nbIter=10</em>, <em>numCompAccomp=40</em>, <em>minF0=39</em>, <em>maxF0=2000</em>, <em>stepNotes=16</em>, <em>chirpPerF0=1</em>, <em>K_numFilters=4</em>, <em>P_numAtomFilters=30</em>, <em>imageCanvas=None</em>, <em>wavCanvas=None</em>, <em>progressBar=None</em>, <em>verbose=True</em>, <em>outputDirSuffix='/'</em>, <em>minF0search=None</em>, <em>maxF0search=None</em>, <em>tfrepresentation='stft'</em>, <em>cqtfmax=4000</em>, <em>cqtfmin=50</em>, <em>cqtbins=48</em>, <em>cqtWinFunc=&lt;function sqrt_blackmanharris at 0x10264d578&gt;</em>, <em>cqtAtomHopFactor=0.25</em>, <em>initHF00='random'</em>, <em>freeMemory=True</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>SeparateLeadProcess</p>
+<p>class which implements the source separation algorithm, separating the
+&#8216;lead&#8217; voice from the &#8216;accompaniment&#8217;. It can deal automatically with the
+task (the &#8216;lead&#8217; voice becomes the most energetic one), or can be manually
+told what the &#8216;lead&#8217; is (through the melody line).</p>
+<dl class="docutils">
+<dt><strong>Attributes</strong></dt>
+<dd><dl class="first docutils">
+<dt>dataType <span class="classifier-delimiter">:</span> <span class="classifier">dtype</span></dt>
+<dd>this is the input data type (usually the same as the audio encoding)</dd>
+<dt>displayEvolution <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd>display the evolution of the arrays (notably HF0)</dd>
+<dt>F, N <span class="classifier-delimiter">:</span> <span class="classifier">integer, integer</span></dt>
+<dd><dl class="first docutils">
+<dt>F the number of frequency bins in the time-frequency representation</dt>
+<dd>(this is half the Fourier bins, + 1)</dd>
+</dl>
+<p class="last">N the number of analysis input frames</p>
+</dd>
+<dt>files :</dt>
+<dd><p class="first">dictionary containing the filenames of the output files for the
+separated signals, with the following keys (after initialization)</p>
+<blockquote>
+<div><p>&#8216;inputAudioFilename&#8217; : input filename</p>
+<p>&#8216;mus_output_file&#8217; : output filename for the estimated
+&#8216;accompaniment&#8217;, appending &#8216;_acc.wav&#8217; to the radical.</p>
+<p>&#8216;outputDirSuffix&#8217; : the subfolder name to be appended to the path
+of the directory of the input file, the output files will be
+written in that subfolder</p>
+<p>&#8216;outputDir&#8217; : the full path of the output files directory</p>
+<p>&#8216;pathBaseName&#8217; : base name for the output files
+(full path + radical for all output files)</p>
+<p>&#8216;pitch_output_file&#8217; : output filename for the estimated melody line
+appending &#8216;_pitches.txt&#8217; to the radical.</p>
+<p>&#8216;voc_output_file&#8217; : output filename for the estimated &#8216;lead
+instrument&#8217;, appending &#8216;_voc.wav&#8217; to the radical.</p>
+</div></blockquote>
+<p class="last">Additionally, the estimated &#8216;accompaniment&#8217; and &#8216;lead&#8217; with unvoiced
+parts estimation are written to the corresponding filename without
+these unvoiced parts, to which &#8216;_VUIMM.wav&#8217; is appended.</p>
+</dd>
+<dt>imageCanvas <span class="classifier-delimiter">:</span> <span class="classifier">instance from MplCanvas or MplCanvas3Axes</span></dt>
+<dd>canvas used to draw the image of HF0</dd>
+<dt>scaleData <span class="classifier-delimiter">:</span> <span class="classifier">double</span></dt>
+<dd>maximum value of the input data array.
+With scipy.io.wavfile, the data array type is integer, and does not
+fit well with the algorithm, so we need this scaleData parameter to
+navigate back and forth between the double and integer representation.</dd>
+<dt>scopeAllowedHF0 <span class="classifier-delimiter">:</span> <span class="classifier">double</span></dt>
+<dd>scope of allowed F0s around the estimated/given melody line</dd>
+</dl>
+<p>stftParams : dictionary with the parameters for the time-frequency
+representation (Short-Time Fourier Transform - STFT), with the keys:</p>
+<blockquote>
+<div><p>&#8216;hopsize&#8217; : the step, in number of samples, between analysis
+frames for the STFT</p>
+<p>&#8216;NFT&#8217; : the number of Fourier bins on which the Fourier transforms
+are computed.</p>
+<p>&#8216;windowSizeInSamples&#8217; : analysis frame length, in samples</p>
+</div></blockquote>
+<p>SIMMParams : dictionary with the parameters of the SIMM model
+(Smoothed Instantaneous Mixture Model <a class="reference internal" href="#drdf2010">[DRDF2010]</a>), with following keys:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&#8216;alphaL&#8217;, &#8216;alphaR&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">double</span></dt>
+<dd>stereo model, panoramic parameters for the lead part</dd>
+<dt>&#8216;betaL&#8217;, &#8216;betaR&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(R,) ndarray</span></dt>
+<dd>stereo model, panoramic parameters for each of the component of
+the accompaniment part.</dd>
+<dt>&#8216;chirpPerF0&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>number of F0s between two &#8216;stable&#8217; F0s, modelled
+as chirps.</dd>
+<dt>&#8216;F0Table&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(NF0,) ndarray</span></dt>
+<dd>frequency in Hz for each of the F0s appearing in WF0</dd>
+<dt>&#8216;HF0&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(NF0*chirpPerF0, N) ndarray, <em>estimated</em></span></dt>
+<dd>amplitude array corresponding to the different F0s (this is
+what you want if you want the visualisation representation of
+the pitch saliances).</dd>
+<dt>&#8216;HF00&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(NF0*chirpPerF0, N) ndarray, <em>estimated</em></span></dt>
+<dd>amplitude array HF0, after being zeroed everywhere outside
+the given scope from the estimated melody</dd>
+<dt>&#8216;HGAMMA&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(P, K) ndarray, <em>estimated</em></span></dt>
+<dd>amplitude array corresponding to the different smooth shapes,
+decomposition of the filters on the smooth shapes in WGAMMA</dd>
+<dt>&#8216;HM&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(R, N) ndarray, <em>estimated</em></span></dt>
+<dd>amplitude array corresponding to the decomposition of the
+accompaniment on the spectral shapes in WM</dd>
+<dt>&#8216;HPHI&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(K, N) ndarray, <em>estimated</em></span></dt>
+<dd>amplitude array corresponding to the decomposition of the
+filter part on the filter spectral shapes in WPHI, defined
+as np.dot(WGAMMA, HGAMMA)</dd>
+<dt>&#8216;K&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>number of filters for the filter part decomposition</dd>
+<dt>&#8216;maxF0&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">double</span></dt>
+<dd>the highest F0 candidate</dd>
+<dt>&#8216;minF0&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">double</span></dt>
+<dd>the lowest F0 candidate</dd>
+<dt>&#8216;NF0&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>number of F0s in total</dd>
+<dt>&#8216;niter&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>number of iterations for the estimation algorithm</dd>
+<dt>&#8216;P&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>number of smooth spectral shapes for the filter part (in WGAMMA)</dd>
+<dt>&#8216;R&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>number of spectral shapes for the accompaniment part (in WM)</dd>
+<dt>&#8216;stepNotes&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">integer</span></dt>
+<dd>number of F0s between two semitones</dd>
+<dt>&#8216;WF0&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(F, NF0*chirpPerF0) ndarray, <em>fixed</em></span></dt>
+<dd>&#8216;dictionary&#8217; of harmonic spectral shapes for the F0 candidates
+generated thanks to the KLGLOTT88 model [DRDF2010]</dd>
+<dt>&#8216;WGAMMA&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(F, P) ndarray, <em>fixed</em></span></dt>
+<dd>&#8216;dictionary&#8217; of smooth spectral shapes for the filter part</dd>
+<dt>&#8216;WM&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">(F, R) ndarray, <em>estimated</em></span></dt>
+<dd>array of spectral shapes that are directly <em>estimated</em> on the
+signal</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt>verbose <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd>if True, the program writes some information about what is happening</dd>
+<dt>wavCanvas <span class="classifier-delimiter">:</span> <span class="classifier">instance from MplCanvas or MplCanvas3Axes</span></dt>
+<dd>the canvas that is going to be used to draw the input audio waveform</dd>
+<dt>XL, XR <span class="classifier-delimiter">:</span> <span class="classifier">(F, N) ndarray</span></dt>
+<dd>resp. left and right channel STFT arrays</dd>
+</dl>
+</dd>
+</dl>
+<p><strong>Methods</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Constructor <span class="classifier-delimiter">:</span> <span class="classifier">reads the input audio file, computes the STFT,</span></dt>
+<dd>generates the different dictionaries (for the source part,
+harmonic patterns WF0, and for the filter part, smooth
+patterns WGAMMA).</dd>
+<dt>automaticMelodyAndSeparation :</dt>
+<dd>launches sequence of methods to estimate the parameters, estimate the
+melody, then re-estimate the parameters and at last separate the
+lead from the rest, considering the lead is the most energetic source
+of the mixture (with some continuity regularity)</dd>
+<dt>estimSIMMParams :</dt>
+<dd>estimates the parameters of the SIMM, i.e. HF0, HPHI, HGAMMA, HM and WM</dd>
+<dt>estimStereoSIMMParams :</dt>
+<dd>estimates the parameters of the stereo version of the SIMM,
+i.e. same parameters as estimSIMMParams, with the alphas and betas</dd>
+<dt>estimStereoSUIMMParams :</dt>
+<dd>same as above, but first adds &#8216;noise&#8217; components to the source part</dd>
+<dt>initiateHF0WithIndexBestPath :</dt>
+<dd>computes the initial HF0, before the estimation, given the melody line
+(estimated or not)</dd>
+<dt>runViterbi :</dt>
+<dd>estimates the melody line from HF0, the energies of each F0 candidates</dd>
+<dt>setOutputFileNames :</dt>
+<dd>triggered when the text fields are changed, changing the output
+filenames</dd>
+<dt>writeSeparatedSignals :</dt>
+<dd>computing and writing the adaptive Wiener filtered separated files</dd>
+<dt><a class="reference internal" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignalsWithUnvoice" title="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignalsWithUnvoice"><tt class="xref py py-func docutils literal"><span class="pre">writeSeparatedSignalsWithUnvoice()</span></tt></a> :</dt>
+<dd>computing and writing the adaptive Wiener filtered separated files,
+unvoiced parts.</dd>
+</dl>
+</div></blockquote>
+<p><strong>References</strong></p>
+<p>This is a class that encapsulates our work on source separation,
+published as:</p>
+<table class="docutils citation" frame="void" id="ddr2011" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[DDR2011]</td><td>J.-L. Durrieu, B. David and G. Richard,
+A Musically Motivated Mid-Level Representation
+For Pitch Estimation And Musical Audio Source Separation,
+IEEE Journal of Selected Topics on Signal Processing,
+October 2011, Vol. 5 (6), pp. 1180 - 1191.</td></tr>
+</tbody>
+</table>
+<p>and</p>
+<table class="docutils citation" frame="void" id="drdf2010" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[DRDF2010]</a></td><td>J.-L. Durrieu, G. Richard, B. David and C. F&#8217;evotte,
+Source/Filter Model for Main Melody Extraction
+From Polyphonic Audio Signals,
+IEEE Transactions on Audio, Speech and Language Processing,
+special issue on Signal Models and Representations of Musical
+and Environmental Sounds, March 2010, vol. 18 (3), pp. 564 &#8211; 575.</td></tr>
+</tbody>
+</table>
+<p>As of 3/1/2012, available at <a class="reference external" href="http://www.durrieu.ch/research">http://www.durrieu.ch/research</a></p>
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.autoMelSepAndWrite">
+<tt class="descname">autoMelSepAndWrite</tt><big>(</big><em>maxFrames=1000</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.autoMelSepAndWrite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.autoMelSepAndWrite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fully automated estimation of melody and separation of signals.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.automaticMelodyAndSeparation">
+<tt class="descname">automaticMelodyAndSeparation</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.automaticMelodyAndSeparation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.automaticMelodyAndSeparation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fully automated estimation of melody and separation of signals.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.checkChunkSize">
+<tt class="descname">checkChunkSize</tt><big>(</big><em>maxFrames</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.checkChunkSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.checkChunkSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the number of chunks of size maxFrames, and
+changes maxFrames in case it does not provide long enough
+chunks (especially the last chunk).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeChroma">
+<tt class="descname">computeChroma</tt><big>(</big><em>maxFrames=3000</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.computeChroma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeChroma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the chroma matrix.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeMonoX">
+<tt class="descname">computeMonoX</tt><big>(</big><em>start=0</em>, <em>stop=None</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.computeMonoX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeMonoX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes and return SX, the mono channel or mean over the
+channels of the power spectrum of the signal</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeNFrames">
+<tt class="descname">computeNFrames</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.computeNFrames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeNFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute Nb Frames:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeWF0">
+<tt class="descname">computeWF0</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.computeWF0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeWF0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the frequency basis for the source part of SIMM,
+if tfrepresentation is a CQT, it also computes the cqt/hybridcqt
+transform object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.determineTuning">
+<tt class="descname">determineTuning</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.determineTuning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.determineTuning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine Tuning by checking the peaks corresponding
+to all possible patterns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimHF0">
+<tt class="descname">estimHF0</tt><big>(</big><em>R=1</em>, <em>maxFrames=1000</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.estimHF0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimHF0" title="Permalink to this definition">¶</a></dt>
+<dd><p>estimating and storing only HF0 for the whole excerpt,
+with only</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimStereoSIMMParamsWriteSeps">
+<tt class="descname">estimStereoSIMMParamsWriteSeps</tt><big>(</big><em>maxFrames=1000</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.estimStereoSIMMParamsWriteSeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimStereoSIMMParamsWriteSeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimates the parameters little by little, by chunks,
+and sequentially writes the signals. In the end, concatenates all these
+separated signals into the desired output files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimStereoSUIMMParamsWriteSeps">
+<tt class="descname">estimStereoSUIMMParamsWriteSeps</tt><big>(</big><em>maxFrames=1000</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.estimStereoSUIMMParamsWriteSeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.estimStereoSUIMMParamsWriteSeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>same as estimStereoSIMMParamsWriteSeps, but adds the unvoiced
+element in HF0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.setOutputFileNames">
+<tt class="descname">setOutputFileNames</tt><big>(</big><em>outputDirSuffix</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.setOutputFileNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.setOutputFileNames" title="Permalink to this definition">¶</a></dt>
+<dd><p>If already loaded a wav file, at this point, we can redefine
+where we want the output files to be written.</p>
+<p>Could be used, for instance, between the first estimation or the
+Viterbi smooth estimation of the melody, and the re-estimation
+of the parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignals">
+<tt class="descname">writeSeparatedSignals</tt><big>(</big><em>suffix='.wav'</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.writeSeparatedSignals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the separated signals to the files in self.files.
+If suffix contains &#8216;VUIMM&#8217;, then this method will take
+the WF0 and HF0 that contain the estimated unvoiced elements.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignalsWithUnvoice">
+<tt class="descname">writeSeparatedSignalsWithUnvoice</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.writeSeparatedSignalsWithUnvoice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.writeSeparatedSignalsWithUnvoice" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper to give a decent name to the function: simply
+calling self.writeSeparatedSignals with the
+&#8216;_VUIMM.wav&#8217; suffix.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="demix.html"
+                        title="previous chapter">demix</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="separateleadfunctions.html"
+                        title="next chapter">separateLeadFunctions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/separateleadstereo.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="separateleadfunctions.html" title="separateLeadFunctions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="demix.html" title="demix"
+             >previous</a> |</li>
+        <li><a href="../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" >Reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

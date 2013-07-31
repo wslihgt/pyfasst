@@ -68,7 +68,7 @@
 <span class="sd">   </span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NMF_decomposition"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.nmf.NMF_decomposition">[docs]</a><span class="k">def</span> <span class="nf">NMF_decomposition</span><span class="p">(</span><span class="n">SX</span><span class="p">,</span> <span class="n">nbComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="NMF_decomposition"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.nmf.NMF_decomposition">[docs]</a><span class="k">def</span> <span class="nf">NMF_decomposition</span><span class="p">(</span><span class="n">SX</span><span class="p">,</span> <span class="n">nbComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;NMF multiplicative gradient, for Itakura Saito</span>
 <span class="sd">    divergence measure between SX and ``np.dot(W,H)``</span>
 <span class="sd">    </span>
@@ -107,7 +107,7 @@
     
     <span class="k">return</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span>
 </div>
-<div class="viewcode-block" id="NMF_decomp_init"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.nmf.NMF_decomp_init">[docs]</a><span class="k">def</span> <span class="nf">NMF_decomp_init</span><span class="p">(</span><span class="n">SX</span><span class="p">,</span> <span class="n">nbComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<div class="viewcode-block" id="NMF_decomp_init"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.nmf.NMF_decomp_init">[docs]</a><span class="k">def</span> <span class="nf">NMF_decomp_init</span><span class="p">(</span><span class="n">SX</span><span class="p">,</span> <span class="n">nbComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                     <span class="n">Winit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">Hinit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                     <span class="n">updateW</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">updateH</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;NMF multiplicative gradient, for Itakura Saito</span>
@@ -173,7 +173,7 @@
     
     <span class="k">return</span> <span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="o">.</span><span class="n">T</span>
 </div>
-<div class="viewcode-block" id="SFNMF_decomp_init"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.nmf.SFNMF_decomp_init">[docs]</a><span class="k">def</span> <span class="nf">SFNMF_decomp_init</span><span class="p">(</span><span class="n">SX</span><span class="p">,</span> <span class="n">nbComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">nbFiltComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<div class="viewcode-block" id="SFNMF_decomp_init"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.nmf.SFNMF_decomp_init">[docs]</a><span class="k">def</span> <span class="nf">SFNMF_decomp_init</span><span class="p">(</span><span class="n">SX</span><span class="p">,</span> <span class="n">nbComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">nbFiltComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                       <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                       <span class="n">Winit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">Hinit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                       <span class="n">WFiltInit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">HFiltInit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>

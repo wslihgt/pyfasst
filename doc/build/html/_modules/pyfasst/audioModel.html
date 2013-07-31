@@ -858,7 +858,7 @@
 
 <span class="c">########## Main classes for audio models ##########</span>
 
-<div class="viewcode-block" id="FASST"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST">[docs]</a><span class="k">class</span> <span class="nc">FASST</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST">[docs]</a><span class="k">class</span> <span class="nc">FASST</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;**FASST audio model**, from::</span>
 <span class="sd">    </span>
 <span class="sd">     A. Ozerov, E. Vincent and F. Bimbot</span>
@@ -997,7 +997,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">iter_num</span> <span class="o">=</span> <span class="n">iter_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lambdaCorr</span> <span class="o">=</span> <span class="n">lambdaCorr</span>
     
-<div class="viewcode-block" id="FASST.comp_transf_Cx"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.comp_transf_Cx">[docs]</a>    <span class="k">def</span> <span class="nf">comp_transf_Cx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST.comp_transf_Cx"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.comp_transf_Cx">[docs]</a>    <span class="k">def</span> <span class="nf">comp_transf_Cx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the signal representation, according</span>
 <span class="sd">        to the provided signal_representation flag</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1076,7 +1076,7 @@
         <span class="c"># useless for the rest of computations:</span>
         <span class="k">del</span> <span class="n">Xchan</span>
     </div>
-<div class="viewcode-block" id="FASST.estim_param_a_post_model"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.estim_param_a_post_model">[docs]</a>    <span class="k">def</span> <span class="nf">estim_param_a_post_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+<div class="viewcode-block" id="FASST.estim_param_a_post_model"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.estim_param_a_post_model">[docs]</a>    <span class="k">def</span> <span class="nf">estim_param_a_post_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
         <span class="sd">&quot;&quot;&quot;Estimates the _a posteriori_ model for the provided</span>
 <span class="sd">        audio signal. In particular, this runs self.iter_num times</span>
 <span class="sd">        the Generalized Expectation-Maximisation algorithm to</span>
@@ -1125,7 +1125,7 @@
 
         <span class="k">return</span> <span class="n">logliks</span>
     </div>
-<div class="viewcode-block" id="FASST.GEM_iteration"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.GEM_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">GEM_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+<div class="viewcode-block" id="FASST.GEM_iteration"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.GEM_iteration">[docs]</a>    <span class="k">def</span> <span class="nf">GEM_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
         <span class="sd">&quot;&quot;&quot;GEM iteration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">channels</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
@@ -1164,7 +1164,7 @@
         
         <span class="k">return</span> <span class="n">loglik</span>
     </div>
-<div class="viewcode-block" id="FASST.comp_spat_comp_power"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.comp_spat_comp_power">[docs]</a>    <span class="k">def</span> <span class="nf">comp_spat_comp_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spat_comp_ind</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.comp_spat_comp_power"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.comp_spat_comp_power">[docs]</a>    <span class="k">def</span> <span class="nf">comp_spat_comp_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spat_comp_ind</span><span class="p">,</span>
                              <span class="n">spec_comp_ind</span><span class="o">=</span><span class="p">[],</span> <span class="n">factor_ind</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Matlab FASST Toolbox help::</span>
@@ -1221,7 +1221,7 @@
         
         <span class="k">return</span> <span class="n">V</span>
     </div>
-<div class="viewcode-block" id="FASST.comp_spat_cmps_powers"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.comp_spat_cmps_powers">[docs]</a>    <span class="k">def</span> <span class="nf">comp_spat_cmps_powers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spat_comp_ind</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.comp_spat_cmps_powers"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.comp_spat_cmps_powers">[docs]</a>    <span class="k">def</span> <span class="nf">comp_spat_cmps_powers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spat_comp_ind</span><span class="p">,</span>
                               <span class="n">spec_comp_ind</span><span class="o">=</span><span class="p">[],</span> <span class="n">factor_ind</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;Compute the sum of the spectral powers corresponding to the</span>
 <span class="sd">        spatial components as provided in the list `spat_comp_ind`</span>
@@ -1235,7 +1235,7 @@
             <span class="n">V</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comp_spat_comp_power</span><span class="p">(</span><span class="n">spat_comp_ind</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">V</span>
     </div>
-<div class="viewcode-block" id="FASST.retrieve_subsrc_params"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.retrieve_subsrc_params">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_subsrc_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+<div class="viewcode-block" id="FASST.retrieve_subsrc_params"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.retrieve_subsrc_params">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_subsrc_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
         <span class="sd">&quot;&quot;&quot;Computes the various quantities necessary for the estimation of the</span>
 <span class="sd">        main parameters:</span>
 <span class="sd">        </span>
@@ -1294,7 +1294,7 @@
                 
         <span class="k">return</span> <span class="n">spat_comp_powers</span><span class="p">,</span> <span class="n">mix_matrix</span><span class="p">,</span> <span class="n">rank_part_ind</span>
     </div>
-<div class="viewcode-block" id="FASST.compute_suff_stat"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.compute_suff_stat">[docs]</a>    <span class="k">def</span> <span class="nf">compute_suff_stat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spat_comp_powers</span><span class="p">,</span> <span class="n">mix_matrix</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST.compute_suff_stat"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.compute_suff_stat">[docs]</a>    <span class="k">def</span> <span class="nf">compute_suff_stat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spat_comp_powers</span><span class="p">,</span> <span class="n">mix_matrix</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        </span>
 <span class="sd">        Outputs:</span>
@@ -1504,7 +1504,7 @@
         
         <span class="k">return</span> <span class="n">inv_sigma_x_diag</span><span class="p">,</span> <span class="n">inv_sigma_x_off</span><span class="p">,</span> <span class="n">det_sigma_x</span>
     </div>
-<div class="viewcode-block" id="FASST.update_mix_matrix"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.update_mix_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">update_mix_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">hat_Rxs</span><span class="p">,</span> <span class="n">hat_Rss</span><span class="p">,</span> <span class="n">mix_matrix</span><span class="p">,</span> <span class="n">rank_part_ind</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST.update_mix_matrix"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.update_mix_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">update_mix_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">hat_Rxs</span><span class="p">,</span> <span class="n">hat_Rss</span><span class="p">,</span> <span class="n">mix_matrix</span><span class="p">,</span> <span class="n">rank_part_ind</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># deriving which components have which updating rule:</span>
@@ -1609,7 +1609,7 @@
         <span class="c"># should we normalize here?</span>
         <span class="c">##self.renormalize_parameters()</span>
         </div>
-<div class="viewcode-block" id="FASST.separate_spatial_filter_comp"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.separate_spatial_filter_comp">[docs]</a>    <span class="k">def</span> <span class="nf">separate_spatial_filter_comp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.separate_spatial_filter_comp"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.separate_spatial_filter_comp">[docs]</a>    <span class="k">def</span> <span class="nf">separate_spatial_filter_comp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                      <span class="n">dir_results</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                      <span class="n">suffix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;separate_spatial_filter_comp</span>
@@ -1780,7 +1780,7 @@
             <span class="n">outAudioObj</span><span class="o">.</span><span class="n">samplerate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span>
             <span class="n">outAudioObj</span><span class="o">.</span><span class="n">_write</span><span class="p">()</span>
         </div>
-<div class="viewcode-block" id="FASST.separate_spat_comps"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.separate_spat_comps">[docs]</a>    <span class="k">def</span> <span class="nf">separate_spat_comps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.separate_spat_comps"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.separate_spat_comps">[docs]</a>    <span class="k">def</span> <span class="nf">separate_spat_comps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                             <span class="n">dir_results</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                             <span class="n">suffix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;separate_spat_comps</span>
@@ -1798,7 +1798,7 @@
                             <span class="n">spec_comp_ind</span><span class="o">=</span><span class="n">spec_comp_ind</span><span class="p">,</span>
                             <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span>
     </div>
-<div class="viewcode-block" id="FASST.separate_comps"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.separate_comps">[docs]</a>    <span class="k">def</span> <span class="nf">separate_comps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.separate_comps"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.separate_comps">[docs]</a>    <span class="k">def</span> <span class="nf">separate_comps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                        <span class="n">dir_results</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">spec_comp_ind</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">suffix</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -1934,7 +1934,7 @@
         <span class="c">##       should work all the same, but with cqt, not very good</span>
         <span class="c">## means to cut signals and paste them back together...</span>
         </div>
-<div class="viewcode-block" id="FASST.mvdr_2d"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.mvdr_2d">[docs]</a>    <span class="k">def</span> <span class="nf">mvdr_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.mvdr_2d"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.mvdr_2d">[docs]</a>    <span class="k">def</span> <span class="nf">mvdr_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                 <span class="n">theta</span><span class="p">,</span>
                 <span class="n">distanceInterMic</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span>
                 <span class="p">):</span>
@@ -2014,7 +2014,7 @@
             <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sig_repr_params</span><span class="p">[</span><span class="s">&#39;fsize&#39;</span><span class="p">],</span>
             <span class="n">fs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">samplerate</span><span class="p">)</span>
     </div>
-<div class="viewcode-block" id="FASST.gcc_phat_tdoa_2d"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.gcc_phat_tdoa_2d">[docs]</a>    <span class="k">def</span> <span class="nf">gcc_phat_tdoa_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST.gcc_phat_tdoa_2d"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.gcc_phat_tdoa_2d">[docs]</a>    <span class="k">def</span> <span class="nf">gcc_phat_tdoa_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Using the cross-spectrum in self.Cx[1] to estimate the time</span>
 <span class="sd">        difference of arrival detection function (the Generalized Cross-</span>
 <span class="sd">        Correllation GCC), with the phase transform (GCC-PHAT) weighing</span>
@@ -2053,7 +2053,7 @@
 <span class="c">##        if len(spec_comp_ind):</span>
 <span class="c">##            pass</span>
     </div>
-<div class="viewcode-block" id="FASST.compute_sigma_comp_2d"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.compute_sigma_comp_2d">[docs]</a>    <span class="k">def</span> <span class="nf">compute_sigma_comp_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spat_ind</span><span class="p">,</span> <span class="n">spec_comp_ind</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST.compute_sigma_comp_2d"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.compute_sigma_comp_2d">[docs]</a>    <span class="k">def</span> <span class="nf">compute_sigma_comp_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spat_ind</span><span class="p">,</span> <span class="n">spec_comp_ind</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;only for stereo case self.audioObject.channels==2</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
@@ -2100,7 +2100,7 @@
         
         <span class="k">return</span> <span class="n">sigma_comp_diag</span><span class="p">,</span> <span class="n">sigma_comp_off</span>
     </div>
-<div class="viewcode-block" id="FASST.compute_inv_sigma_mix_2d"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.compute_inv_sigma_mix_2d">[docs]</a>    <span class="k">def</span> <span class="nf">compute_inv_sigma_mix_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.compute_inv_sigma_mix_2d"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.compute_inv_sigma_mix_2d">[docs]</a>    <span class="k">def</span> <span class="nf">compute_inv_sigma_mix_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                  <span class="n">sigma_comps_diag</span><span class="p">,</span>
                                  <span class="n">sigma_comps_off</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;only for nb channels = 2</span>
@@ -2121,7 +2121,7 @@
         
         <span class="k">return</span> <span class="n">inv_sigma_x_diag</span><span class="p">,</span> <span class="n">inv_sigma_x_off</span>
     </div>
-<div class="viewcode-block" id="FASST.compute_Wiener_gain_2d"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.compute_Wiener_gain_2d">[docs]</a>    <span class="k">def</span> <span class="nf">compute_Wiener_gain_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.compute_Wiener_gain_2d"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.compute_Wiener_gain_2d">[docs]</a>    <span class="k">def</span> <span class="nf">compute_Wiener_gain_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                <span class="n">sigma_comp_diag</span><span class="p">,</span>
                                <span class="n">sigma_comp_off</span><span class="p">,</span>
                                <span class="n">inv_sigma_mix_diag</span><span class="p">,</span>
@@ -2194,7 +2194,7 @@
         
         <span class="k">return</span> <span class="n">WG</span>
     </div>
-<div class="viewcode-block" id="FASST.update_spectral_components"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.update_spectral_components">[docs]</a>    <span class="k">def</span> <span class="nf">update_spectral_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hat_W</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST.update_spectral_components"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.update_spectral_components">[docs]</a>    <span class="k">def</span> <span class="nf">update_spectral_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hat_W</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the spectral components,</span>
 <span class="sd">        with hat_W as the expected value of power</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2704,7 +2704,7 @@
                         <span class="n">comp_num</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">comp_den</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span> <span class="o">**</span> <span class="n">omega</span>
                     <span class="k">del</span> <span class="n">comp_num</span><span class="p">,</span> <span class="n">comp_den</span><span class="p">,</span> <span class="n">spat_comp_power</span><span class="p">,</span> <span class="n">W</span>
     </div>
-<div class="viewcode-block" id="FASST.renormalize_parameters"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.renormalize_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">renormalize_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST.renormalize_parameters"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.renormalize_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">renormalize_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;renormalize_parameters</span>
 <span class="sd">        </span>
 <span class="sd">        Re-normalize the components</span>
@@ -2766,7 +2766,7 @@
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                         <span class="s">&quot;Temporal discrete state mngmt not done yet. &quot;</span><span class="p">)</span>
             </div>
-<div class="viewcode-block" id="FASST.setComponentParameter"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.setComponentParameter">[docs]</a>    <span class="k">def</span> <span class="nf">setComponentParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">,</span> <span class="n">spec_ind</span><span class="p">,</span> <span class="n">fact_ind</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.setComponentParameter"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.setComponentParameter">[docs]</a>    <span class="k">def</span> <span class="nf">setComponentParameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newValue</span><span class="p">,</span> <span class="n">spec_ind</span><span class="p">,</span> <span class="n">fact_ind</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                               <span class="n">partLabel</span><span class="o">=</span><span class="s">&#39;FB&#39;</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="s">&#39;free&#39;</span><span class="p">,</span>
                               <span class="n">keepDimensions</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A helper function to set a</span>
@@ -2815,7 +2815,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spec_comp</span><span class="p">[</span><span class="n">spec_ind</span><span class="p">][</span><span class="s">&#39;factor&#39;</span><span class="p">][</span><span class="n">fact_ind</span><span class="p">][</span>
             <span class="n">partLabel</span><span class="o">+</span><span class="s">&#39;_frdm_prior&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prior</span>
                 </div>
-<div class="viewcode-block" id="FASST.initialize_all_spec_comps_with_NMF"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.initialize_all_spec_comps_with_NMF">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_all_spec_comps_with_NMF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.initialize_all_spec_comps_with_NMF"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.initialize_all_spec_comps_with_NMF">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_all_spec_comps_with_NMF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                            <span class="n">sameInitAll</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                                            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes an NMF on the one-channel mix (averaging diagonal</span>
@@ -2842,7 +2842,7 @@
             <span class="c"># components (but only with factor 0)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialize_all_spec_comps_with_NMF_indiv</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="FASST.initialize_all_spec_comps_with_NMF_indiv"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.initialize_all_spec_comps_with_NMF_indiv">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_all_spec_comps_with_NMF_indiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.initialize_all_spec_comps_with_NMF_indiv"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.initialize_all_spec_comps_with_NMF_indiv">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_all_spec_comps_with_NMF_indiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                                                  <span class="n">updateFreqBasis</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                                                  <span class="n">updateTimeWeight</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -2906,7 +2906,7 @@
                 
         <span class="bp">self</span><span class="o">.</span><span class="n">renormalize_parameters</span><span class="p">()</span>
     </div>
-<div class="viewcode-block" id="FASST.initialize_all_spec_comps_with_NMF_same"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.initialize_all_spec_comps_with_NMF_same">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_all_spec_comps_with_NMF_same</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.initialize_all_spec_comps_with_NMF_same"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.initialize_all_spec_comps_with_NMF_same">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_all_spec_comps_with_NMF_same</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize all the components with the same amplitude and spectral</span>
@@ -2948,7 +2948,7 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">renormalize_parameters</span><span class="p">()</span>
     </div>
-<div class="viewcode-block" id="FASST.initializeConvParams"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.FASST.initializeConvParams">[docs]</a>    <span class="k">def</span> <span class="nf">initializeConvParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initMethod</span><span class="o">=</span><span class="s">&#39;demix&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="FASST.initializeConvParams"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.initializeConvParams">[docs]</a>    <span class="k">def</span> <span class="nf">initializeConvParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initMethod</span><span class="o">=</span><span class="s">&#39;demix&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;setting the spatial parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioObject</span><span class="o">.</span><span class="n">channels</span>
@@ -3012,7 +3012,7 @@
                     <span class="n">A</span><span class="p">[</span><span class="n">spat_ind</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
                     <span class="p">)</span>
     </div></div>
-<div class="viewcode-block" id="MultiChanNMFInst_FASST"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.MultiChanNMFInst_FASST">[docs]</a><span class="k">class</span> <span class="nc">MultiChanNMFInst_FASST</span><span class="p">(</span><span class="n">FASST</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiChanNMFInst_FASST"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.MultiChanNMFInst_FASST">[docs]</a><span class="k">class</span> <span class="nc">MultiChanNMFInst_FASST</span><span class="p">(</span><span class="n">FASST</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;MultiChanNMFInst_FASST</span>
 <span class="sd">    </span>
 <span class="sd">    sub-classes FASST</span>
@@ -3092,7 +3092,7 @@
             
         <span class="bp">self</span><span class="o">.</span><span class="n">renormalize_parameters</span><span class="p">()</span>
         
-<div class="viewcode-block" id="MultiChanNMFInst_FASST.setSpecCompFB"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.MultiChanNMFInst_FASST.setSpecCompFB">[docs]</a>    <span class="k">def</span> <span class="nf">setSpecCompFB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compNb</span><span class="p">,</span> <span class="n">FB</span><span class="p">,</span> <span class="n">FB_frdm_prior</span><span class="o">=</span><span class="s">&#39;fixed&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiChanNMFInst_FASST.setSpecCompFB"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.MultiChanNMFInst_FASST.setSpecCompFB">[docs]</a>    <span class="k">def</span> <span class="nf">setSpecCompFB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compNb</span><span class="p">,</span> <span class="n">FB</span><span class="p">,</span> <span class="n">FB_frdm_prior</span><span class="o">=</span><span class="s">&#39;fixed&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;SetSpecCompFB</span>
 <span class="sd">        </span>
 <span class="sd">        sets the spectral component&#39;s frequency basis.</span>
@@ -3112,7 +3112,7 @@
                 <span class="mf">0.25</span><span class="p">)</span>
         <span class="n">speccomp</span><span class="p">[</span><span class="s">&#39;FB_frdm_prior&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FB_frdm_prior</span>
 </div></div>
-<div class="viewcode-block" id="MultiChanNMFConv"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.MultiChanNMFConv">[docs]</a><span class="k">class</span> <span class="nc">MultiChanNMFConv</span><span class="p">(</span><span class="n">MultiChanNMFInst_FASST</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiChanNMFConv"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.MultiChanNMFConv">[docs]</a><span class="k">class</span> <span class="nc">MultiChanNMFConv</span><span class="p">(</span><span class="n">MultiChanNMFInst_FASST</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Takes the multichannel NMF instantaneous class, and makes it</span>
 <span class="sd">    convolutive!</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -3183,7 +3183,7 @@
                 <span class="n">factor</span><span class="p">[</span><span class="s">&#39;TW_DP_frdm_prior&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;fixed&#39;</span>
                 <span class="c"># factor[&#39;TW_DP_frdm_prior&#39;] = &#39;free&#39;</span>
         
-<div class="viewcode-block" id="multiChanSourceF0Filter"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter">[docs]</a><span class="k">class</span> <span class="nc">multiChanSourceF0Filter</span><span class="p">(</span><span class="n">FASST</span><span class="p">):</span>
+<div class="viewcode-block" id="multiChanSourceF0Filter"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter">[docs]</a><span class="k">class</span> <span class="nc">multiChanSourceF0Filter</span><span class="p">(</span><span class="n">FASST</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;multi channel source/filter model</span>
 <span class="sd">    nbcomps components, nbcomps-1 SF models, 1 residual component</span>
 <span class="sd">    </span>
@@ -3415,7 +3415,7 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">renormalize_parameters</span><span class="p">()</span>
         
-<div class="viewcode-block" id="multiChanSourceF0Filter.initSpecCompsWithLabelAndFiles"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.initSpecCompsWithLabelAndFiles">[docs]</a>    <span class="k">def</span> <span class="nf">initSpecCompsWithLabelAndFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrus</span><span class="o">=</span><span class="p">[],</span> <span class="n">instru2modelfile</span><span class="o">=</span><span class="p">{},</span>
+<div class="viewcode-block" id="multiChanSourceF0Filter.initSpecCompsWithLabelAndFiles"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.initSpecCompsWithLabelAndFiles">[docs]</a>    <span class="k">def</span> <span class="nf">initSpecCompsWithLabelAndFiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrus</span><span class="o">=</span><span class="p">[],</span> <span class="n">instru2modelfile</span><span class="o">=</span><span class="p">{},</span>
                                        <span class="n">freqBasisAdaptive</span><span class="o">=</span><span class="s">&#39;fixed&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize the spectral components with the instrument labels as</span>
 <span class="sd">        well as with the components stored in the provided dictionary in</span>
@@ -3495,7 +3495,7 @@
         
         <span class="k">return</span> <span class="n">instrumentNames</span>
         </div>
-<div class="viewcode-block" id="multiChanSourceF0Filter.setSpecCompFB"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.setSpecCompFB">[docs]</a>    <span class="k">def</span> <span class="nf">setSpecCompFB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compNb</span><span class="p">,</span> <span class="n">FB</span><span class="p">,</span> <span class="n">FB_frdm_prior</span><span class="o">=</span><span class="s">&#39;fixed&#39;</span><span class="p">,):</span>
+<div class="viewcode-block" id="multiChanSourceF0Filter.setSpecCompFB"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.setSpecCompFB">[docs]</a>    <span class="k">def</span> <span class="nf">setSpecCompFB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compNb</span><span class="p">,</span> <span class="n">FB</span><span class="p">,</span> <span class="n">FB_frdm_prior</span><span class="o">=</span><span class="s">&#39;fixed&#39;</span><span class="p">,):</span>
         <span class="sd">&quot;&quot;&quot;SetSpecCompFB</span>
 <span class="sd">        </span>
 <span class="sd">        sets the spectral component&#39;s frequency basis.</span>
@@ -3515,7 +3515,7 @@
                 <span class="mf">0.25</span><span class="p">)</span>
         <span class="n">speccomp</span><span class="p">[</span><span class="s">&#39;FB_frdm_prior&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">FB_frdm_prior</span>
     </div>
-<div class="viewcode-block" id="multiChanSourceF0Filter.initializeFreeMats"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.initializeFreeMats">[docs]</a>    <span class="k">def</span> <span class="nf">initializeFreeMats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<div class="viewcode-block" id="multiChanSourceF0Filter.initializeFreeMats"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.initializeFreeMats">[docs]</a>    <span class="k">def</span> <span class="nf">initializeFreeMats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;initialize free matrices, with NMF decomposition</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># we initialize the matrices with NMF decomposition using the</span>
@@ -3558,7 +3558,7 @@
             
         <span class="bp">self</span><span class="o">.</span><span class="n">renormalize_parameters</span><span class="p">()</span>
     </div>
-<div class="viewcode-block" id="multiChanSourceF0Filter.makeItConvolutive"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.makeItConvolutive">[docs]</a>    <span class="k">def</span> <span class="nf">makeItConvolutive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="multiChanSourceF0Filter.makeItConvolutive"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.makeItConvolutive">[docs]</a>    <span class="k">def</span> <span class="nf">makeItConvolutive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Takes the spatial parameters and sets them to a convolutive</span>
 <span class="sd">        mixture, in case the parameter has not yet been changed to</span>
 <span class="sd">        &#39;conv&#39; mode.</span>
@@ -3646,7 +3646,7 @@
 <span class="c">##                    A[spat_ind].T</span>
 <span class="c">##                    )</span>
     </div>
-<div class="viewcode-block" id="multiChanSourceF0Filter.estim_param_a_post_model"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.estim_param_a_post_model">[docs]</a>    <span class="k">def</span> <span class="nf">estim_param_a_post_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+<div class="viewcode-block" id="multiChanSourceF0Filter.estim_param_a_post_model"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.estim_param_a_post_model">[docs]</a>    <span class="k">def</span> <span class="nf">estim_param_a_post_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
         <span class="sd">&quot;&quot;&quot;estim_param_a_post_model</span>
 <span class="sd">        </span>
 <span class="sd">        Estimation of model parameters, using the sparsity constraints.</span>
@@ -3694,7 +3694,7 @@
             
         <span class="k">return</span> <span class="n">logliks</span>
     </div>
-<div class="viewcode-block" id="multiChanSourceF0Filter.reweigh_sparsity_constraint"><a class="viewcode-back" href="../../audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.reweigh_sparsity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">reweigh_sparsity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+<div class="viewcode-block" id="multiChanSourceF0Filter.reweigh_sparsity_constraint"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multiChanSourceF0Filter.reweigh_sparsity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">reweigh_sparsity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;reweigh_sparsity_constraint</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>

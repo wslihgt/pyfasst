@@ -10,3 +10,15 @@ UTILS
 .. automodule:: pyfasst.tools.utils
     :members: 
 
+SIGNALTOOLS
+===========
+
+.. automodule:: pyfasst.tools.signalTools
+    :members:
+
+DISTANCES
+=========
+
+.. automodule:: pyfasst.tools.distances
+    :members: 
+

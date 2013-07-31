@@ -11,7 +11,8 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-	
+   
+   description	
    audiomodel
    tftransforms
    demix

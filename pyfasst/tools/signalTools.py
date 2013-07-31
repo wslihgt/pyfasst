@@ -132,49 +132,49 @@ def invHermMat2D(a_00, a_01, a_11):
 def inv_herm_mat_2d(sigma_x_diag, sigma_x_off, verbose=False):
     """Computes the inverse of 2D hermitian matrices.
 
-    Inputs
-    ------
-    sigma_x_diag
+    **Inputs**
+    
+     sigma_x_diag
         ndarray, with (dim of axis=0) = 2
 
         The diagonal elements of the matrices to invert.
         sigma_x_diag[0] are the (0,0) elements and
         sigma_x_diag[1] are the (1,1) ones.
 
-    sigma_x_off
+     sigma_x_off
         ndarray, with the same dimensions as sigma_x_diag[0]
 
         The off-diagonal elements of the matrices, more precisely the
         (0,1) element (since the matrices are assumed Hermitian,
         the (1,0) element is the complex conjugate)
 
-    Outputs
-    -------
-    inv_sigma_x_diag
+    **Outputs**
+    
+     inv_sigma_x_diag
         ndarray, 2 x shape(sigma_x_off)
 
         Diagonal elements of the inverse matrices.
         [0] <-> (0,0)
         [1] <-> (1,1)
 
-    inv_sigma_x_off
+     inv_sigma_x_off
         ndarray, shape(sigma_x_off)
 
         Off-diagonal (0,1) elements of the inverse matrices
 
-    det_sigma_x
+     det_sigma_x
         ndarray, shape(sigma_x_off)
 
         For each inversion, the determinant of the matrix.
 
-    Remarks
-    -------
-    The inversion is done explicitly, by computing the determinant
-    (explicit formula for 2D matrices), then the elements of the
-    inverse with the corresponding formulas.
-
-    To deal with ill-conditioned matrices, a minimum (absolute) value of
-    the determinant is guaranteed. 
+    **Remarks**
+    
+     The inversion is done explicitly, by computing the determinant
+     (explicit formula for 2D matrices), then the elements of the
+     inverse with the corresponding formulas.
+ 
+     To deal with ill-conditioned matrices, a minimum (absolute) value of
+     the determinant is guaranteed. 
 
     """
     #if len(sigma_x_diag.shape) != 3:

@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyfasst.tools.signalTools &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyfasst.tools.signalTools</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;signalTools.py</span>
+
+<span class="sd">gathers signal processing tools</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="kn">as</span> <span class="nn">spsig</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-10</span>
+
+<div class="viewcode-block" id="medianFilter"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.signalTools.medianFilter">[docs]</a><span class="k">def</span> <span class="nf">medianFilter</span><span class="p">(</span><span class="n">inputArray</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;median filter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">inputArray</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">outputArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">inputArray</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">outputArray</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span>
+            <span class="n">inputArray</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">length</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span><span class="nb">min</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="n">length</span><span class="p">,</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">outputArray</span><span class="p">[</span><span class="n">n</span><span class="p">]):</span>
+            <span class="n">outputArray</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">inputArray</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> 
+    <span class="k">return</span> <span class="n">outputArray</span>
+</div>
+<div class="viewcode-block" id="prinComp2D"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.signalTools.prinComp2D">[docs]</a><span class="k">def</span> <span class="nf">prinComp2D</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span> <span class="n">X1</span><span class="p">,</span> <span class="n">neighborNb</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the eigen values and eigen vectors for a</span>
+<span class="sd">    matrix X of shape 2 x F x N, computing the 2 x 2 covariance matrices</span>
+<span class="sd">    for the F x N over the temporal neighborhood of size neighborNb.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">F</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">X0</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">F2</span><span class="p">,</span> <span class="n">N2</span> <span class="o">=</span> <span class="n">X1</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">F</span><span class="o">!=</span><span class="n">F2</span> <span class="ow">or</span> <span class="n">N</span><span class="o">!=</span><span class="n">N2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;X1 and X2 of size &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">X0</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                         <span class="o">+</span> <span class="s">&#39; and &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">X1</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    
+    <span class="n">lenCov</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">neighborNb</span> <span class="o">+</span> <span class="mi">1</span>
+    
+    <span class="n">onesNeigh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">neighborNb</span><span class="p">)</span> <span class="c"># to compute the means/</span>
+    <span class="n">mu0_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">F</span><span class="p">,</span> <span class="n">lenCov</span><span class="p">],)</span>
+    <span class="n">mu1_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">F</span><span class="p">,</span> <span class="n">lenCov</span><span class="p">],)</span>
+    <span class="n">mu01</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">F</span><span class="p">,</span> <span class="n">lenCov</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+    
+    <span class="n">cov0_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">F</span><span class="p">,</span> <span class="n">lenCov</span><span class="p">],)</span>
+    <span class="n">cov1_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">F</span><span class="p">,</span> <span class="n">lenCov</span><span class="p">],)</span>
+    <span class="n">cov01</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">F</span><span class="p">,</span> <span class="n">lenCov</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="p">):</span>
+        <span class="n">mu0</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">spsig</span><span class="o">.</span><span class="n">fftconvolve</span><span class="p">(</span><span class="n">in1</span><span class="o">=</span><span class="n">X0</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="n">in2</span><span class="o">=</span><span class="n">onesNeigh</span><span class="p">,</span>
+                               <span class="n">mode</span><span class="o">=</span><span class="s">&#39;valid&#39;</span><span class="p">)</span>
+             <span class="p">)</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="n">neighborNb</span>
+        <span class="n">mu1</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">spsig</span><span class="o">.</span><span class="n">fftconvolve</span><span class="p">(</span><span class="n">in1</span><span class="o">=</span><span class="n">X1</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="n">in2</span><span class="o">=</span><span class="n">onesNeigh</span><span class="p">,</span>
+                               <span class="n">mode</span><span class="o">=</span><span class="s">&#39;valid&#39;</span><span class="p">)</span>
+             <span class="p">)</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="n">neighborNb</span>
+        <span class="c"># means: in original, equal to 0...</span>
+        <span class="n">mu01</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">mu1</span><span class="p">)</span>
+        <span class="n">mu0_2</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mu0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">mu1_2</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">mu1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        
+        <span class="n">x_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">X0</span><span class="p">[</span><span class="n">f</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">cov0_2</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">spsig</span><span class="o">.</span><span class="n">fftconvolve</span><span class="p">(</span><span class="n">in1</span><span class="o">=</span><span class="n">x_2</span><span class="p">,</span> <span class="n">in2</span><span class="o">=</span><span class="n">onesNeigh</span><span class="p">,</span>
+                                     <span class="n">mode</span><span class="o">=</span><span class="s">&#39;valid&#39;</span><span class="p">)</span>
+                   <span class="p">)</span> <span class="c">#  - neighborNb * mu0_2[f]</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">neighborNb</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">)</span>
+        
+        <span class="n">x_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">f</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">cov1_2</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">spsig</span><span class="o">.</span><span class="n">fftconvolve</span><span class="p">(</span><span class="n">in1</span><span class="o">=</span><span class="n">x_2</span><span class="p">,</span> <span class="n">in2</span><span class="o">=</span><span class="n">onesNeigh</span><span class="p">,</span>
+                                     <span class="n">mode</span><span class="o">=</span><span class="s">&#39;valid&#39;</span><span class="p">)</span>
+                   <span class="p">)</span> <span class="c"># - neighborNb * mu1_2[f]</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">neighborNb</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">)</span>
+        
+        <span class="n">x_2</span> <span class="o">=</span> <span class="n">X0</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">X1</span><span class="p">[</span><span class="n">f</span><span class="p">])</span>
+        <span class="n">cov01</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">spsig</span><span class="o">.</span><span class="n">fftconvolve</span><span class="p">(</span><span class="n">in1</span><span class="o">=</span><span class="n">x_2</span><span class="p">,</span> <span class="n">in2</span><span class="o">=</span><span class="n">onesNeigh</span><span class="p">,</span>
+                               <span class="n">mode</span><span class="o">=</span><span class="s">&#39;valid&#39;</span><span class="p">)</span>
+             <span class="p">)</span> <span class="c"># - neighborNb * mu01[f]</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">neighborNb</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">)</span>
+        
+    <span class="n">traSig</span> <span class="o">=</span> <span class="n">cov0_2</span> <span class="o">+</span> <span class="n">cov1_2</span>
+    <span class="n">detSig</span> <span class="o">=</span> <span class="n">cov0_2</span> <span class="o">*</span> <span class="n">cov1_2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cov01</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">traSig</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">detSig</span><span class="p">)</span>
+    
+    <span class="c"># eigen values</span>
+    <span class="n">lambdaM</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">traSig</span> <span class="o">+</span> <span class="n">delta</span><span class="p">)</span>
+    <span class="n">lambdam</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="n">traSig</span> <span class="o">-</span> <span class="n">delta</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">lambdaM</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;lambdaM is negative:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lambdaM</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">lambdam</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;lambdam is negative:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lambdam</span><span class="p">))</span>
+    <span class="c">##lambdaM = np.copy(lambda0)</span>
+    <span class="c">##lambdam = np.copy(lambda1)</span>
+    
+    <span class="c"># eigen vectors</span>
+    <span class="n">vM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">lenCov</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+    <span class="n">vm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">lenCov</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+    <span class="c"># 20130613T1512 there seems to be issues with NaNs:</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cov01</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lambdaM</span> <span class="o">-</span> <span class="n">cov0_2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">vM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov01</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="n">vM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lambdaM</span> <span class="o">-</span> <span class="n">cov0_2</span><span class="p">)</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="c"># setting the den=0 eigen vectors to u_x:</span>
+    <span class="n">vM</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">den</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">vM</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">den</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c"># same issue on the small lambda eigenvector:</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cov01</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lambdam</span> <span class="o">-</span> <span class="n">cov0_2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">vm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cov01</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="n">vm</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lambdam</span> <span class="o">-</span> <span class="n">cov0_2</span><span class="p">)</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="n">vm</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">den</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">vm</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">den</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="k">return</span> <span class="n">lambdaM</span><span class="p">,</span> <span class="n">lambdam</span><span class="p">,</span> <span class="n">vM</span><span class="p">,</span> <span class="n">vm</span><span class="p">,</span> <span class="c">#mu0_2, mu1_2, m01, cov0_2, cov1_2, cov01</span>
+</div>
+<div class="viewcode-block" id="invHermMat2D"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.signalTools.invHermMat2D">[docs]</a><span class="k">def</span> <span class="nf">invHermMat2D</span><span class="p">(</span><span class="n">a_00</span><span class="p">,</span> <span class="n">a_01</span><span class="p">,</span> <span class="n">a_11</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This inverts a set of 2x2 Hermitian matrices</span>
+
+<span class="sd">    better check :py:func:`inv_herm_mat_2d` instead, and replace all</span>
+<span class="sd">    reference to this by the former.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">det</span> <span class="o">=</span> <span class="n">a_00</span> <span class="o">*</span> <span class="n">a_11</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a_01</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">det</span><span class="o">==</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;The matrix is probably non invertible! </span><span class="si">%s</span><span class="s">&quot;</span>
+                      <span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">det</span><span class="p">[</span><span class="n">det</span><span class="o">==</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">a_11</span><span class="o">/</span><span class="n">det</span><span class="p">,</span> <span class="o">-</span><span class="n">a_01</span><span class="o">/</span><span class="n">det</span><span class="p">,</span> <span class="n">a_00</span><span class="o">/</span><span class="n">det</span>
+    </div>
+<div class="viewcode-block" id="inv_herm_mat_2d"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.signalTools.inv_herm_mat_2d">[docs]</a><span class="k">def</span> <span class="nf">inv_herm_mat_2d</span><span class="p">(</span><span class="n">sigma_x_diag</span><span class="p">,</span> <span class="n">sigma_x_off</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the inverse of 2D hermitian matrices.</span>
+
+<span class="sd">    Inputs</span>
+<span class="sd">    ------</span>
+<span class="sd">    sigma_x_diag</span>
+<span class="sd">        ndarray, with (dim of axis=0) = 2</span>
+
+<span class="sd">        The diagonal elements of the matrices to invert.</span>
+<span class="sd">        sigma_x_diag[0] are the (0,0) elements and</span>
+<span class="sd">        sigma_x_diag[1] are the (1,1) ones.</span>
+
+<span class="sd">    sigma_x_off</span>
+<span class="sd">        ndarray, with the same dimensions as sigma_x_diag[0]</span>
+
+<span class="sd">        The off-diagonal elements of the matrices, more precisely the</span>
+<span class="sd">        (0,1) element (since the matrices are assumed Hermitian,</span>
+<span class="sd">        the (1,0) element is the complex conjugate)</span>
+
+<span class="sd">    Outputs</span>
+<span class="sd">    -------</span>
+<span class="sd">    inv_sigma_x_diag</span>
+<span class="sd">        ndarray, 2 x shape(sigma_x_off)</span>
+
+<span class="sd">        Diagonal elements of the inverse matrices.</span>
+<span class="sd">        [0] &lt;-&gt; (0,0)</span>
+<span class="sd">        [1] &lt;-&gt; (1,1)</span>
+
+<span class="sd">    inv_sigma_x_off</span>
+<span class="sd">        ndarray, shape(sigma_x_off)</span>
+
+<span class="sd">        Off-diagonal (0,1) elements of the inverse matrices</span>
+
+<span class="sd">    det_sigma_x</span>
+<span class="sd">        ndarray, shape(sigma_x_off)</span>
+
+<span class="sd">        For each inversion, the determinant of the matrix.</span>
+
+<span class="sd">    Remarks</span>
+<span class="sd">    -------</span>
+<span class="sd">    The inversion is done explicitly, by computing the determinant</span>
+<span class="sd">    (explicit formula for 2D matrices), then the elements of the</span>
+<span class="sd">    inverse with the corresponding formulas.</span>
+
+<span class="sd">    To deal with ill-conditioned matrices, a minimum (absolute) value of</span>
+<span class="sd">    the determinant is guaranteed. </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#if len(sigma_x_diag.shape) != 3:</span>
+    <span class="c">#    raise ValueError(&quot;Something weird happened to sigma_x&quot;)</span>
+    <span class="n">det_sigma_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">sigma_x_diag</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sigma_x_off</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;number of 0s in det &quot;</span><span class="p">,(</span><span class="n">det_sigma_x</span><span class="o">==</span><span class="mf">0.</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="c"># issue when det sigma x is 0... </span>
+    <span class="n">det_sigma_x</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">det_sigma_x</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span> <span class="o">*</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">det_sigma_x</span><span class="p">),</span> <span class="n">eps</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;number of 0s left in det&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">det_sigma_x</span><span class="o">==</span><span class="mf">0.</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">inv_sigma_x_diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sigma_x_diag</span><span class="p">)</span>
+    <span class="n">inv_sigma_x_off</span> <span class="o">=</span> <span class="o">-</span> <span class="n">sigma_x_off</span> <span class="o">/</span> <span class="n">det_sigma_x</span>
+    <span class="n">inv_sigma_x_diag</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigma_x_diag</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">det_sigma_x</span>
+    <span class="n">inv_sigma_x_diag</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigma_x_diag</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">det_sigma_x</span>
+
+    <span class="k">return</span> <span class="n">inv_sigma_x_diag</span><span class="p">,</span> <span class="n">inv_sigma_x_off</span><span class="p">,</span> <span class="n">det_sigma_x</span>
+</div>
+<div class="viewcode-block" id="f0detectionFunction"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.signalTools.f0detectionFunction">[docs]</a><span class="k">def</span> <span class="nf">f0detectionFunction</span><span class="p">(</span><span class="n">TFmatrix</span><span class="p">,</span> <span class="n">freqs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                        <span class="n">samplingrate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <span class="n">fouriersize</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
+                        <span class="n">f0min</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">f0max</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">stepnote</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                        <span class="n">numberHarmonics</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                        <span class="n">detectFunc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="n">weightFreqs</span><span class="o">=</span><span class="bp">None</span> <span class="p">,</span>
+                        <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the Harmonic Sum</span>
+
+<span class="sd">    detectFunc should be a function taking an array as argument, and</span>
+
+<span class="sd">    </span>
+<span class="sd">    `threshold` is homogenous to a tone on the western musical scale</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">TFmatrix</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">TFmatrix</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">nframes</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">nfreqs</span> <span class="o">=</span> <span class="n">TFmatrix</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nfreqs</span><span class="p">,</span> <span class="n">nframes</span> <span class="o">=</span> <span class="n">TFmatrix</span><span class="o">.</span><span class="n">shape</span>
+        
+    <span class="k">if</span> <span class="n">freqs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c"># assuming STFT</span>
+        <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nfreqs</span><span class="p">)</span> <span class="o">*</span> <span class="n">samplingrate</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">fouriersize</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">weightFreqs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">weightFreqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nfreqs</span><span class="p">)</span>
+    
+    <span class="n">F0number</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
+        <span class="p">(</span><span class="mf">12.</span> <span class="o">*</span> <span class="n">stepnote</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">f0max</span> <span class="o">/</span> <span class="n">f0min</span><span class="p">))</span>
+    <span class="n">F0Table</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">f0min</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="mf">2.</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">F0number</span><span class="p">)</span>
+                   <span class="o">/</span> <span class="p">(</span><span class="mf">12.</span> <span class="o">*</span> <span class="n">stepnote</span><span class="p">)</span>
+                   <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    
+    <span class="n">TFmatrixSum</span> <span class="o">=</span> <span class="n">TFmatrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="n">hs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">F0number</span><span class="p">,</span> <span class="n">nframes</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">nf0</span><span class="p">,</span> <span class="n">f0</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">F0Table</span><span class="p">):</span>
+        <span class="c">##indexToSum = (</span>
+        <span class="c">##    np.argmin(</span>
+        <span class="c">##        np.abs(12 * np.log2(np.vstack(freqs)</span>
+        <span class="c">##                / (np.arange(1, numberHarmonics + 1) * f0))),</span>
+        <span class="c">##        axis=0))</span>
+        <span class="c">##indexToSum = np.sum(((np.abs(</span>
+        <span class="c">##    12 * np.log2(np.vstack(freqs)</span>
+        <span class="c">##                 / (np.arange(1, numberHarmonics + 1) * f0))))</span>
+        <span class="c">##    &lt; threshold), axis=1) &gt; 0</span>
+        <span class="c">#### indexToSum</span>
+        <span class="c">## indexToSum = (</span>
+        <span class="c">##     np.min(</span>
+        <span class="c">##         np.abs(</span>
+        <span class="c">##             12 * np.log2(</span>
+        <span class="c">##                 np.vstack(freqs)</span>
+        <span class="c">##                 / (np.arange(1, numberHarmonics + 1) * f0)</span>
+        <span class="c">##                 )</span>
+        <span class="c">##             ),</span>
+        <span class="c">##         axis=1</span>
+        <span class="c">##         )</span>
+        <span class="c">##     ) &lt; threshold</span>
+        
+        <span class="c">##if indexToSum.sum():</span>
+        <span class="c">##    hs[nf0] = detectFunc(np.vstack(weightFreqs[indexToSum])</span>
+        <span class="c">##                         * TFmatrix[indexToSum] / TFmatrixSum,</span>
+        <span class="c">##                         axis=0)</span>
+        <span class="c">##else:</span>
+        <span class="c">##    print &quot;No freq bins for f0:&quot;, f0</span>
+        
+        <span class="c"># reworking this whole by looking for the bin within the allowed ones</span>
+        <span class="c"># for which the TFmat is max:</span>
+        <span class="n">subTFMat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">nh</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">numberHarmonics</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">indexToSum</span> <span class="o">=</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+                <span class="mi">12</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">freqs</span> <span class="o">/</span> <span class="p">(</span><span class="n">nh</span> <span class="o">*</span> <span class="n">f0</span><span class="p">))))</span>
+                                 <span class="o">&lt;</span> <span class="n">threshold</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">indexToSum</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">indexToSum</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">subTFMat</span><span class="p">):</span>
+                    <span class="n">subTFMat</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">weightFreqs</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">])</span>
+                        <span class="o">*</span> <span class="n">TFmatrix</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">])</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="n">subTFMat</span><span class="o">.</span><span class="n">shape</span>
+                        <span class="k">print</span> <span class="n">weightFreqs</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">]</span>
+                        <span class="k">print</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">weightFreqs</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">])</span>
+                               <span class="o">*</span> <span class="n">TFmatrix</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">])</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">subTFMat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">subTFMat</span><span class="p">,</span>
+                         <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">weightFreqs</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">])</span>
+                          <span class="o">*</span> <span class="n">TFmatrix</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">])</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
+            <span class="k">elif</span> <span class="n">indexToSum</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">subTFMat</span><span class="p">):</span>
+                    <span class="n">subTFMat</span> <span class="o">=</span> <span class="p">(</span><span class="n">weightFreqs</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">]</span>
+                                <span class="o">*</span> <span class="n">TFmatrix</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="n">subTFMat</span><span class="o">.</span><span class="n">shape</span>
+                        <span class="k">print</span> <span class="p">(</span><span class="n">weightFreqs</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">]</span>
+                               <span class="o">*</span> <span class="n">TFmatrix</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span>
+                    <span class="n">subTFMat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">subTFMat</span><span class="p">,</span>
+                         <span class="n">weightFreqs</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">]</span> <span class="o">*</span> <span class="n">TFmatrix</span><span class="p">[</span><span class="n">indexToSum</span><span class="p">]])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;No freq bins for f0:&quot;</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="s">&quot;harmo&quot;</span><span class="p">,</span> <span class="n">nh</span>
+                
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subTFMat</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">subTFMat</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">hs</span><span class="p">[</span><span class="n">nf0</span><span class="p">]</span> <span class="o">=</span> <span class="n">detectFunc</span><span class="p">(</span><span class="n">subTFMat</span> <span class="o">/</span> <span class="n">TFmatrixSum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">subTFMat</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">hs</span><span class="p">[</span><span class="n">nf0</span><span class="p">]</span> <span class="o">=</span> <span class="n">detectFunc</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">subTFMat</span><span class="p">)</span> <span class="o">/</span> <span class="n">TFmatrixSum</span><span class="p">,</span>
+                                     <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;No input for f0:&quot;</span><span class="p">,</span> <span class="n">f0</span>
+    
+    <span class="k">return</span> <span class="n">hs</span><span class="p">,</span> <span class="n">F0Table</span>
+</div>
+<div class="viewcode-block" id="harmonicSum"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.signalTools.harmonicSum">[docs]</a><span class="k">def</span> <span class="nf">harmonicSum</span><span class="p">(</span><span class="n">TFmatrix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the harmonic sum</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">f0detectionFunction</span><span class="p">(</span><span class="n">TFmatrix</span><span class="p">,</span> <span class="n">detectFunc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="harmonicProd"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.signalTools.harmonicProd">[docs]</a><span class="k">def</span> <span class="nf">harmonicProd</span><span class="p">(</span><span class="n">TFmatrix</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the harmonic sum</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">f0detectionFunction</span><span class="p">(</span><span class="n">TFmatrix</span><span class="p">,</span> <span class="n">detectFunc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="sortSpectrum"><a class="viewcode-back" href="../../../tools.html#pyfasst.tools.signalTools.sortSpectrum">[docs]</a><span class="k">def</span> <span class="nf">sortSpectrum</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span>
+                 <span class="n">numberHarmonicsHS</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                 <span class="n">numberHarmonicsHP</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sort the spectra in ``spectrum`` with respect to their F0</span>
+<span class="sd">    values, as estimated by HS * HP function. </span>
+<span class="sd">    </span>
+<span class="sd">    20130521 DJL sort of works, but periodicity detection should be reworked</span>
+<span class="sd">    according to YIN and the like, in order to obtain better estimates.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hs</span><span class="p">,</span> <span class="n">f0tablehs</span> <span class="o">=</span> <span class="n">harmonicSum</span><span class="p">(</span>
+        <span class="n">spectrum</span><span class="p">,</span>
+        <span class="n">numberHarmonics</span><span class="o">=</span><span class="n">numberHarmonicsHS</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">hp</span><span class="p">,</span> <span class="n">f0tablehp</span> <span class="o">=</span> <span class="n">harmonicProd</span><span class="p">(</span>
+        <span class="n">spectrum</span><span class="p">,</span>
+        <span class="n">numberHarmonics</span><span class="o">=</span><span class="n">numberHarmonicsHP</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">f0s</span> <span class="o">=</span> <span class="n">f0tablehs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">hs</span> <span class="o">*</span> <span class="n">hp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+    <span class="n">indsort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">f0s</span><span class="p">)</span>
+    <span class="n">sortedSpectrum</span> <span class="o">=</span> <span class="n">spectrum</span><span class="p">[:,</span> <span class="n">indsort</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">sortedSpectrum</span><span class="p">,</span> <span class="n">f0s</span><span class="p">[</span><span class="n">indsort</span><span class="p">],</span> <span class="n">hs</span><span class="p">,</span> <span class="n">hp</span><span class="p">,</span> <span class="n">f0tablehs</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

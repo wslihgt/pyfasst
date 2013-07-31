@@ -56,13 +56,12 @@
 <p>The <tt class="xref py py-mod docutils literal"><span class="pre">tools</span></tt> package contains various modules with different uses.</p>
 <div class="section" id="module-pyfasst.tools.utils">
 <span id="utils"></span><h2>UTILS<a class="headerlink" href="#module-pyfasst.tools.utils" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="utils-py">
-<h3>utils.py<a class="headerlink" href="#utils-py" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">utils.py</span></tt></p>
 <p>Useful functions for (audio) signal processing</p>
 <p>2013 Jean-Louis Durrieu</p>
 <p><a class="reference external" href="http://www.durrieu.ch">http://www.durrieu.ch</a></p>
 <div class="section" id="content">
-<h4>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h4>
+<h3>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyfasst.tools.utils.db">
 <tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">db</tt><big>(</big><em>val</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/utils.html#db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.db" title="Permalink to this definition">¶</a></dt>
@@ -111,6 +110,126 @@
 
 </div>
 </div>
+<div class="section" id="module-pyfasst.tools.signalTools">
+<span id="signaltools"></span><h2>SIGNALTOOLS<a class="headerlink" href="#module-pyfasst.tools.signalTools" title="Permalink to this headline">¶</a></h2>
+<p>signalTools.py</p>
+<p>gathers signal processing tools</p>
+<dl class="function">
+<dt id="pyfasst.tools.signalTools.f0detectionFunction">
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x101cb96e0&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Harmonic Sum</p>
+<p>detectFunc should be a function taking an array as argument, and</p>
+<p><cite>threshold</cite> is homogenous to a tone on the western musical scale</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.signalTools.harmonicProd">
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">harmonicProd</tt><big>(</big><em>TFmatrix</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#harmonicProd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.harmonicProd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the harmonic sum</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.signalTools.harmonicSum">
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">harmonicSum</tt><big>(</big><em>TFmatrix</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#harmonicSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.harmonicSum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the harmonic sum</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.signalTools.invHermMat2D">
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">invHermMat2D</tt><big>(</big><em>a_00</em>, <em>a_01</em>, <em>a_11</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#invHermMat2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.invHermMat2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>This inverts a set of 2x2 Hermitian matrices</p>
+<p>better check <a class="reference internal" href="#pyfasst.tools.signalTools.inv_herm_mat_2d" title="pyfasst.tools.signalTools.inv_herm_mat_2d"><tt class="xref py py-func docutils literal"><span class="pre">inv_herm_mat_2d()</span></tt></a> instead, and replace all
+reference to this by the former.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.signalTools.inv_herm_mat_2d">
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">inv_herm_mat_2d</tt><big>(</big><em>sigma_x_diag</em>, <em>sigma_x_off</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#inv_herm_mat_2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.inv_herm_mat_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the inverse of 2D hermitian matrices.</p>
+<p><strong>Inputs</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>sigma_x_diag</dt>
+<dd><p class="first">ndarray, with (dim of axis=0) = 2</p>
+<p class="last">The diagonal elements of the matrices to invert.
+sigma_x_diag[0] are the (0,0) elements and
+sigma_x_diag[1] are the (1,1) ones.</p>
+</dd>
+<dt>sigma_x_off</dt>
+<dd><p class="first">ndarray, with the same dimensions as sigma_x_diag[0]</p>
+<p class="last">The off-diagonal elements of the matrices, more precisely the
+(0,1) element (since the matrices are assumed Hermitian,
+the (1,0) element is the complex conjugate)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Outputs</strong></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>inv_sigma_x_diag</dt>
+<dd><p class="first">ndarray, 2 x shape(sigma_x_off)</p>
+<p class="last">Diagonal elements of the inverse matrices.
+[0] &lt;-&gt; (0,0)
+[1] &lt;-&gt; (1,1)</p>
+</dd>
+<dt>inv_sigma_x_off</dt>
+<dd><p class="first">ndarray, shape(sigma_x_off)</p>
+<p class="last">Off-diagonal (0,1) elements of the inverse matrices</p>
+</dd>
+<dt>det_sigma_x</dt>
+<dd><p class="first">ndarray, shape(sigma_x_off)</p>
+<p class="last">For each inversion, the determinant of the matrix.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Remarks</strong></p>
+<blockquote>
+<div><p>The inversion is done explicitly, by computing the determinant
+(explicit formula for 2D matrices), then the elements of the
+inverse with the corresponding formulas.</p>
+<p>To deal with ill-conditioned matrices, a minimum (absolute) value of
+the determinant is guaranteed.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.signalTools.medianFilter">
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">medianFilter</tt><big>(</big><em>inputArray</em>, <em>length=10</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#medianFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.medianFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>median filter</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.signalTools.prinComp2D">
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">prinComp2D</tt><big>(</big><em>X0</em>, <em>X1</em>, <em>neighborNb=10</em>, <em>verbose=0</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#prinComp2D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.prinComp2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the eigen values and eigen vectors for a
+matrix X of shape 2 x F x N, computing the 2 x 2 covariance matrices
+for the F x N over the temporal neighborhood of size neighborNb.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.signalTools.sortSpectrum">
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">sortSpectrum</tt><big>(</big><em>spectrum</em>, <em>numberHarmonicsHS=50</em>, <em>numberHarmonicsHP=1</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#sortSpectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.sortSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort the spectra in <tt class="docutils literal"><span class="pre">spectrum</span></tt> with respect to their F0
+values, as estimated by HS * HP function.</p>
+<p>20130521 DJL sort of works, but periodicity detection should be reworked
+according to YIN and the like, in order to obtain better estimates.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyfasst.tools.distances">
+<span id="distances"></span><h2>DISTANCES<a class="headerlink" href="#module-pyfasst.tools.distances" title="Permalink to this headline">¶</a></h2>
+<p>distances.py</p>
+<p>distance/divergence functions</p>
+<p>2013 Jean-Louis Durrieu</p>
+<dl class="function">
+<dt id="pyfasst.tools.distances.ISDistortion">
+<tt class="descclassname">pyfasst.tools.distances.</tt><tt class="descname">ISDistortion</tt><big>(</big><em>X</em>, <em>Y</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/distances.html#ISDistortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.distances.ISDistortion" title="Permalink to this definition">¶</a></dt>
+<dd><p>value = ISDistortion(X, Y)</p>
+<p>Returns the value of the Itakura-Saito (IS) divergence between
+matrix X and matrix Y. X and Y should be two NumPy arrays with
+same dimension.</p>
+</dd></dl>
+
 </div>
 </div>
 
@@ -124,12 +243,11 @@
   <ul>
 <li><a class="reference internal" href="#">TOOLS</a><ul>
 <li><a class="reference internal" href="#module-pyfasst.tools.utils">UTILS</a><ul>
-<li><a class="reference internal" href="#utils-py">utils.py</a><ul>
 <li><a class="reference internal" href="#content">Content</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li><a class="reference internal" href="#module-pyfasst.tools.signalTools">SIGNALTOOLS</a></li>
+<li><a class="reference internal" href="#module-pyfasst.tools.distances">DISTANCES</a></li>
 </ul>
 </li>
 </ul>

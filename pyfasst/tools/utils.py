@@ -1,7 +1,5 @@
 """
-========
-utils.py
-========
+``utils.py``
 
 Useful functions for (audio) signal processing 
 
@@ -10,7 +8,7 @@ Useful functions for (audio) signal processing
 http://www.durrieu.ch
 
 Content
-=======
+-------
 """
 
 import numpy as np

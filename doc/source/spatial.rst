@@ -10,7 +10,6 @@ Contents
 .. automodule:: pyfasst.spatial.dirdiag
     :members:
 
-
 .. automodule:: pyfasst.spatial.steering_vectors
     :members:
 

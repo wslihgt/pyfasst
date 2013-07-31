@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyFASST &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="index.html" />
+    <link rel="next" title="audioModel" href="audiomodel.html" />
+    <link rel="prev" title="Welcome to pyFASST’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="audiomodel.html" title="audioModel"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyFASST’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyfasst">
+<h1>pyFASST<a class="headerlink" href="#pyfasst" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">contributors:</th><td class="field-body">Jean-Louis Durrieu</td>
+</tr>
+<tr class="field-even field"><th class="field-name">web:</th><td class="field-body"><a class="reference external" href="https://git.epfl.ch/repo/pyfasst/">https://git.epfl.ch/repo/pyfasst/</a> <a class="reference external" href="https://github.com/wslihgt/pyfasst">https://github.com/wslihgt/pyfasst</a></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>A Python implementation to the Flexible Audio Source Separation Toolbox</p>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>This toolbox is meant to allow to use the framework FASST and extend it within a python program. It is primarily a re-write in Python of the original Matlab (C) version. The object programming framework allows to extend and create</p>
+</div>
+<div class="section" id="using-the-python-package">
+<h2>Using the Python package<a class="headerlink" href="#using-the-python-package" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
+<p>Most of the code is written in <a class="reference external" href="http://www.python.org">Python</a>, but occasionally, there may be some C source code, requiring either Cython or SWIG for compiling. In general, to run this code, the required components are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Matplotlib <a class="reference external" href="http://matplotlib.sourceforge.net">http://matplotlib.sourceforge.net</a></li>
+<li>Numpy <a class="reference external" href="http://numpy.scipy.org">http://numpy.scipy.org</a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="install">
+<h3>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Using the provided audio model classes</li>
+<li>Creating a new audio model class</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="algorithms">
+<h2>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
+<p>The FASST framework is described in <a class="reference internal" href="#ozerov2012">[Ozerov2012]</a>. We have implemented this Python version mostly thanks to the provided Matlab (C) code available at <a class="reference external" href="http://bass-db.gforge.inria.fr/fasst/">http://bass-db.gforge.inria.fr/fasst/</a>.</p>
+<dl class="docutils">
+<dt>For initialization purposes, several side algorithms and systems have also been implemented:</dt>
+<dd><ul class="first last simple">
+<li>SIMM model (Smooth Instantaneous Mixture Model) from <a class="reference internal" href="tools.html#durrieu2010">[Durrieu2010]</a> and <a class="reference internal" href="#durrieu2011">[Durrieu2011]</a>: allows to analyze, detect and separate the lead instrument from a polyphonic audio (musical) mixture. Note: the original purpose of this implementation was to provide a sensible way of using information from the SIMM model into the more general multi-channel audio source separation model provided, for instance, by FASST.</li>
+<li>DEMIX algorithm (Direction Estimation of Mixing matrIX) <a class="reference internal" href="#arberet2010">[Arberet2010]</a> for spatial mixing parameter initialization.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<table class="docutils citation" frame="void" id="arberet2010" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[Arberet2010]</a></td><td>Arberet, S.; Gribonval, R. and Bimbot, F.,
+<cite>A Robust Method to Count and Locate Audio Sources in a Multichannel
+Underdetermined Mixture</cite>, IEEE Transactions on Signal Processing, 2010,
+58, 121 - 133. [<a class="reference external" href="http://infoscience.epfl.ch/record/150461/">web</a>]</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="durrieu2010" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[Durrieu2010]</a></td><td>J.-L. Durrieu, G. Richard, B. David and C. F\&#8217;{e}votte,
+<cite>Source/Filter Model for Main Melody Extraction From Polyphonic Audio
+Signals</cite>, IEEE Transactions on Audio, Speech and Language Processing,
+special issue on Signal Models and Representations of Musical and
+Environmental Sounds, March 2010, Vol. 18 (3), pp. 564 &#8211; 575.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="durrieu2011" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[Durrieu2011]</a></td><td>J.-L. Durrieu, G. Richard and B. David,
+<a class="reference external" href="http://www.durrieu.ch/research/jstsp2010.html">A Musically Motivated Representation For Pitch Estimation And Musical
+Source Separation</a>,
+IEEE Journal of Selected Topics on Signal Processing, October 2011,
+Vol. 5 (6), pp. 1180 - 1191.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="ozerov2012" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[Ozerov2012]</a></td><td>A. Ozerov, E. Vincent, and F. Bimbot,
+<a class="reference external" href="http://hal.inria.fr/hal-00626962/">A general flexible framework for the handling of prior information in audio
+source separation</a>,
+IEEE Transactions on Audio, Speech and Signal Processing, Vol.  20 (4),
+pp. 1118-1133 (2012).</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyFASST</a><ul>
+<li><a class="reference internal" href="#abstract">Abstract</a></li>
+<li><a class="reference internal" href="#using-the-python-package">Using the Python package</a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#install">Install</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#algorithms">Algorithms</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to pyFASST&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="audiomodel.html"
+                        title="next chapter">audioModel</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/description.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="audiomodel.html" title="audioModel"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyFASST’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

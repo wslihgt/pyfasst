@@ -54,6 +54,73 @@
   <div class="section" id="tools">
 <h1>TOOLS<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
 <p>The <tt class="xref py py-mod docutils literal"><span class="pre">tools</span></tt> package contains various modules with different uses.</p>
+<div class="section" id="module-pyfasst.tools.distances">
+<span id="distances"></span><h2>DISTANCES<a class="headerlink" href="#module-pyfasst.tools.distances" title="Permalink to this headline">¶</a></h2>
+<p>distances.py</p>
+<p>distance/divergence functions</p>
+<p>2013 Jean-Louis Durrieu</p>
+<dl class="function">
+<dt id="pyfasst.tools.distances.ISDistortion">
+<tt class="descclassname">pyfasst.tools.distances.</tt><tt class="descname">ISDistortion</tt><big>(</big><em>X</em>, <em>Y</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/distances.html#ISDistortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.distances.ISDistortion" title="Permalink to this definition">¶</a></dt>
+<dd><p>value = ISDistortion(X, Y)</p>
+<p>Returns the value of the Itakura-Saito (IS) divergence between
+matrix X and matrix Y. X and Y should be two NumPy arrays with
+same dimension.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyfasst.tools.nmf">
+<span id="nonnegative-matrix-factorization"></span><h2>NONNEGATIVE MATRIX FACTORIZATION<a class="headerlink" href="#module-pyfasst.tools.nmf" title="Permalink to this headline">¶</a></h2>
+<p>Simple Nonnegative Matrix Factorization (NMF) routines to be used
+to estimate initial parameters in FASST.</p>
+<p>Relevant references:</p>
+<table class="docutils citation" frame="void" id="durrieu2010" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[Durrieu2010]</a></td><td>J.-L. Durrieu, G. Richard, B. David and C. Fevotte,
+Source/Filter Model for Main Melody Extraction From Polyphonic Audio 
+Signals, IEEE Transactions on Audio, Speech and Language Processing, 
+special issue on Signal Models and Representations of Musical and 
+Environmental Sounds, March 2010, Vol. 18 (3), pp. 564 &#8211; 575.</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="fevotte2009" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[Fevotte2009]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> C. Fevotte and N. Bertin and J.-L. Durrieu,
+Nonnegative matrix factorization with the Itakura-Saito divergence.
+With application to music analysis,
+Neural Computation, vol. 21 (3), pp. 793-830, March 2009.
+[<a class="reference external" href="http://www.unice.fr/cfevotte/publications/journals/neco09_is-nmf.pdf">pdf</a>]</td></tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="pyfasst.tools.nmf.NMF_decomp_init">
+<tt class="descclassname">pyfasst.tools.nmf.</tt><tt class="descname">NMF_decomp_init</tt><big>(</big><em>SX</em>, <em>nbComps=10</em>, <em>niter=10</em>, <em>verbose=0</em>, <em>Winit=None</em>, <em>Hinit=None</em>, <em>updateW=True</em>, <em>updateH=True</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/nmf.html#NMF_decomp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.nmf.NMF_decomp_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>NMF multiplicative gradient, for Itakura Saito
+divergence measure between <tt class="docutils literal"><span class="pre">SX</span></tt> and <tt class="docutils literal"><span class="pre">np.dot(W,H)</span></tt></p>
+<p>See for instance <a class="reference internal" href="#fevotte2009">[Fevotte2009]</a>.</p>
+<p>Note: for (probably marginal) efficiency, the amplitude matrix <tt class="docutils literal"><span class="pre">H</span></tt>
+is &#8220;transposed&#8221;, such that its use in the <tt class="docutils literal"><span class="pre">np.dot</span></tt> operations uses
+a C-ordered contiguous array. The output is however in the &#8220;correct&#8221; form.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.nmf.NMF_decomposition">
+<tt class="descclassname">pyfasst.tools.nmf.</tt><tt class="descname">NMF_decomposition</tt><big>(</big><em>SX</em>, <em>nbComps=10</em>, <em>niter=10</em>, <em>verbose=0</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/nmf.html#NMF_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.nmf.NMF_decomposition" title="Permalink to this definition">¶</a></dt>
+<dd><p>NMF multiplicative gradient, for Itakura Saito
+divergence measure between SX and <tt class="docutils literal"><span class="pre">np.dot(W,H)</span></tt></p>
+<p>See for instance <a class="reference internal" href="#fevotte2009">[Fevotte2009]</a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.nmf.SFNMF_decomp_init">
+<tt class="descclassname">pyfasst.tools.nmf.</tt><tt class="descname">SFNMF_decomp_init</tt><big>(</big><em>SX</em>, <em>nbComps=10</em>, <em>nbFiltComps=10</em>, <em>niter=10</em>, <em>verbose=0</em>, <em>Winit=None</em>, <em>Hinit=None</em>, <em>WFiltInit=None</em>, <em>HFiltInit=None</em>, <em>updateW=True</em>, <em>updateH=True</em>, <em>updateWFilt=True</em>, <em>updateHFilt=True</em>, <em>nbResComps=2</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/nmf.html#SFNMF_decomp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.nmf.SFNMF_decomp_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements a simple source/filter NMF algorithm, similar to that introduced in
+<a class="reference internal" href="#durrieu2010">[Durrieu2010]</a></p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-pyfasst.tools.utils">
 <span id="utils"></span><h2>UTILS<a class="headerlink" href="#module-pyfasst.tools.utils" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">utils.py</span></tt></p>
@@ -116,7 +183,7 @@
 <p>gathers signal processing tools</p>
 <dl class="function">
 <dt id="pyfasst.tools.signalTools.f0detectionFunction">
-<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x101cb96e0&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x101c9c6e0&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Harmonic Sum</p>
 <p>detectFunc should be a function taking an array as argument, and</p>
 <p><cite>threshold</cite> is homogenous to a tone on the western musical scale</p>
@@ -216,21 +283,6 @@ according to YIN and the like, in order to obtain better estimates.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-pyfasst.tools.distances">
-<span id="distances"></span><h2>DISTANCES<a class="headerlink" href="#module-pyfasst.tools.distances" title="Permalink to this headline">¶</a></h2>
-<p>distances.py</p>
-<p>distance/divergence functions</p>
-<p>2013 Jean-Louis Durrieu</p>
-<dl class="function">
-<dt id="pyfasst.tools.distances.ISDistortion">
-<tt class="descclassname">pyfasst.tools.distances.</tt><tt class="descname">ISDistortion</tt><big>(</big><em>X</em>, <em>Y</em><big>)</big><a class="reference internal" href="_modules/pyfasst/tools/distances.html#ISDistortion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.distances.ISDistortion" title="Permalink to this definition">¶</a></dt>
-<dd><p>value = ISDistortion(X, Y)</p>
-<p>Returns the value of the Itakura-Saito (IS) divergence between
-matrix X and matrix Y. X and Y should be two NumPy arrays with
-same dimension.</p>
-</dd></dl>
-
-</div>
 </div>
 
 
@@ -242,12 +294,13 @@ same dimension.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">TOOLS</a><ul>
+<li><a class="reference internal" href="#module-pyfasst.tools.distances">DISTANCES</a></li>
+<li><a class="reference internal" href="#module-pyfasst.tools.nmf">NONNEGATIVE MATRIX FACTORIZATION</a></li>
 <li><a class="reference internal" href="#module-pyfasst.tools.utils">UTILS</a><ul>
 <li><a class="reference internal" href="#content">Content</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-pyfasst.tools.signalTools">SIGNALTOOLS</a></li>
-<li><a class="reference internal" href="#module-pyfasst.tools.distances">DISTANCES</a></li>
 </ul>
 </li>
 </ul>

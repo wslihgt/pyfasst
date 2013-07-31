@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="pyFASST 0.1 documentation" href="index.html" />
-    <link rel="next" title="audioModel" href="audiomodel.html" />
+    <link rel="next" title="Reference" href="reference.html" />
     <link rel="prev" title="Welcome to pyFASST’s documentation!" href="index.html" /> 
   </head>
   <body>
@@ -41,7 +41,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="audiomodel.html" title="audioModel"
+          <a href="reference.html" title="Reference"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to pyFASST’s documentation!"
@@ -83,11 +83,16 @@
 <div><ul class="simple">
 <li>Matplotlib <a class="reference external" href="http://matplotlib.sourceforge.net">http://matplotlib.sourceforge.net</a></li>
 <li>Numpy <a class="reference external" href="http://numpy.scipy.org">http://numpy.scipy.org</a></li>
+<li>Scipy <a class="reference external" href="http://www.scipy.org">http://www.scipy.org</a></li>
+<li>setuptool <a class="reference external" href="https://pypi.python.org/pypi/setuptools">https://pypi.python.org/pypi/setuptools</a></li>
 </ul>
 </div></blockquote>
 </div>
 <div class="section" id="install">
 <h3>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the aforementioned packages, installing this package requires to compile the tracking part, in <tt class="xref py py-mod docutils literal"><span class="pre">pyfasst.SeparateLeadStereo.tracking</span></tt>. In the corresponding folder, type:</p>
+<div class="highlight-python"><pre>python setup.py build_ext --inplace</pre>
+</div>
 </div>
 <div class="section" id="examples">
 <h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
@@ -105,7 +110,7 @@
 <dl class="docutils">
 <dt>For initialization purposes, several side algorithms and systems have also been implemented:</dt>
 <dd><ul class="first last simple">
-<li>SIMM model (Smooth Instantaneous Mixture Model) from <a class="reference internal" href="tools.html#durrieu2010">[Durrieu2010]</a> and <a class="reference internal" href="#durrieu2011">[Durrieu2011]</a>: allows to analyze, detect and separate the lead instrument from a polyphonic audio (musical) mixture. Note: the original purpose of this implementation was to provide a sensible way of using information from the SIMM model into the more general multi-channel audio source separation model provided, for instance, by FASST.</li>
+<li>SIMM model (Smooth Instantaneous Mixture Model) from <a class="reference internal" href="#durrieu2010">[Durrieu2010]</a> and <a class="reference internal" href="#durrieu2011">[Durrieu2011]</a>: allows to analyze, detect and separate the lead instrument from a polyphonic audio (musical) mixture. Note: the original purpose of this implementation was to provide a sensible way of using information from the SIMM model into the more general multi-channel audio source separation model provided, for instance, by FASST.</li>
 <li>DEMIX algorithm (Direction Estimation of Mixing matrIX) <a class="reference internal" href="#arberet2010">[Arberet2010]</a> for spatial mixing parameter initialization.</li>
 </ul>
 </dd>
@@ -181,8 +186,8 @@ pp. 1118-1133 (2012).</td></tr>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to pyFASST&#8217;s documentation!</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="audiomodel.html"
-                        title="next chapter">audioModel</a></p>
+  <p class="topless"><a href="reference.html"
+                        title="next chapter">Reference</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/description.txt"
@@ -215,7 +220,7 @@ pp. 1118-1133 (2012).</td></tr>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="audiomodel.html" title="audioModel"
+          <a href="reference.html" title="Reference"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to pyFASST’s documentation!"

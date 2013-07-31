@@ -45,12 +45,13 @@ class MinQTSLStest(STFTSLStest):
     def setUp(self):
         super(MinQTSLStest, self).setUp()
         self.SLSkwargs['tfrepresentation'] = 'mqt'
-    
-class CQTSLStest(STFTSLStest):
-    """Testing SeparateLeadStereo with MinQT
-    """
-    def setUp(self):
-        super(MinQTSLStest, self).setUp()
-        self.SLSkwargs['tfrepresentation'] = 'cqt'
+
+
+##class CQTSLStest(STFTSLStest):
+##    """Testing SeparateLeadStereo with CQT
+##    """
+##    def setUp(self):
+##        super(MinQTSLStest, self).setUp()
+##        self.SLSkwargs['tfrepresentation'] = 'cqt'
     
 

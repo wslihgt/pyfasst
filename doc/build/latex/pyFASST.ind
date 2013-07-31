@@ -1,0 +1,239 @@
+\begin{theindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter A
+  \item adaptive\_thresholding\_clusters() (pyfasst.demixTF.DEMIX method), \hyperpage{7}
+  \item automaticMelodyAndSeparation() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item autoMelSepAndWrite() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+
+  \indexspace
+  \bigletter C
+  \item cellCQT2spCQT() (pyfasst.tftransforms.minqt.CQTransfo method), \hyperpage{25}
+  \item cellCQT2spCQT() (pyfasst.tftransforms.minqt.HybridCQTransfo method), \hyperpage{26}
+  \item cellCQT2spCQT() (pyfasst.tftransforms.minqt.MinQTransfo method), \hyperpage{26}
+  \item checkChunkSize() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item comp\_clusters() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item comp\_parameters() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item comp\_pcafeatures() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item comp\_sig\_repr() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item comp\_spat\_cmps\_powers() (pyfasst.audioModel.FASST method), \hyperpage{3}
+  \item comp\_spat\_comp\_power() (pyfasst.audioModel.FASST method), \hyperpage{3}
+  \item comp\_transf\_Cx() (pyfasst.audioModel.FASST method), \hyperpage{3}
+  \item compute\_inv\_sigma\_mix\_2d() (pyfasst.audioModel.FASST method), \hyperpage{4}
+  \item compute\_sigma\_comp\_2d() (pyfasst.audioModel.FASST method), \hyperpage{4}
+  \item compute\_suff\_stat() (pyfasst.audioModel.FASST method), \hyperpage{4}
+  \item compute\_temporal() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item compute\_Wiener\_gain\_2d() (pyfasst.audioModel.FASST method), \hyperpage{3}
+  \item computeChroma() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item computeHybrid() (pyfasst.tftransforms.minqt.HybridCQTransfo method), \hyperpage{26}
+  \item computeLinearPart() (pyfasst.tftransforms.minqt.HybridCQTransfo method), \hyperpage{26}
+  \item computeLinearPart() (pyfasst.tftransforms.minqt.MinQTransfo method), \hyperpage{26}
+  \item computeMissingLinearFreqKernel() (pyfasst.tftransforms.minqt.HybridCQTKernel method), 
+		\hyperpage{26}
+  \item computeMissingLinearFreqKernel() (pyfasst.tftransforms.minqt.MinQTKernel method), 
+		\hyperpage{26}
+  \item computeMonoX() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item computeNFrames() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item computeTransform() (pyfasst.tftransforms.minqt.CQTransfo method), \hyperpage{25}
+  \item computeTransform() (pyfasst.tftransforms.minqt.HybridCQTransfo method), \hyperpage{26}
+  \item computeTransform() (pyfasst.tftransforms.minqt.MinQTransfo method), \hyperpage{27}
+  \item computeWF0() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item confidenceFromVar() (in module pyfasst.demixTF), \hyperpage{9}
+  \item CQTKernel (class in pyfasst.tftransforms.minqt), \hyperpage{24}
+  \item CQTransfo (class in pyfasst.tftransforms.minqt), \hyperpage{25}
+  \item create\_exclusive\_clusters() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+
+  \indexspace
+  \bigletter D
+  \item db() (in module pyfasst.tools.utils), \hyperpage{28}
+  \item DEMIX (class in pyfasst.demixTF), \hyperpage{7}
+  \item determineTuning() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item dir\_diag\_stereo() (in module pyfasst.spatial.steering\_vectors), \hyperpage{22}
+  \item directivity\_filter\_diagram\_ULA() (in module pyfasst.spatial.dirdiag), \hyperpage{20}
+
+  \indexspace
+  \bigletter E
+  \item estim\_param\_a\_post\_model() (pyfasst.audioModel.FASST method), \hyperpage{4}
+  \item estim\_param\_a\_post\_model() (pyfasst.audioModel.multiChanSourceF0Filter method), 
+		\hyperpage{6}
+  \item estimDAOBound() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item estimHF0() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item estimStereoSIMMParamsWriteSeps() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item estimStereoSUIMMParamsWriteSeps() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+
+  \indexspace
+  \bigletter F
+  \item f0detectionFunction() (in module pyfasst.tools.signalTools), \hyperpage{29}
+  \item FASST (class in pyfasst.audioModel), \hyperpage{3}
+  \item freq\_stamps (pyfasst.tftransforms.minqt.CQTransfo attribute), \hyperpage{25}
+
+  \indexspace
+  \bigletter G
+  \item gcc\_phat\_tdoa\_2d() (pyfasst.audioModel.FASST method), \hyperpage{4}
+  \item GEM\_iteration() (pyfasst.audioModel.FASST method), \hyperpage{3}
+  \item gen\_steer\_vec\_acous() (in module pyfasst.spatial.steering\_vectors), \hyperpage{22}
+  \item gen\_steer\_vec\_far\_src\_uniform\_linear\_array() (in module pyfasst.spatial.steering\_vectors), 
+		\hyperpage{22}
+  \item generate\_ODGD\_spec() (in module pyfasst.SeparateLeadStereo.separateLeadFunctions), 
+		\hyperpage{14}
+  \item generate\_ODGD\_spec\_chirped() (in module pyfasst.SeparateLeadStereo.separateLeadFunctions), 
+		\hyperpage{15}
+  \item generate\_ODGD\_spec\_inharmo() (in module pyfasst.SeparateLeadStereo.separateLeadFunctions), 
+		\hyperpage{15}
+  \item generate\_steer\_vec\_thetas() (in module pyfasst.spatial.dirdiag), \hyperpage{21}
+  \item generate\_WF0\_chirped() (in module pyfasst.SeparateLeadStereo.separateLeadFunctions), 
+		\hyperpage{19}
+  \item generate\_WF0\_MinQT\_chirped() (in module pyfasst.SeparateLeadStereo.separateLeadFunctions), 
+		\hyperpage{15}
+  \item generate\_WF0\_NSGTMinQT\_chirped() (in module pyfasst.SeparateLeadStereo.separateLeadFunctions), 
+		\hyperpage{17}
+  \item generate\_WF0\_TR\_chirped() (in module pyfasst.SeparateLeadStereo.separateLeadFunctions), 
+		\hyperpage{18}
+  \item generateHannBasis() (in module pyfasst.SeparateLeadStereo.separateLeadFunctions), 
+		\hyperpage{14}
+  \item get\_centroid\_distance() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item get\_indices\_peak() (in module pyfasst.demixTF), \hyperpage{9}
+  \item getTFPointsNearDelta() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item getTFpointsNearTheta\_OneScale() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+
+  \indexspace
+  \bigletter H
+  \item hann() (in module pyfasst.tools.utils), \hyperpage{28}
+  \item harmonicProd() (in module pyfasst.tools.signalTools), \hyperpage{29}
+  \item harmonicSum() (in module pyfasst.tools.signalTools), \hyperpage{29}
+  \item HybridCQTKernel (class in pyfasst.tftransforms.minqt), \hyperpage{25}
+  \item HybridCQTransfo (class in pyfasst.tftransforms.minqt), \hyperpage{26}
+
+  \indexspace
+  \bigletter I
+  \item ident() (in module pyfasst.tools.utils), \hyperpage{28}
+  \item identify\_deltaT() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item initialize\_all\_spec\_comps\_with\_NMF() (pyfasst.audioModel.FASST method), \hyperpage{4}
+  \item initialize\_all\_spec\_comps\_with\_NMF\_indiv() (pyfasst.audioModel.FASST method), 
+		\hyperpage{5}
+  \item initialize\_all\_spec\_comps\_with\_NMF\_same() (pyfasst.audioModel.FASST method), 
+		\hyperpage{5}
+  \item initializeConvParams() (pyfasst.audioModel.FASST method), \hyperpage{4}
+  \item initializeFreeMats() (pyfasst.audioModel.multiChanSourceF0Filter method), \hyperpage{7}
+  \item initSpecCompsWithLabelAndFiles() (pyfasst.audioModel.multiChanSourceF0Filter method), 
+		\hyperpage{6}
+  \item inv\_herm\_mat\_2d() (in module pyfasst.tools.signalTools), \hyperpage{29}
+  \item invertFromCellCQT() (pyfasst.tftransforms.minqt.CQTransfo method), \hyperpage{25}
+  \item invertFromSpCQT() (pyfasst.tftransforms.minqt.CQTransfo method), \hyperpage{25}
+  \item invertFromSpCQTRast() (pyfasst.tftransforms.minqt.CQTransfo method), \hyperpage{25}
+  \item invertFromSpCQTRast() (pyfasst.tftransforms.minqt.MinQTransfo method), \hyperpage{27}
+  \item invertHybridCQT() (pyfasst.tftransforms.minqt.HybridCQTransfo method), \hyperpage{26}
+  \item invertLinearPart() (pyfasst.tftransforms.minqt.HybridCQTransfo method), \hyperpage{26}
+  \item invertLinearPart() (pyfasst.tftransforms.minqt.MinQTransfo method), \hyperpage{27}
+  \item invertTransform() (pyfasst.tftransforms.minqt.CQTransfo method), \hyperpage{25}
+  \item invertTransform() (pyfasst.tftransforms.minqt.HybridCQTransfo method), \hyperpage{26}
+  \item invertTransform() (pyfasst.tftransforms.minqt.MinQTransfo method), \hyperpage{27}
+  \item invHermMat2D() (in module pyfasst.tools.signalTools), \hyperpage{29}
+  \item ISDistortion() (in module pyfasst.tools.distances), \hyperpage{27}
+
+  \indexspace
+  \bigletter L
+  \item linCellCQT2LinSpCQT() (pyfasst.tftransforms.minqt.MinQTransfo method), \hyperpage{27}
+
+  \indexspace
+  \bigletter M
+  \item make\_MVDR\_filter\_target() (in module pyfasst.spatial.dirdiag), \hyperpage{21}
+  \item makeItConvolutive() (pyfasst.audioModel.multiChanSourceF0Filter method), \hyperpage{7}
+  \item medianFilter() (in module pyfasst.tools.signalTools), \hyperpage{29}
+  \item MinQTKernel (class in pyfasst.tftransforms.minqt), \hyperpage{26}
+  \item MinQTransfo (class in pyfasst.tftransforms.minqt), \hyperpage{26}
+  \item MultiChanNMFConv (class in pyfasst.audioModel), \hyperpage{6}
+  \item MultiChanNMFInst\_FASST (class in pyfasst.audioModel), \hyperpage{6}
+  \item multiChanSourceF0Filter (class in pyfasst.audioModel), \hyperpage{6}
+  \item mvdr\_2d() (pyfasst.audioModel.FASST method), \hyperpage{5}
+
+  \indexspace
+  \bigletter N
+  \item nextpow2() (in module pyfasst.tools.utils), \hyperpage{28}
+  \item NMF\_decomp\_init() (in module pyfasst.tools.nmf), \hyperpage{27}
+  \item NMF\_decomposition() (in module pyfasst.tools.nmf), \hyperpage{27}
+
+  \indexspace
+  \bigletter P
+  \item prinComp2D() (in module pyfasst.tools.signalTools), \hyperpage{30}
+  \item produceMVDRplots() (in module pyfasst.spatial.dirdiag), \hyperpage{21}
+  \item producePicDiagramAgainstDistNSensors() (in module pyfasst.spatial.dirdiag), \hyperpage{21}
+  \item pyfasst.audioModel (module), \hyperpage{2}
+  \item pyfasst.demixTF (module), \hyperpage{7}
+  \item pyfasst.SeparateLeadStereo.separateLeadFunctions (module), \hyperpage{14}
+  \item pyfasst.SeparateLeadStereo.SeparateLeadStereoTF (module), \hyperpage{9}
+  \item pyfasst.spatial.dirdiag (module), \hyperpage{20}
+  \item pyfasst.spatial.steering\_vectors (module), \hyperpage{21}
+  \item pyfasst.tftransforms.minqt (module), \hyperpage{24}
+  \item pyfasst.tftransforms.stft (module), \hyperpage{23}
+  \item pyfasst.tftransforms.tft (module), \hyperpage{23}
+  \item pyfasst.tools.distances (module), \hyperpage{27}
+  \item pyfasst.tools.nmf (module), \hyperpage{27}
+  \item pyfasst.tools.signalTools (module), \hyperpage{29}
+  \item pyfasst.tools.utils (module), \hyperpage{28}
+
+  \indexspace
+  \bigletter Q
+  \item qValues (pyfasst.tftransforms.minqt.CQTransfo attribute), \hyperpage{25}
+
+  \indexspace
+  \bigletter R
+  \item reestimate\_clusterCentroids() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item refine\_clusters() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item remove\_empty\_clusters() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item renormalize\_parameters() (pyfasst.audioModel.FASST method), \hyperpage{5}
+  \item retrieve\_subsrc\_params() (pyfasst.audioModel.FASST method), \hyperpage{5}
+  \item reweigh\_sparsity\_constraint() (pyfasst.audioModel.multiChanSourceF0Filter method), 
+		\hyperpage{7}
+
+  \indexspace
+  \bigletter S
+  \item separate\_comps() (pyfasst.audioModel.FASST method), \hyperpage{5}
+  \item separate\_spat\_comps() (pyfasst.audioModel.FASST method), \hyperpage{5}
+  \item separate\_spatial\_filter\_comp() (pyfasst.audioModel.FASST method), \hyperpage{5}
+  \item SeparateLeadProcess (class in pyfasst.SeparateLeadStereo.SeparateLeadStereoTF), 
+		\hyperpage{9}
+  \item setComponentParameter() (pyfasst.audioModel.FASST method), \hyperpage{6}
+  \item setOutputFileNames() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item setSpecCompFB() (pyfasst.audioModel.MultiChanNMFInst\_FASST method), \hyperpage{6}
+  \item setSpecCompFB() (pyfasst.audioModel.multiChanSourceF0Filter method), \hyperpage{7}
+  \item SFNMF\_decomp\_init() (in module pyfasst.tools.nmf), \hyperpage{28}
+  \item sinebell() (in module pyfasst.tools.utils), \hyperpage{28}
+  \item sortSpectrum() (in module pyfasst.tools.signalTools), \hyperpage{30}
+  \item spatial\_filtering() (pyfasst.demixTF.DEMIX method), \hyperpage{8}
+  \item spCQT (pyfasst.tftransforms.minqt.CQTransfo attribute), \hyperpage{25}
+  \item spCQT2CellCQT() (pyfasst.tftransforms.minqt.CQTransfo method), \hyperpage{25}
+  \item spCQT2CellCQT() (pyfasst.tftransforms.minqt.MinQTransfo method), \hyperpage{27}
+  \item sqrt\_blackmanharris() (in module pyfasst.tools.utils), \hyperpage{28}
+  \item steeringVectorsFromCentroids() (pyfasst.demixTF.DEMIX method), \hyperpage{9}
+
+  \indexspace
+  \bigletter T
+  \item time\_stamps (pyfasst.tftransforms.minqt.CQTransfo attribute), \hyperpage{25}
+  \item transfo (pyfasst.tftransforms.minqt.CQTransfo attribute), \hyperpage{25}
+
+  \indexspace
+  \bigletter U
+  \item update\_mix\_matrix() (pyfasst.audioModel.FASST method), \hyperpage{6}
+  \item update\_spectral\_components() (pyfasst.audioModel.FASST method), \hyperpage{6}
+
+  \indexspace
+  \bigletter W
+  \item writeSeparatedSignals() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{13}
+  \item writeSeparatedSignalsWithUnvoice() (pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess method), 
+		\hyperpage{14}
+
+\end{theindex}

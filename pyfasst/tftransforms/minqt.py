@@ -28,20 +28,6 @@ from stft import stft, istft
 
 from ..tools.utils import nextpow2, sqrt_blackmanharris
 
-##def nextpow2(i):
-##    """nextpow2: return the number 2**n, n \in \N  such that
-##    2**n is the smallest value satisfying
-##        i <= 2**n
-    
-##    """
-##    n = 2
-##    while n < i:
-##        n = n * 2
-##    return n
-
-##def sqrt_blackmanharris(M):
-##    return np.sqrt(spsig.blackmanharris(M))
-
 class CQTKernel(object):
     """The CQT Kernel contains everything that can be
     precomputed for Constant-Q transforms. This

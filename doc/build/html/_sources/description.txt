@@ -21,9 +21,17 @@ Most of the code is written in `Python <http://www.python.org>`_, but occasional
 
   * Matplotlib http://matplotlib.sourceforge.net 
   * Numpy http://numpy.scipy.org
+  * Scipy http://www.scipy.org
+  * setuptool https://pypi.python.org/pypi/setuptools
 
 Install
 -------
+
+In addition to the aforementioned packages, installing this package requires to compile the tracking part, in :py:mod:`pyfasst.SeparateLeadStereo.tracking`. In the corresponding folder, type::
+
+  python setup.py build_ext --inplace
+
+
 
 Examples
 --------

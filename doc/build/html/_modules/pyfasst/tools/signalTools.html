@@ -184,49 +184,49 @@
 <div class="viewcode-block" id="inv_herm_mat_2d"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.signalTools.inv_herm_mat_2d">[docs]</a><span class="k">def</span> <span class="nf">inv_herm_mat_2d</span><span class="p">(</span><span class="n">sigma_x_diag</span><span class="p">,</span> <span class="n">sigma_x_off</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Computes the inverse of 2D hermitian matrices.</span>
 
-<span class="sd">    Inputs</span>
-<span class="sd">    ------</span>
-<span class="sd">    sigma_x_diag</span>
+<span class="sd">    **Inputs**</span>
+<span class="sd">    </span>
+<span class="sd">     `sigma_x_diag`</span>
 <span class="sd">        ndarray, with (dim of axis=0) = 2</span>
 
 <span class="sd">        The diagonal elements of the matrices to invert.</span>
-<span class="sd">        sigma_x_diag[0] are the (0,0) elements and</span>
-<span class="sd">        sigma_x_diag[1] are the (1,1) ones.</span>
+<span class="sd">        `sigma_x_diag[0]` are the (0,0) elements and</span>
+<span class="sd">        `sigma_x_diag[1]` are the (1,1) ones.</span>
 
-<span class="sd">    sigma_x_off</span>
-<span class="sd">        ndarray, with the same dimensions as sigma_x_diag[0]</span>
+<span class="sd">     `sigma_x_off`</span>
+<span class="sd">        ndarray, with the same dimensions as `sigma_x_diag[0]`</span>
 
 <span class="sd">        The off-diagonal elements of the matrices, more precisely the</span>
 <span class="sd">        (0,1) element (since the matrices are assumed Hermitian,</span>
 <span class="sd">        the (1,0) element is the complex conjugate)</span>
 
-<span class="sd">    Outputs</span>
-<span class="sd">    -------</span>
-<span class="sd">    inv_sigma_x_diag</span>
+<span class="sd">    **Outputs**</span>
+<span class="sd">    </span>
+<span class="sd">     `inv_sigma_x_diag`</span>
 <span class="sd">        ndarray, 2 x shape(sigma_x_off)</span>
 
 <span class="sd">        Diagonal elements of the inverse matrices.</span>
 <span class="sd">        [0] &lt;-&gt; (0,0)</span>
 <span class="sd">        [1] &lt;-&gt; (1,1)</span>
 
-<span class="sd">    inv_sigma_x_off</span>
+<span class="sd">     `inv_sigma_x_off`</span>
 <span class="sd">        ndarray, shape(sigma_x_off)</span>
 
 <span class="sd">        Off-diagonal (0,1) elements of the inverse matrices</span>
 
-<span class="sd">    det_sigma_x</span>
+<span class="sd">     `det_sigma_x`</span>
 <span class="sd">        ndarray, shape(sigma_x_off)</span>
 
 <span class="sd">        For each inversion, the determinant of the matrix.</span>
 
-<span class="sd">    Remarks</span>
-<span class="sd">    -------</span>
-<span class="sd">    The inversion is done explicitly, by computing the determinant</span>
-<span class="sd">    (explicit formula for 2D matrices), then the elements of the</span>
-<span class="sd">    inverse with the corresponding formulas.</span>
-
-<span class="sd">    To deal with ill-conditioned matrices, a minimum (absolute) value of</span>
-<span class="sd">    the determinant is guaranteed. </span>
+<span class="sd">    **Remarks**</span>
+<span class="sd">    </span>
+<span class="sd">     The inversion is done explicitly, by computing the determinant</span>
+<span class="sd">     (explicit formula for 2D matrices), then the elements of the</span>
+<span class="sd">     inverse with the corresponding formulas.</span>
+<span class="sd"> </span>
+<span class="sd">     To deal with ill-conditioned matrices, a minimum (absolute) value of</span>
+<span class="sd">     the determinant is guaranteed. </span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c">#if len(sigma_x_diag.shape) != 3:</span>

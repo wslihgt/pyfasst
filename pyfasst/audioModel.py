@@ -2855,19 +2855,7 @@ class multichanLead(multiChanSourceF0Filter):
     then use the obtained parameters/signals in order to initialize the more
     general source separation algorithm.
 
-    NB: as for now, the sole Lead/Accompaniment separation achieves better
-    separation than the combination of all the possibilities, probably
-    because of a more flexible framework for the former than for the latter.
-    """
-    def __init__(self, *args, **kwargs):
-        """multichanLead
-        
-        subclasses multiChanSourceF0Filter
-        
-        Provides additional methods to estimate the lead/accompaniment parameters
-        meant to be used as initial parameters for one of the sources.
-        
-        Tentative plan for estimation:
+    Tentative plan for estimation:
         
         1 estimate the Lead/Accompaniment using SIMM
 
@@ -2878,6 +2866,21 @@ class multichanLead(multiChanSourceF0Filter):
         4 re-estimate
 
         5 write the estimated signals and enjoy success!
+
+    NB: as for now, the sole Lead/Accompaniment separation achieves better
+    separation than the combination of all the possibilities, probably
+    because of a more flexible framework for the former than for the latter.
+    Some results have been published at the
+    `SiSEC <http://sisec.wiki.irisa.fr>`_ 2013 evaluation campaign.
+    
+    """
+    def __init__(self, *args, **kwargs):
+        """multichanLead
+        
+        subclasses multiChanSourceF0Filter
+        
+        Provides additional methods to estimate the lead/accompaniment parameters
+        meant to be used as initial parameters for one of the sources.
         
         """
         super(multichanLead, self).__init__(*args, **kwargs)

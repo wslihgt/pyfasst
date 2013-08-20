@@ -428,7 +428,6 @@ class SeparateLeadProcess():
             'hybridcqt': 0,
             'cqt': 0,}
         
-        
         self.SIMMParams['niter'] = nbIter
         self.SIMMParams['R'] = numCompAccomp
         
@@ -760,6 +759,14 @@ class SeparateLeadProcess():
         return self.totFrames
     
     def computeStereoX(self, start=0, stop=None, ):
+        """Compute the transform on each of the channels.
+        
+        TODO this function should be modified such that we only use the
+        :py:class:`pyfasst.tftransforms.tft.TFTransform` framework. This
+        could prove complicated though (especially for multiple chunk
+        processing.). Current state (20130820): hack mainly focussed on STFT
+        as a TF representation.
+        """
         fs, data = wav.read(self.files['inputAudioFilename'])
         data = np.double(data) / self.scaleData
         if self.tfrepresentation == 'stft':

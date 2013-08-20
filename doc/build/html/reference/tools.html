@@ -101,8 +101,34 @@ Neural Computation, vol. 21 (3), pp. 793-830, March 2009.
 <tt class="descclassname">pyfasst.tools.nmf.</tt><tt class="descname">NMF_decomp_init</tt><big>(</big><em>SX</em>, <em>nbComps=10</em>, <em>niter=10</em>, <em>verbose=0</em>, <em>Winit=None</em>, <em>Hinit=None</em>, <em>updateW=True</em>, <em>updateH=True</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/nmf.html#NMF_decomp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.nmf.NMF_decomp_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>NMF multiplicative gradient, for Itakura Saito
 divergence measure between <tt class="docutils literal"><span class="pre">SX</span></tt> and <tt class="docutils literal"><span class="pre">np.dot(W,H)</span></tt></p>
+<div class="math">
+\[\mathbf{S}_X \approx \mathbf{W} \mathbf{H}\]\[s_{X, fn} \approx \sum_{k=1}^K w_{fk} h_{kn}\]</div>
 <p>See for instance <a class="reference internal" href="#fevotte2009">[Fevotte2009]</a>.</p>
-<p>Note: for (probably marginal) efficiency, the amplitude matrix <tt class="docutils literal"><span class="pre">H</span></tt>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>SX</strong> (<em>numpy.ndarray</em>) &#8211; Matrix to be factorized</li>
+<li><strong>nbComps</strong> (<em>integer</em>) &#8211; Number of components / factors into which to decompose <cite>SX</cite></li>
+<li><strong>niter</strong> (<em>integer</em>) &#8211; Number of iterations for the NMF algorithm</li>
+<li><strong>verbose</strong> (<em>integer</em>) &#8211; 0 for null verbosity, 1 for normal and more for debug</li>
+<li><strong>Winit</strong> (<em>numpy.ndarray</em>) &#8211; Initial array for matrix <cite>W</cite></li>
+<li><strong>Hinit</strong> (<em>numpy.ndarray</em>) &#8211; Initial array for matrix <cite>H</cite></li>
+<li><strong>updateW</strong> (<em>boolean</em>) &#8211; whether to update W or not</li>
+<li><strong>updateH</strong> (<em>boolean</em>) &#8211; whether to update H or not</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><cite>W</cite> and <cite>H</cite> (<tt class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></tt>) -
+the &#8220;spectral&#8221; component dictionary matrix and the &#8220;activation&#8221;
+coefficient matrix.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Notes :
+For (probably marginal) efficiency, the amplitude matrix <tt class="docutils literal"><span class="pre">H</span></tt>
 is &#8220;transposed&#8221;, such that its use in the <tt class="docutils literal"><span class="pre">np.dot</span></tt> operations uses
 a C-ordered contiguous array. The output is however in the &#8220;correct&#8221; form.</p>
 </dd></dl>
@@ -185,7 +211,7 @@ divergence measure between SX and <tt class="docutils literal"><span class="pre"
 <p>gathers signal processing tools</p>
 <dl class="function">
 <dt id="pyfasst.tools.signalTools.f0detectionFunction">
-<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x1025f9cf8&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x101bd5e60&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Harmonic Sum</p>
 <p>detectFunc should be a function taking an array as argument, and</p>
 <p><cite>threshold</cite> is homogenous to a tone on the western musical scale</p>

@@ -48,7 +48,7 @@ class MinQTSLStest(STFTSLStest):
 
 
 ##class CQTSLStest(STFTSLStest):
-##    """Testing SeparateLeadStereo with CQT
+##    """Testing SeparateLeadStereo with CQT 
 ##    """
 ##    def setUp(self):
 ##        super(MinQTSLStest, self).setUp()

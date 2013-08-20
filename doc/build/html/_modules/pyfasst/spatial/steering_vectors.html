@@ -133,6 +133,8 @@
                     <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the diagram of directivity for the input</span>
 <span class="sd">    short time Fourier transform second order statistics in Cx</span>
+<span class="sd">    (this Cx is compatible with the attribute from an instantiation</span>
+<span class="sd">    of :py:class:`pyfasst.audioModel.FASST`)</span>
 <span class="sd">    </span>
 <span class="sd">    .. math::</span>
 <span class="sd">    </span>
@@ -145,11 +147,11 @@
 <span class="sd">    </span>
 <span class="sd">    **Method**:</span>
 <span class="sd">    </span>
-<span class="sd">    We use the Capon method, on each of the Fourier channel</span>
+<span class="sd">    We use the Capon method, on each of the Fourier channel :math:`k`:</span>
 <span class="sd">    </span>
 <span class="sd">    .. math::</span>
 <span class="sd">    </span>
-<span class="sd">        \phi_k(\\theta) = a_k(\\theta)^H inv(Rxx) a_k(\\theta)</span>
+<span class="sd">        \phi_k(\\theta) = a_k(\\theta)^H R_{xx}^{-1} a_k(\\theta)</span>
 <span class="sd">    </span>
 <span class="sd">    The algorithm therefore returns one directivity graph for each</span>
 <span class="sd">    frequency band. </span>

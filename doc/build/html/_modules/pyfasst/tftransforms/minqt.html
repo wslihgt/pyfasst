@@ -59,9 +59,10 @@
 <span class="sd">2010 [SK2010]_</span>
 
 <span class="sd">Adaptation of the Constant Q transform as presented in</span>
-<span class="sd">.. [SK2010] Schoerkhuber, C. and Klapuri, A., \</span>
-<span class="sd">\&quot;Constant-Q transform toolbox for music processing,\&quot;</span>
-<span class="sd">submitted to the 7th Sound and Music Computing Conference, Barcelona, Spain.</span>
+
+<span class="sd">.. [SK2010] Schoerkhuber, C. and Klapuri, A.,</span>
+<span class="sd">   \&quot;Constant-Q transform toolbox for music processing,\&quot;</span>
+<span class="sd">   submitted to the 7th Sound and Music Computing Conference, Barcelona, Spain.</span>
 
 <span class="sd">Comments beginning with &#39;%&#39; and &#39;%%&#39; are retained from the original Matlab</span>
 <span class="sd">code. </span>
@@ -71,26 +72,13 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="kn">as</span> <span class="nn">spsig</span>  <span class="c"># for the windows</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="kn">as</span> <span class="nn">spsig</span>  <span class="c"># for the windows and filters</span>
 <span class="c"># import scipy.sparse as spspa</span>
 <span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="kn">as</span> <span class="nn">spinterp</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">audioObject</span> <span class="k">as</span> <span class="n">ao</span> <span class="c"># for the stft and istft</span>
+<span class="c"># from .. import audioObject as ao # for the stft and istft</span>
+<span class="kn">from</span> <span class="nn">stft</span> <span class="kn">import</span> <span class="n">stft</span><span class="p">,</span> <span class="n">istft</span>
 
 <span class="kn">from</span> <span class="nn">..tools.utils</span> <span class="kn">import</span> <span class="n">nextpow2</span><span class="p">,</span> <span class="n">sqrt_blackmanharris</span>
-
-<span class="c">##def nextpow2(i):</span>
-<span class="c">##    &quot;&quot;&quot;nextpow2: return the number 2**n, n \in \N  such that</span>
-<span class="c">##    2**n is the smallest value satisfying</span>
-<span class="c">##        i &lt;= 2**n</span>
-    
-<span class="c">##    &quot;&quot;&quot;</span>
-<span class="c">##    n = 2</span>
-<span class="c">##    while n &lt; i:</span>
-<span class="c">##        n = n * 2</span>
-<span class="c">##    return n</span>
-
-<span class="c">##def sqrt_blackmanharris(M):</span>
-<span class="c">##    return np.sqrt(spsig.blackmanharris(M))</span>
 
 <div class="viewcode-block" id="CQTKernel"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTKernel">[docs]</a><span class="k">class</span> <span class="nc">CQTKernel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;The CQT Kernel contains everything that can be</span>
@@ -100,8 +88,7 @@
 <span class="sd">    compute the decomposition on the different octaves by</span>
 <span class="sd">    downsampling the signal.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
+<span class="sd">    Parameters:</span>
 
 <span class="sd">     fmax</span>
 <span class="sd">      The maximum desired central frequency</span>
@@ -133,8 +120,7 @@
 <span class="sd">      number of frames, otherwise, each lower analysis octave will have</span>
 <span class="sd">      half as many frames as the direct upper analysis octave.)</span>
 <span class="sd">     </span>
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
+<span class="sd">    Attributes:</span>
 <span class="sd">    </span>
 <span class="sd">     sparKernel</span>
 <span class="sd">     weight</span>
@@ -300,6 +286,8 @@
 
 </div>
 <div class="viewcode-block" id="HybridCQTKernel"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTKernel">[docs]</a><span class="k">class</span> <span class="nc">HybridCQTKernel</span><span class="p">(</span><span class="n">CQTKernel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Hybrid CQT/Linear kernel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HybridCQTKernel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">computeMissingLinearFreqKernel</span><span class="p">()</span>
@@ -371,6 +359,8 @@
 
 </div></div>
 <div class="viewcode-block" id="MinQTKernel"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTKernel">[docs]</a><span class="k">class</span> <span class="nc">MinQTKernel</span><span class="p">(</span><span class="n">CQTKernel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Min Q Transform Kernel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">fmax</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">linFTLen</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initiates and computes the MinQT kernel,</span>
@@ -462,6 +452,7 @@
 
 </div></div>
 <div class="viewcode-block" id="CQTransfo"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.CQTransfo">[docs]</a><span class="k">class</span> <span class="nc">CQTransfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constant Q Transform&quot;&quot;&quot;</span>
     <span class="n">transformname</span> <span class="o">=</span> <span class="s">&#39;cqt&#39;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span>
@@ -1131,6 +1122,7 @@
         <span class="k">return</span> <span class="bp">True</span>
 </div>
 <div class="viewcode-block" id="HybridCQTransfo"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.HybridCQTransfo">[docs]</a><span class="k">class</span> <span class="nc">HybridCQTransfo</span><span class="p">(</span><span class="n">CQTransfo</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Hybrid Constant Q Transform&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HybridCQTransfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c"># but the cqtkernel is augmented as an hybrid kernel:</span>
@@ -1427,6 +1419,7 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">freqs</span><span class="p">,</span> <span class="n">linfreqs</span><span class="p">])</span>
 </div>
 <div class="viewcode-block" id="MinQTransfo"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.minqt.MinQTransfo">[docs]</a><span class="k">class</span> <span class="nc">MinQTransfo</span><span class="p">(</span><span class="n">CQTransfo</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Minimum Q Transform&quot;&quot;&quot;</span>
     <span class="n">transformname</span> <span class="o">=</span> <span class="s">&#39;minqt&#39;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmax</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">linFTLen</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1484,11 +1477,11 @@
         <span class="c"># since qo.stft centers the first frame on the first</span>
         <span class="c"># sample of the data, we need to remove half a window:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">offsetSTFT</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">first_center</span><span class="p">)</span>
-        <span class="n">X</span><span class="p">,</span><span class="n">F</span><span class="p">,</span><span class="n">N</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetSTFT</span><span class="p">:],</span>
-                        <span class="n">window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linWindow</span><span class="p">,</span>
-                        <span class="n">hopsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">atomHOP</span><span class="p">,</span>
-                        <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linFTLen</span><span class="p">,</span>
-                        <span class="n">fs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>
+        <span class="n">X</span><span class="p">,</span><span class="n">F</span><span class="p">,</span><span class="n">N</span> <span class="o">=</span> <span class="n">stft</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetSTFT</span><span class="p">:],</span>
+                     <span class="n">window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linWindow</span><span class="p">,</span>
+                     <span class="n">hopsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">atomHOP</span><span class="p">,</span>
+                     <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linFTLen</span><span class="p">,</span>
+                     <span class="n">fs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>
         <span class="c"># filling cellCQT, assuming same number of frames:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cellCQT</span><span class="p">[</span><span class="s">&#39;linear&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">Kmax</span><span class="p">:,</span>
                                    <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nframes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">winNr</span><span class="p">]</span>
@@ -1536,9 +1529,9 @@
                       <span class="bp">self</span><span class="o">.</span><span class="n">cellCQT</span><span class="p">[</span><span class="s">&#39;linear&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
                      <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
         <span class="n">Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">Kmax</span><span class="p">:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cellCQT</span><span class="p">[</span><span class="s">&#39;linear&#39;</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">ao</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linWindow</span><span class="p">,</span>
-                     <span class="n">hopsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">atomHOP</span><span class="p">,</span>
-                     <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linFTLen</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">istft</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linWindow</span><span class="p">,</span>
+                  <span class="n">hopsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">atomHOP</span><span class="p">,</span>
+                  <span class="n">nfft</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cqtkernel</span><span class="o">.</span><span class="n">linFTLen</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixZeros</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetSTFT</span><span class="p">):]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">datalen_init</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">y</span>

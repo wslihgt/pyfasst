@@ -67,6 +67,7 @@
 <span class="sd">See each function docstring for more information.</span>
 
 <span class="sd">TODO: expend this?</span>
+<span class="sd">TODO: move all these functions in different modules, in ..tools for instance</span>
 
 <span class="sd">License</span>
 <span class="sd">=======</span>
@@ -87,6 +88,7 @@
 <span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">audioObject</span> <span class="k">as</span> <span class="n">ao</span> <span class="c"># for all these fancy transforms</span>
 
 <span class="kn">from</span> <span class="nn">..tools.utils</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">..tools.distances</span> <span class="kn">import</span> <span class="n">ISDistortion</span>
 
 <span class="c">### SOME USEFUL, INSTRUMENTAL, FUNCTIONS</span>
 
@@ -102,15 +104,15 @@
 <span class="c">##        n = n * 2</span>
 <span class="c">##    return n</span>
 
-<div class="viewcode-block" id="ISDistortion"><a class="viewcode-back" href="../../../separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.ISDistortion">[docs]</a><span class="k">def</span> <span class="nf">ISDistortion</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    value = ISDistortion(X, Y)</span>
-<span class="sd">  </span>
-<span class="sd">    Returns the value of the Itakura-Saito (IS) divergence between</span>
-<span class="sd">    matrix X and matrix Y. X and Y should be two NumPy arrays with</span>
-<span class="sd">    same dimension.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">sum</span><span class="p">((</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">X</span> <span class="o">/</span> <span class="n">Y</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span> <span class="o">/</span> <span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+<span class="c">##def ISDistortion(X,Y):</span>
+<span class="c">##    &quot;&quot;&quot;</span>
+<span class="c">##    value = ISDistortion(X, Y)</span>
+  
+<span class="c">##    Returns the value of the Itakura-Saito (IS) divergence between</span>
+<span class="c">##    matrix X and matrix Y. X and Y should be two NumPy arrays with</span>
+<span class="c">##    same dimension.</span>
+<span class="c">##    &quot;&quot;&quot;</span>
+<span class="c">##    return sum((-np.log(X / Y) + (X / Y) - 1))</span>
 
 <span class="c"># DEFINING SOME WINDOW FUNCTIONS</span>
 
@@ -136,7 +138,7 @@
 <span class="c">##    return np.hanning(args)</span>
 
 <span class="c"># FUNCTIONS FOR TIME-FREQUENCY REPRESENTATION</span>
-</div>
+
 <span class="k">def</span> <span class="nf">stft</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">sinebell</span><span class="p">(</span><span class="mi">2048</span><span class="p">),</span> <span class="n">hopsize</span><span class="o">=</span><span class="mf">256.0</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="mf">2048.0</span><span class="p">,</span> \
          <span class="n">fs</span><span class="o">=</span><span class="mf">44100.0</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1052,6 +1054,14 @@
 <div class="viewcode-block" id="generateHannBasis"><a class="viewcode-back" href="../../../reference/separateleadfunctions.html#pyfasst.SeparateLeadStereo.separateLeadFunctions.generateHannBasis">[docs]</a><span class="k">def</span> <span class="nf">generateHannBasis</span><span class="p">(</span><span class="n">numberFrequencyBins</span><span class="p">,</span> <span class="n">sizeOfFourier</span><span class="p">,</span> <span class="n">Fs</span><span class="p">,</span> \
                       <span class="n">frequencyScale</span><span class="o">=</span><span class="s">&#39;linear&#39;</span><span class="p">,</span> <span class="n">numberOfBasis</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> \
                       <span class="n">overlap</span><span class="o">=.</span><span class="mi">75</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generates a collection of Hann functions, spaced across the</span>
+<span class="sd">    frequency axis, as desired by the user (and if implemented),</span>
+<span class="sd">    targetting the given number of basis and adapting the extent (or bandwidth)</span>
+<span class="sd">    of each function (over the frequencies) to that number and according</span>
+<span class="sd">    to the desired overlap between these windows.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">isScaleRecognized</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="k">if</span> <span class="n">frequencyScale</span> <span class="o">==</span> <span class="s">&#39;linear&#39;</span><span class="p">:</span>
         <span class="c"># number of windows generated:</span>

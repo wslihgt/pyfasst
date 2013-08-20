@@ -15,7 +15,7 @@ Usage
 See each function docstring for more information.
 
 TODO: expend this?
-TODO: move all these functions in different modules, in ..tools for instance
+TODO: move all these functions in different modules, in :py:mod:`pyfasst.tools` for instance
 
 License
 =======
@@ -89,28 +89,35 @@ from ..tools.distances import ISDistortion
 
 def stft(data, window=sinebell(2048), hopsize=256.0, nfft=2048.0, \
          fs=44100.0, start=0, stop=None):
-    """
-    X, F, N = stft(data, window=sinebell(2048), hopsize=1024.0,
-                   nfft=2048.0, fs=44100)
-                   
+    """\
     Computes the short time Fourier transform (STFT) of data.
     
     Inputs:
-        data                  : one-dimensional time-series to be
-                                analyzed
-        window=sinebell(2048) : analysis window
-        hopsize=1024.0        : hopsize for the analysis
-        nfft=2048.0           : number of points for the Fourier
-                                computation (the user has to provide an
-                                even number)
-        fs=44100.0            : sampling rate of the signal
+    
+    :param data:
+            one-dimensional time-series to be analyzed
+    :param window:
+            analysis window
+    :param hopsize:
+            hopsize for the analysis
+    :param nfft:
+            number of points for the Fourier
+            computation (the user has to provide an
+            even number)
+    :param fs: sampling rate of the signal
         
     Outputs:
-        X                     : STFT of data
-        F                     : values of frequencies at each Fourier
-                                bins
-        N                     : central time at the middle of each
-                                analysis window
+
+    :returns:
+        * X
+            STFT of data
+        * F
+            values of frequencies at each Fourier
+            bins
+        * N
+            central time at the middle of each
+            analysis window
+    
     """
     
     # window defines the size of the analysis windows
@@ -156,27 +163,34 @@ def stft(data, window=sinebell(2048), hopsize=256.0, nfft=2048.0, \
 def istft(X, analysisWindow=None,
           window=sinebell(2048), hopsize=256.0, nfft=2048.0,
           originalDataLen=None, start=-1, stop=None):
-    """
-    data = istft(X, window=sinebell(2048), hopsize=256.0, nfft=2048.0)
-    
+    """\
     Computes an inverse of the short time Fourier transform (STFT),
     here, the overlap-add procedure is implemented.
     
     Inputs:
-        X                     : STFT of the signal, to be "inverted"
-        window=sinebell(2048) : synthesis window
-                                (should be the "complementary" window
-                                for the analysis window)
-        hopsize=1024.0        : hopsize for the analysis
-        nfft=2048.0           : number of points for the Fourier
-                                computation
-                                (the user has to provide an even number)
+    
+    :param X:
+            STFT of the signal, to be "inverted"
+    :param window: 
+            synthesis window
+            (should be the "complementary" window
+            for the analysis window)
+    :param hopsize: 
+            hopsize for the analysis
+    :param nfft: 
+            number of points for the Fourier
+            computation
+            (the user has to provide an even number)
                                 
     Outputs:
-        data                  : time series corresponding to the given
-                                STFT the first half-window is removed,
-                                complying with the STFT computation
-                                given in the function 'stft'
+
+    :returns:
+        * `data` -  
+          time series corresponding to the given
+          STFT the first half-window is removed,
+          complying with the STFT computation
+          given in the function 'stft'
+    
     """
     if analysisWindow is None:
         analysisWindow = window
@@ -224,38 +238,51 @@ def generate_WF0_chirped(minF0, maxF0, Fs, Nfft=2048, stepNotes=4, \
                          lengthWindow=2048, Ot=0.5, perF0=1, \
                          depthChirpInSemiTone=0.5, loadWF0=True,
                          analysisWindow='hanning'):
-    """
-    F0Table, WF0 = generate_WF0_chirped(minF0, maxF0, Fs, Nfft=2048,
-                                        stepNotes=4, lengthWindow=2048,
-                                        Ot=0.5, perF0=2,
-                                        depthChirpInSemiTone=0.5)
-                                        
+    """\
     Generates a 'basis' matrix for the source part WF0, using the
     source model KLGLOTT88, with the following I/O arguments:
+    
     Inputs:
-        minF0                the minimum value for the fundamental
-                             frequency (F0)
-        maxF0                the maximum value for F0
-        Fs                   the desired sampling rate
-        Nfft                 the number of bins to compute the Fourier
-                             transform
-        stepNotes            the number of F0 per semitone
-        lengthWindow         the size of the window for the Fourier
-                             transform
-        Ot                   the glottal opening coefficient for
-                             KLGLOTT88
-        perF0                the number of chirps considered per F0
-                             value
-        depthChirpInSemiTone the maximum value, in semitone, of the
-                             allowed chirp per F0
+
+    :param minF0:
+            the minimum value for the fundamental
+            frequency (F0)
+    :param maxF0:                
+            the maximum value for F0
+    :param Fs:                   
+            the desired sampling rate
+    :param Nfft:                 
+            the number of bins to compute the Fourier
+            transform
+    :param stepNotes:            
+            the number of F0 per semitone
+    :param lengthWindow:         
+            the size of the window for the Fourier
+            transform
+    :param Ot:                   
+            the glottal opening coefficient for
+            KLGLOTT88
+    :param perF0:                
+            the number of chirps considered per F0
+            value
+    :param depthChirpInSemiTone: 
+            the maximum value, in semitone, of the
+            allowed chirp per F0
                              
     Outputs:
-        F0Table the vector containing the values of the fundamental
-                frequencies in Hertz (Hz) corresponding to the
-                harmonic combs in WF0, i.e. the columns of WF0
-        WF0     the basis matrix, where each column is a harmonic comb
-                generated by KLGLOTT88 (with a sinusoidal model, then
-                transformed into the spectral domain)
+
+    :returns:
+    
+        * `F0Table` -  
+          the vector containing the values of the fundamental
+          frequencies in Hertz (Hz) corresponding to the
+          harmonic combs in WF0, i.e. the columns of WF0
+          
+        * `WF0` -      
+          the basis matrix, where each column is a harmonic comb
+          generated by KLGLOTT88 (with a sinusoidal model, then
+          transformed into the spectral domain)
+    
     """
     # generating a filename to keep data:
     filename = str('').join(['wf0_',
@@ -324,39 +351,51 @@ def generate_WF0_MinQT_chirped(minF0, maxF0, cqtfmax, cqtfmin, cqtbins=48.,
                                analysisWindow='hanning',
                                atomHopFactor=0.25,
                                cqtWinFunc=np.hanning, verbose=False):
-    """
-    F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,
-                                        stepNotes=4, lengthWindow=2048,
-                                        Ot=0.5, perF0=2,
-                                        depthChirpInSemiTone=0.5)
-                                        
+    """\
     Generates a 'basis' matrix for the source part WF0, using the
     source model KLGLOTT88, with the following I/O arguments:
+
     Inputs:
-        minF0                the minimum value for the fundamental
-                             frequency (F0)
-        maxF0                the maximum value for F0
-        cqtfmax...
-        Fs                   the desired sampling rate
-        Nfft                 the number of bins to compute the Fourier
-                             transform
-        stepNotes            the number of F0 per semitone
-        lengthWindow         the size of the window for the Fourier
-                             transform
-        Ot                   the glottal opening coefficient for
-                             KLGLOTT88
-        perF0                the number of chirps considered per F0
-                             value
-        depthChirpInSemiTone the maximum value, in semitone, of the
-                             allowed chirp per F0
+
+    :param minF0:           
+            the minimum value for the fundamental
+            frequency (F0)
+    :param     maxF0:            
+            the maximum value for F0
+    :param     cqtfmax: ...
+    :param     Fs:                   
+            the desired sampling rate
+    :param     Nfft:                 
+            the number of bins to compute the Fourier
+            transform
+    :param     stepNotes:            
+            the number of F0 per semitone
+    :param     lengthWindow:         
+            the size of the window for the Fourier
+            transform
+    :param     Ot:                   
+            the glottal opening coefficient for
+            KLGLOTT88
+    :param     perF0:                
+            the number of chirps considered per F0
+            value
+    :param     depthChirpInSemiTone: 
+            the maximum value, in semitone, of the
+            allowed chirp per F0
                              
     Outputs:
-        F0Table the vector containing the values of the fundamental
-                frequencies in Hertz (Hz) corresponding to the
-                harmonic combs in WF0, i.e. the columns of WF0
-        WF0     the basis matrix, where each column is a harmonic comb
-                generated by KLGLOTT88 (with a sinusoidal model, then
-                transformed into the spectral domain)
+
+    :returns:
+    
+        * `F0Table` - 
+          the vector containing the values of the fundamental
+          frequencies in Hertz (Hz) corresponding to the
+          harmonic combs in WF0, i.e. the columns of WF0
+
+        * `WF0` -      
+          the basis matrix, where each column is a harmonic comb
+          generated by KLGLOTT88 (with a sinusoidal model, then
+          transformed into the spectral domain)
     
     20120828T2358 Horribly slow...
     """
@@ -489,38 +528,56 @@ def generate_WF0_NSGTMinQT_chirped(minF0, maxF0, cqtfmax, cqtfmin, cqtbins=48.,
                                    atomHopFactor=0.25,
                                    cqtWinFunc=np.hanning, verbose=False):
     """
-    F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,
-                                        stepNotes=4, lengthWindow=2048,
-                                        Ot=0.5, perF0=2,
-                                        depthChirpInSemiTone=0.5)
+    ::
+    
+        F0Table, WF0 = generate_WF0_MinCQT_chirped(minF0, maxF0, Fs, Nfft=2048,
+            stepNotes=4, lengthWindow=2048,
+            Ot=0.5, perF0=2,
+            depthChirpInSemiTone=0.5)
+            
                                         
     Generates a 'basis' matrix for the source part WF0, using the
     source model KLGLOTT88, with the following I/O arguments:
+
     Inputs:
-        minF0                the minimum value for the fundamental
-                             frequency (F0)
-        maxF0                the maximum value for F0
-        cqtfmax...
-        Fs                   the desired sampling rate
-        Nfft                 the number of bins to compute the Fourier
-                             transform
-        stepNotes            the number of F0 per semitone
-        lengthWindow         the size of the window for the Fourier
-                             transform
-        Ot                   the glottal opening coefficient for
-                             KLGLOTT88
-        perF0                the number of chirps considered per F0
-                             value
-        depthChirpInSemiTone the maximum value, in semitone, of the
-                             allowed chirp per F0
+    
+    :param minF0:
+        the minimum value for the fundamental
+        frequency (F0)
+    :param maxF0:
+        the maximum value for F0
+    :param cqtfmax:
+        ...
+    :param Fs:
+        the desired sampling rate
+    :param Nfft:
+        the number of bins to compute the Fourier
+        transform
+    :param stepNotes:
+        the number of F0 per semitone
+    :param lengthWindow:
+        the size of the window for the Fourier
+        transform
+    :param Ot:
+        the glottal opening coefficient for
+        KLGLOTT88
+    :param perF0:
+        the number of chirps considered per F0
+        value
+    :param depthChirpInSemiTone:
+        the maximum value, in semitone, of the
+        allowed chirp per F0
                              
     Outputs:
-        F0Table the vector containing the values of the fundamental
-                frequencies in Hertz (Hz) corresponding to the
-                harmonic combs in WF0, i.e. the columns of WF0
-        WF0     the basis matrix, where each column is a harmonic comb
-                generated by KLGLOTT88 (with a sinusoidal model, then
-                transformed into the spectral domain)
+    
+    :returns:
+        * `F0Table` - the vector containing the values of the fundamental
+          frequencies in Hertz (Hz) corresponding to the
+          harmonic combs in WF0, i.e. the columns of WF0
+          
+        * `WF0` - the basis matrix, where each column is a harmonic comb
+          generated by KLGLOTT88 (with a sinusoidal model, then
+          transformed into the spectral domain)
     
     20120828T2358 Horribly slow...
     """
@@ -640,35 +697,50 @@ def generate_WF0_TR_chirped(transform, minF0, maxF0, stepNotes=4,
                             Ot=0.5, perF0=1, 
                             depthChirpInSemiTone=0.5, loadWF0=True,
                             verbose=False):
-    """
+    """\
     Generates a 'basis' matrix for the source part WF0, using the
     source model KLGLOTT88, with the following I/O arguments:
-    Inputs:
-        minF0                the minimum value for the fundamental
-                             frequency (F0)
-        maxF0                the maximum value for F0
-        cqtfmax...
-        Fs                   the desired sampling rate
-        Nfft                 the number of bins to compute the Fourier
-                             transform
-        stepNotes            the number of F0 per semitone
-        lengthWindow         the size of the window for the Fourier
-                             transform
-        Ot                   the glottal opening coefficient for
-                             KLGLOTT88
-        perF0                the number of chirps considered per F0
-                             value
-        depthChirpInSemiTone the maximum value, in semitone, of the
-                             allowed chirp per F0
-                             
-    Outputs:
-        F0Table the vector containing the values of the fundamental
-                frequencies in Hertz (Hz) corresponding to the
-                harmonic combs in WF0, i.e. the columns of WF0
-        WF0     the basis matrix, where each column is a harmonic comb
-                generated by KLGLOTT88 (with a sinusoidal model, then
-                transformed into the spectral domain)
     
+    Inputs:
+    
+    :param minF0:
+        the minimum value for the fundamental
+        frequency (F0)
+    :param maxF0:
+        the maximum value for F0
+    :param cqtfmax:  ...
+    :param Fs: the desired sampling rate
+    :param Nfft:
+        the number of bins to compute the Fourier
+        transform
+    :param stepNotes:
+        the number of F0 per semitone
+    :param lengthWindow:
+        the size of the window for the Fourier
+        transform
+    :param Ot:
+        the glottal opening coefficient for
+        KLGLOTT88
+    :param perF0:
+        the number of chirps considered per F0
+        value
+    :param depthChirpInSemiTone:
+        the maximum value, in semitone, of the
+        allowed chirp per F0
+
+    Outputs:
+    
+    :returns:
+      * `F0Table` - 
+        the vector containing the values of the fundamental
+        frequencies in Hertz (Hz) corresponding to the
+        harmonic combs in WF0, i.e. the columns of WF0
+      * `WF0` - 
+        the basis matrix, where each column is a harmonic comb
+        generated by KLGLOTT88 (with a sinusoidal model, then
+        transformed into the spectral domain)
+        
+    Notes:
     20120828T2358 Horribly slow...
     """
     if hasattr(transform, 'octaveNr'):

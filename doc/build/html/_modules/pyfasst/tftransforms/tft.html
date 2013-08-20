@@ -60,21 +60,28 @@
 <span class="kn">from</span> <span class="nn">stft</span> <span class="kn">import</span> <span class="n">STFT</span> <span class="c"># TODO: should be the opposite, should import stft from here into audioObject</span>
 <span class="kn">from</span> <span class="nn">nsgt</span> <span class="kn">import</span> <span class="n">NSGMinQT</span>
 
-<span class="c"># Possible super class transform:</span>
+<span class="c"># Possible super class transform: </span>
 <div class="viewcode-block" id="TFTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.tft.TFTransform">[docs]</a><span class="k">class</span> <span class="nc">TFTransform</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;TFTransform is the Time-Frequency Transform base class. All the</span>
 <span class="sd">    TF representations sub-classing it should implement the following</span>
 <span class="sd">    methods:</span>
-<span class="sd">    * :py:method:TFTransform.computeTransform to compute the desired transform</span>
-<span class="sd">      on data. The transform is then stored in :py:attrs:TFTransform.transfo</span>
-<span class="sd">    * :py:method:invertTransform to invert the transform from the stored</span>
-<span class="sd">    transform</span>
-
-<span class="sd">    It should </span>
+<span class="sd">    </span>
+<span class="sd">    * :py:func:`TFTransform.computeTransform` to compute the desired transform</span>
+<span class="sd">      on data. The transform is then stored in `TFTransform.transfo`_</span>
+<span class="sd">      </span>
+<span class="sd">    * :py:func:`TFTransform.invertTransform` to invert the transform from the</span>
+<span class="sd">      stored transform in `TFTransform.transfo`_</span>
+<span class="sd">      </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">transformname</span> <span class="o">=</span> <span class="s">&#39;dummy&#39;</span>
     
     <span class="n">transfo</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># risky to have it defined here</span>
+    <span class="sd">&quot;&quot;&quot;.. _TFTransform.transfo:</span>
+<span class="sd">    </span>
+<span class="sd">    `TFTransform.transfo` receives the transform when computeTransform</span>
+<span class="sd">    is called.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="n">fmin</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
@@ -89,12 +96,30 @@
                  <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;We define all the possible input for the transform here.</span>
+<span class="sd">        Maybe not the brightest of all ideas. One has to be able to</span>
+<span class="sd">        call all sub-classes even if they don&#39;t have the same input</span>
+<span class="sd">        parameters.</span>
+<span class="sd">        </span>
+<span class="sd">        For convenience, the parameterization should be done at this</span>
+<span class="sd">        call, and not when computing the transform (with only ``data``</span>
+<span class="sd">        as input). This is not compatible with the NSQT framework, which</span>
+<span class="sd">        requires to know the size of the signal for initialization. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     
-<div class="viewcode-block" id="TFTransform.computeTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.tft.TFTransform.computeTransform">[docs]</a>    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TFTransform.computeTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.tft.TFTransform.computeTransform">[docs]</a>    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the transform on the provided data.</span>
+<span class="sd">        The sub-classes should re-implement this method,</span>
+<span class="sd">        and store the result in the attribute</span>
+<span class="sd">        `TFTransform.transfo`_.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
 <div class="viewcode-block" id="TFTransform.invertTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.tft.TFTransform.invertTransform">[docs]</a>    <span class="k">def</span> <span class="nf">invertTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the inverse transform from the stored</span>
+<span class="sd">        transform in `TFTransform.transfo`_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     
 </div></div>
@@ -105,6 +130,7 @@
     <span class="s">&#39;minqt&#39;</span><span class="p">:</span> <span class="n">MinQTransfo</span><span class="p">,</span>
     <span class="s">&#39;nsgmqt&#39;</span><span class="p">:</span> <span class="n">NSGMinQT</span><span class="p">,</span>
     <span class="s">&#39;cqt&#39;</span><span class="p">:</span> <span class="n">CQTransfo</span><span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;A convenience dictionary, with abbreviated names for the transforms.&quot;&quot;&quot;</span>
     
 </pre></div>
 

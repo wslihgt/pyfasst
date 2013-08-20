@@ -66,7 +66,7 @@ lead instrument/main voice from a (stereophonic) audio mixture.</p>
 <p>copyright (C) 2011 - 2013 Jean-Louis Durrieu</p>
 <dl class="class">
 <dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess">
-<em class="property">class </em><tt class="descclassname">pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.</tt><tt class="descname">SeparateLeadProcess</tt><big>(</big><em>inputAudioFilename</em>, <em>windowSize=0.0464</em>, <em>hopsize=None</em>, <em>NFT=None</em>, <em>nbIter=10</em>, <em>numCompAccomp=40</em>, <em>minF0=39</em>, <em>maxF0=2000</em>, <em>stepNotes=16</em>, <em>chirpPerF0=1</em>, <em>K_numFilters=4</em>, <em>P_numAtomFilters=30</em>, <em>imageCanvas=None</em>, <em>wavCanvas=None</em>, <em>progressBar=None</em>, <em>verbose=True</em>, <em>outputDirSuffix='/'</em>, <em>minF0search=None</em>, <em>maxF0search=None</em>, <em>tfrepresentation='stft'</em>, <em>cqtfmax=4000</em>, <em>cqtfmin=50</em>, <em>cqtbins=48</em>, <em>cqtWinFunc=&lt;function sqrt_blackmanharris at 0x10264d578&gt;</em>, <em>cqtAtomHopFactor=0.25</em>, <em>initHF00='random'</em>, <em>freeMemory=True</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.</tt><tt class="descname">SeparateLeadProcess</tt><big>(</big><em>inputAudioFilename</em>, <em>windowSize=0.0464</em>, <em>hopsize=None</em>, <em>NFT=None</em>, <em>nbIter=10</em>, <em>numCompAccomp=40</em>, <em>minF0=39</em>, <em>maxF0=2000</em>, <em>stepNotes=16</em>, <em>chirpPerF0=1</em>, <em>K_numFilters=4</em>, <em>P_numAtomFilters=30</em>, <em>imageCanvas=None</em>, <em>wavCanvas=None</em>, <em>progressBar=None</em>, <em>verbose=True</em>, <em>outputDirSuffix='/'</em>, <em>minF0search=None</em>, <em>maxF0search=None</em>, <em>tfrepresentation='stft'</em>, <em>cqtfmax=4000</em>, <em>cqtfmin=50</em>, <em>cqtbins=48</em>, <em>cqtWinFunc=&lt;function sqrt_blackmanharris at 0x10260ded8&gt;</em>, <em>cqtAtomHopFactor=0.25</em>, <em>initHF00='random'</em>, <em>freeMemory=True</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess" title="Permalink to this definition">¶</a></dt>
 <dd><p>SeparateLeadProcess</p>
 <p>class which implements the source separation algorithm, separating the
 &#8216;lead&#8217; voice from the &#8216;accompaniment&#8217;. It can deal automatically with the
@@ -291,6 +291,17 @@ channels of the power spectrum of the signal</p>
 <dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeNFrames">
 <tt class="descname">computeNFrames</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.computeNFrames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeNFrames" title="Permalink to this definition">¶</a></dt>
 <dd><p>compute Nb Frames:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeStereoX">
+<tt class="descname">computeStereoX</tt><big>(</big><em>start=0</em>, <em>stop=None</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/SeparateLeadStereo/SeparateLeadStereoTF.html#SeparateLeadProcess.computeStereoX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.SeparateLeadStereo.SeparateLeadStereoTF.SeparateLeadProcess.computeStereoX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the transform on each of the channels.</p>
+<p>TODO this function should be modified such that we only use the
+<a class="reference internal" href="tftransforms.html#pyfasst.tftransforms.tft.TFTransform" title="pyfasst.tftransforms.tft.TFTransform"><tt class="xref py py-class docutils literal"><span class="pre">pyfasst.tftransforms.tft.TFTransform</span></tt></a> framework. This
+could prove complicated though (especially for multiple chunk
+processing.). Current state (20130820): hack mainly focussed on STFT
+as a TF representation.</p>
 </dd></dl>
 
 <dl class="method">

@@ -588,9 +588,19 @@ methods (<a class="reference internal" href="#pyfasst.audioModel.multichanLead.r
 lead instrument from the accompaniment, as in <a class="reference internal" href="../description.html#durrieu2011">[Durrieu2011]</a>, and
 then use the obtained parameters/signals in order to initialize the more
 general source separation algorithm.</p>
+<p>Tentative plan for estimation:</p>
+<blockquote>
+<div><p>1 estimate the Lead/Accompaniment using SIMM</p>
+<p>2 estimate the spatial parameters for each of the separated signals</p>
+<p>3 plug the SIMM params and the spatial params into pyFASST, and</p>
+<p>4 re-estimate</p>
+<p>5 write the estimated signals and enjoy success!</p>
+</div></blockquote>
 <p>NB: as for now, the sole Lead/Accompaniment separation achieves better
 separation than the combination of all the possibilities, probably
-because of a more flexible framework for the former than for the latter.</p>
+because of a more flexible framework for the former than for the latter.
+Some results have been published at the
+<a class="reference external" href="http://sisec.wiki.irisa.fr">SiSEC</a> 2013 evaluation campaign.</p>
 <dl class="method">
 <dt id="pyfasst.audioModel.multichanLead.demixOnGivenFile">
 <tt class="descname">demixOnGivenFile</tt><big>(</big><em>filename</em>, <em>nsources=1</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#multichanLead.demixOnGivenFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.multichanLead.demixOnGivenFile" title="Permalink to this definition">¶</a></dt>

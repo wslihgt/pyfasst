@@ -17,6 +17,10 @@ Relevant references:
 
 """
 
+import numpy as np
+
+eps = 1e-10
+
 def NMF_decomposition(SX, nbComps=10, niter=10, verbose=0):
     """NMF multiplicative gradient, for Itakura Saito
     divergence measure between SX and ``np.dot(W,H)``
@@ -59,12 +63,42 @@ def NMF_decomposition(SX, nbComps=10, niter=10, verbose=0):
 def NMF_decomp_init(SX, nbComps=10, niter=10, verbose=0,
                     Winit=None, Hinit=None,
                     updateW=True, updateH=True):
-    """NMF multiplicative gradient, for Itakura Saito
+    """\
+    NMF multiplicative gradient, for Itakura Saito
     divergence measure between ``SX`` and ``np.dot(W,H)``
+
+    .. math::
+
+        \\mathbf{S}_X \\approx \\mathbf{W} \\mathbf{H}
+    
+        s_{X, fn} \\approx \\sum_{k=1}^K w_{fk} h_{kn}
     
     See for instance [Fevotte2009]_.
+    
+    :param numpy.ndarray SX: 
+        Matrix to be factorized
+    :param integer nbComps:
+        Number of components / factors into which to decompose `SX`
+    :param integer niter: 
+        Number of iterations for the NMF algorithm
+    :param integer verbose:
+        0 for null verbosity, 1 for normal and more for debug
+    :param numpy.ndarray Winit:
+        Initial array for matrix `W`
+    :param numpy.ndarray Hinit:
+        Initial array for matrix `H`
+    :param boolean updateW: 
+        whether to update W or not
+    :param boolean updateH: 
+        whether to update H or not
 
-    Note: for (probably marginal) efficiency, the amplitude matrix ``H``
+    :returns:
+      `W` and `H` (:py:class:`numpy.ndarray`) -
+      the "spectral" component dictionary matrix and the "activation"
+      coefficient matrix.
+    
+    Notes :
+    For (probably marginal) efficiency, the amplitude matrix ``H``
     is "transposed", such that its use in the ``np.dot`` operations uses
     a C-ordered contiguous array. The output is however in the "correct" form.
     """
@@ -77,15 +111,17 @@ def NMF_decomp_init(SX, nbComps=10, niter=10, verbose=0,
         W = np.copy(Winit)
         if verbose and updateW:
             print "    NMF decomp init: updating provided initial W..." 
-            
-    if Hinit.shape == (nbComps, nframes):
-        H = np.copy(Hinit.T)
-        if verbose and updateH:
-            print "    NMF decomp init: updating provided initial H..."
-    elif  Hinit.shape == (nframes, nbComps):
-        H = np.copy(Hinit)
-        if verbose and updateH:
-            print "    NMF decomp init: updating provided initial H..."
+
+    if Hinit is not None:
+        if Hinit.shape == (nbComps, nframes):
+            H = np.copy(Hinit.T)
+            if verbose and updateH:
+                print "    NMF decomp init: updating provided initial H..."
+        elif  Hinit.shape == (nframes, nbComps):
+            H = np.copy(Hinit)
+            if verbose and updateH:
+                print "    NMF decomp init: updating provided initial H..."
+        else: raise AttributeError('Hinit not in the right shape.')
     else:
         H = np.random.randn(nframes, nbComps, )**2
         if verbose and not updateH:
@@ -129,7 +165,8 @@ def SFNMF_decomp_init(SX, nbComps=10, nbFiltComps=10,
                       updateW=True, updateH=True,
                       updateWFilt=True, updateHFilt=True,
                       nbResComps=2):
-    """Implements a simple source/filter NMF algorithm, similar to that introduced in
+    """\
+    Implements a simple source/filter NMF algorithm, similar to that introduced in
     [Durrieu2010]_
        
     """

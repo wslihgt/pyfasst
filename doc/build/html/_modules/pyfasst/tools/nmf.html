@@ -54,19 +54,24 @@
 <span class="sd">to estimate initial parameters in FASST.</span>
 
 <span class="sd">Relevant references:</span>
-<span class="sd">.. [Durrieu2010] J.-L. Durrieu, G. Richard, B. David and C. F\\&#39;{e}votte, </span>
-<span class="sd">   `Source/Filter Model for Main Melody Extraction From Polyphonic Audio </span>
-<span class="sd">   Signals`, IEEE Transactions on Audio, Speech and Language Processing, </span>
+
+<span class="sd">.. [Durrieu2010] J.-L. Durrieu, G. Richard, B. David and C. Fevotte,</span>
+<span class="sd">   Source/Filter Model for Main Melody Extraction From Polyphonic Audio </span>
+<span class="sd">   Signals, IEEE Transactions on Audio, Speech and Language Processing, </span>
 <span class="sd">   special issue on Signal Models and Representations of Musical and </span>
 <span class="sd">   Environmental Sounds, March 2010, Vol. 18 (3), pp. 564 -- 575.</span>
 
 <span class="sd">.. [Fevotte2009] C. Fevotte and N. Bertin and J.-L. Durrieu,</span>
-<span class="sd">   `Nonnegative matrix factorization with the Itakura-Saito divergence.</span>
-<span class="sd">   With application to music analysis`,</span>
+<span class="sd">   Nonnegative matrix factorization with the Itakura-Saito divergence.</span>
+<span class="sd">   With application to music analysis,</span>
 <span class="sd">   Neural Computation, vol. 21 (3), pp. 793-830, March 2009.</span>
 <span class="sd">   [`pdf &lt;http://www.unice.fr/cfevotte/publications/journals/neco09_is-nmf.pdf&gt;`_]</span>
-<span class="sd">   </span>
+
 <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-10</span>
 
 <div class="viewcode-block" id="NMF_decomposition"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.nmf.NMF_decomposition">[docs]</a><span class="k">def</span> <span class="nf">NMF_decomposition</span><span class="p">(</span><span class="n">SX</span><span class="p">,</span> <span class="n">nbComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;NMF multiplicative gradient, for Itakura Saito</span>
@@ -110,12 +115,39 @@
 <div class="viewcode-block" id="NMF_decomp_init"><a class="viewcode-back" href="../../../reference/tools.html#pyfasst.tools.nmf.NMF_decomp_init">[docs]</a><span class="k">def</span> <span class="nf">NMF_decomp_init</span><span class="p">(</span><span class="n">SX</span><span class="p">,</span> <span class="n">nbComps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                     <span class="n">Winit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">Hinit</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                     <span class="n">updateW</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">updateH</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;NMF multiplicative gradient, for Itakura Saito</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    NMF multiplicative gradient, for Itakura Saito</span>
 <span class="sd">    divergence measure between ``SX`` and ``np.dot(W,H)``</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\mathbf{S}_X \\approx \\mathbf{W} \\mathbf{H}</span>
+<span class="sd">    </span>
+<span class="sd">        s_{X, fn} \\approx \\sum_{k=1}^K w_{fk} h_{kn}</span>
 <span class="sd">    </span>
 <span class="sd">    See for instance [Fevotte2009]_.</span>
+<span class="sd">    </span>
+<span class="sd">    :param numpy.ndarray SX: </span>
+<span class="sd">        Matrix to be factorized</span>
+<span class="sd">    :param integer nbComps:</span>
+<span class="sd">        Number of components / factors into which to decompose `SX`</span>
+<span class="sd">    :param integer niter: </span>
+<span class="sd">        Number of iterations for the NMF algorithm</span>
+<span class="sd">    :param integer verbose:</span>
+<span class="sd">        0 for null verbosity, 1 for normal and more for debug</span>
+<span class="sd">    :param numpy.ndarray Winit:</span>
+<span class="sd">        Initial array for matrix `W`</span>
+<span class="sd">    :param numpy.ndarray Hinit:</span>
+<span class="sd">        Initial array for matrix `H`</span>
+<span class="sd">    :param boolean updateW: </span>
+<span class="sd">        whether to update W or not</span>
+<span class="sd">    :param boolean updateH: </span>
+<span class="sd">        whether to update H or not</span>
 
-<span class="sd">    Note: for (probably marginal) efficiency, the amplitude matrix ``H``</span>
+<span class="sd">    Returns :</span>
+<span class="sd">    </span>
+<span class="sd">    Notes :</span>
+<span class="sd">    For (probably marginal) efficiency, the amplitude matrix ``H``</span>
 <span class="sd">    is &quot;transposed&quot;, such that its use in the ``np.dot`` operations uses</span>
 <span class="sd">    a C-ordered contiguous array. The output is however in the &quot;correct&quot; form.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -128,15 +160,17 @@
         <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">Winit</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">updateW</span><span class="p">:</span>
             <span class="k">print</span> <span class="s">&quot;    NMF decomp init: updating provided initial W...&quot;</span> 
-            
-    <span class="k">if</span> <span class="n">Hinit</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">nbComps</span><span class="p">,</span> <span class="n">nframes</span><span class="p">):</span>
-        <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">Hinit</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">updateH</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;    NMF decomp init: updating provided initial H...&quot;</span>
-    <span class="k">elif</span>  <span class="n">Hinit</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">nframes</span><span class="p">,</span> <span class="n">nbComps</span><span class="p">):</span>
-        <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">Hinit</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">updateH</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;    NMF decomp init: updating provided initial H...&quot;</span>
+
+    <span class="k">if</span> <span class="n">Hinit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">Hinit</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">nbComps</span><span class="p">,</span> <span class="n">nframes</span><span class="p">):</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">Hinit</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">updateH</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;    NMF decomp init: updating provided initial H...&quot;</span>
+        <span class="k">elif</span>  <span class="n">Hinit</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">nframes</span><span class="p">,</span> <span class="n">nbComps</span><span class="p">):</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">Hinit</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">updateH</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;    NMF decomp init: updating provided initial H...&quot;</span>
+        <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&#39;Hinit not in the right shape.&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">nframes</span><span class="p">,</span> <span class="n">nbComps</span><span class="p">,</span> <span class="p">)</span><span class="o">**</span><span class="mi">2</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">updateH</span><span class="p">:</span>
@@ -182,12 +216,6 @@
                       <span class="n">nbResComps</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Implements a simple source/filter NMF algorithm, similar to that introduced in</span>
 <span class="sd">    [Durrieu2010]_</span>
-<span class="sd">    </span>
-<span class="sd">    .. [Durrieu2010] J.-L. Durrieu, G. Richard, B. David and C. F\\&#39;{e}votte, </span>
-<span class="sd">       `Source/Filter Model for Main Melody Extraction From Polyphonic Audio </span>
-<span class="sd">       Signals`, IEEE Transactions on Audio, Speech and Language Processing, </span>
-<span class="sd">       special issue on Signal Models and Representations of Musical and </span>
-<span class="sd">       Environmental Sounds, March 2010, Vol. 18 (3), pp. 564 -- 575.</span>
 <span class="sd">       </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">freqs</span><span class="p">,</span> <span class="n">nframes</span> <span class="o">=</span> <span class="n">SX</span><span class="o">.</span><span class="n">shape</span>

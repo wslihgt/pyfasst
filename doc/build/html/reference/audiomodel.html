@@ -28,7 +28,7 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="pyFASST 0.1 documentation" href="../index.html" />
     <link rel="up" title="Reference" href="../reference.html" />
-    <link rel="next" title="demix" href="demix.html" />
+    <link rel="next" title="audioObject" href="audioobject.html" />
     <link rel="prev" title="Reference" href="../reference.html" /> 
   </head>
   <body>
@@ -42,7 +42,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="demix.html" title="demix"
+          <a href="audioobject.html" title="audioObject"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../reference.html" title="Reference"
@@ -59,7 +59,6 @@
             
   <div class="section" id="module-pyfasst.audioModel">
 <span id="audiomodel"></span><h1>audioModel<a class="headerlink" href="#module-pyfasst.audioModel" title="Permalink to this headline">¶</a></h1>
-<p>AudioModel:</p>
 <div class="section" id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
@@ -73,20 +72,23 @@
 </div>
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt>..[Ozerov2012] A. Ozerov, E. Vincent and F. Bimbot</dt>
-<dd>&#8220;A General Flexible Framework for the Handling of Prior Information
+<table class="docutils citation" frame="void" id="ozerov2012" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[Ozerov2012]</a></td><td>A. Ozerov, E. Vincent and F. Bimbot
+&#8220;A General Flexible Framework for the Handling of Prior Information
 in Audio Source Separation,&#8221; 
 IEEE Transactions on Audio, Speech and Signal Processing 20(4),
 pp. 1118-1133 (2012)                            
-Available: <a class="reference external" href="http://hal.inria.fr/hal-00626962/">Archive on HAL</a></dd>
-</dl>
+Available: <a class="reference external" href="http://hal.inria.fr/hal-00626962/">Archive on HAL</a></td></tr>
+</tbody>
+</table>
 <p>Adapted from the Matlab toolbox available at
 <a class="reference external" href="http://bass-db.gforge.inria.fr/fasst/">http://bass-db.gforge.inria.fr/fasst/</a></p>
 </div>
 <div class="section" id="copyright-tbd">
 <h2>Copyright (TBD)<a class="headerlink" href="#copyright-tbd" title="Permalink to this headline">¶</a></h2>
-<p>Jean-Louis Durrieu, EPFL-SSTI-IEL-LTS5</p>
+<p>Jean-Louis Durrieu, EPFL-STI-IEL-LTS5</p>
 <div class="highlight-python"><pre>jean DASH louis AT durrieu DOT ch</pre>
 </div>
 <p>2012-2013
@@ -97,11 +99,94 @@ Available: <a class="reference external" href="http://hal.inria.fr/hal-00626962/
 <dl class="class">
 <dt id="pyfasst.audioModel.FASST">
 <em class="property">class </em><tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">FASST</tt><big>(</big><em>audio, transf='stft', wlen=2048, hopsize=512, iter_num=50, sim_ann_opt='ann', ann_PSD_lim=[None, None], verbose=0, nmfUpdateCoeff=1.0, tffmin=25, tffmax=18000, tfWinFunc=None, tfbpo=48, lambdaCorr=0.0</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#FASST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST" title="Permalink to this definition">¶</a></dt>
-<dd><p><strong>FASST audio model</strong>, from <a class="reference internal" href="../description.html#ozerov2012">[Ozerov2012]</a></p>
+<dd><p><strong>FASST</strong>: Flexible Audio Source Separation Toolbox</p>
+<p>This is the superclass that implements the core functions for
+the framework for audio source separation as introduced in <a class="reference internal" href="#ozerov2012">[Ozerov2012]</a></p>
+<blockquote>
+<div>A. Ozerov, E. Vincent and F. Bimbot
+&#8220;A General Flexible Framework for the Handling of Prior
+Information in Audio Source Separation,&#8221; 
+IEEE Transactions on Audio, Speech and Signal Processing 20(4),
+pp. 1118-1133 (2012)                            
+Available: <a class="reference external" href="http://hal.inria.fr/hal-00626962/">http://hal.inria.fr/hal-00626962/</a></div></blockquote>
+<p>In order to use it, one should sub-class this class, and in particular
+define several elements that are assumed by the core functions for
+estimation and separation in this class, see below for a list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>audio</strong> &#8211; the audio filename</li>
+<li><strong>transf</strong> &#8211; a string describing the desired Time-Frequency (TF) representation</li>
+<li><strong>wlen</strong> &#8211; length of the analysis windows, mostly for STFT representation</li>
+<li><strong>hopsize</strong> (<em>integer</em>) &#8211; the size of samples between two analysis frames</li>
+<li><strong>iter_num</strong> (<em>integer</em>) &#8211; number of GEM iterations for parameter esitmation</li>
+<li><strong>sim_ann_opt</strong> (<em>str</em>) &#8211; type of annealing strategy (<cite>&#8216;ann&#8217;</cite>. <cite>&#8216;no_ann&#8217;</cite>)</li>
+<li><strong>ann_PSD_lim</strong> (<em>list</em>) &#8211; list of 2 elements, <cite>ann_PSD_lim[0]</cite> is the amount of added noise
+to the PSD at beginning, and <cite>ann_PSD_lim[1]</cite> is this amount at the
+end of the estimation.</li>
+<li><strong>verbose</strong> (<em>integer</em>) &#8211; level of verbose: 0 for almost nothing, greater than 1 for debug
+messages</li>
+<li><strong>nmfUpdateCoeff</strong> (<em>double</em>) &#8211; the exponent for the Non-Negative Matrix Factorization-type updates
+within the GEM iteration</li>
+<li><strong>tffmin</strong> &#8211; minimum frequency for the TF representation</li>
+<li><strong>tffmax</strong> &#8211; maximal frequency</li>
+<li><strong>tfWinFunc</strong> &#8211; window function (please provide a python function here)</li>
+<li><strong>tfbpo</strong> (<em>integer</em>) &#8211; number of bins per octave, for Constant-Q-based representations</li>
+<li><strong>lambdaCorr</strong> (<em>double</em>) &#8211; penalization term to control the correlation between the sources.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Some important attributes of this class are:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>spat_comps</strong> (<em>dict</em>) &#8211; a dictionary containing the spatial component parameters and
+variables. In particular, for a given component numbered <cite>spat_ind</cite>,</li>
+<li><strong>spec_comps</strong> (<em>dict</em>) &#8211; the spectral component parameters dictionary.</li>
+<li><strong>audioObject</strong> (<a class="reference internal" href="audioobject.html#pyfasst.audioObject.AudioObject" title="pyfasst.audioObject.AudioObject"><em>pyfasst.audioObject.AudioObject</em></a>) &#8211; the audio object that is to be processed.
+See <a class="reference internal" href="audioobject.html#pyfasst.audioObject.AudioObject" title="pyfasst.audioObject.AudioObject"><tt class="xref py py-class docutils literal"><span class="pre">pyfasst.audioObject.AudioObject</span></tt></a> for details.</li>
+<li><strong>sig_repr_params</strong> &#8211; <p>Parameters for the computation of the signal TF representation. The
+keys in this dictionary are:</p>
+<blockquote>
+<div><cite>&#8216;transf&#8217;</cite> - the type of TF representation<p><cite>&#8216;wlen&#8217;</cite> - the window length in samples</p>
+<p><cite>&#8216;fsize&#8217;</cite> - the size of the Fourier transform (in samples)</p>
+<p><cite>&#8216;hopsize&#8217;</cite> - the hop-size in samples between two consecutive frames</p>
+<p><cite>&#8216;tffmin&#8217;</cite>, <cite>&#8216;tffmax&#8217;</cite>, <cite>&#8216;tfbpo&#8217;</cite>, <cite>&#8216;tfWinFunc&#8217;</cite>, <cite>&#8216;hopfactor&#8217;</cite> -
+variables related to specific TF representations.</p>
+</div></blockquote>
+</li>
+<li><strong>tft</strong> (<a class="reference internal" href="tftransforms.html#pyfasst.tftransforms.tft.TFTransform" title="pyfasst.tftransforms.tft.TFTransform"><em>pyfasst.tftransforms.tft.TFTransform</em></a>) &#8211; The object that implements the TF transform.
+See <a class="reference internal" href="tftransforms.html#pyfasst.tftransforms.tft.TFTransform" title="pyfasst.tftransforms.tft.TFTransform"><tt class="xref py py-class docutils literal"><span class="pre">pyfasst.tftransforms.tft.TFTransform</span></tt></a></li>
+<li><strong>Cx</strong> (<em>numpy.ndarray</em>) &#8211; The computed transform, after <tt class="xref py py-meth docutils literal"><span class="pre">FASST.omp_transf_Cx()</span></tt> has been
+called. For memory management, as of 20130820, <tt class="xref py py-attr docutils literal"><span class="pre">FASST.Cx</span></tt>,
+for a given frame and given frequency, is supposed to be Hermitian:
+only the upper diagonal is therefore kept.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="pyfasst.audioModel.FASST.GEM_iteration">
 <tt class="descname">GEM_iteration</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#FASST.GEM_iteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST.GEM_iteration" title="Permalink to this definition">¶</a></dt>
-<dd><p>GEM iteration</p>
+<dd><p>GEM iteration: one iteration of the Generalized Expectation-
+Maximization algorithm to update the various parameters whose
+<tt class="xref py py-attr docutils literal"><span class="pre">FASST.spec_comp[spec_ind]['frdm_prior']</span></tt> is set to <tt class="docutils literal"><span class="pre">'free'</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>loglik</cite> (double): the log-likelihood of the data,
+given the updated parameters</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -144,7 +229,8 @@ the observed signal&#8217;s parameterized spectral power.</p>
 <dt id="pyfasst.audioModel.FASST.comp_transf_Cx">
 <tt class="descname">comp_transf_Cx</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#FASST.comp_transf_Cx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST.comp_transf_Cx" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the signal representation, according
-to the provided signal_representation flag</p>
+to the provided signal representation flag, in
+<tt class="xref py py-attr docutils literal"><span class="pre">FASST.sig_repr_params['transf']</span></tt></p>
 </dd></dl>
 
 <dl class="method">
@@ -219,16 +305,25 @@ loglik</div></blockquote>
 <tt class="descname">estim_param_a_post_model</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#FASST.estim_param_a_post_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.FASST.estim_param_a_post_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimates the <cite>a posteriori</cite> model for the provided
 audio signal. In particular, this runs self.iter_num times
-the Generalized Expectation-Maximisation algorithm to
+the Generalized Expectation-Maximisation algorithm
+<a class="reference internal" href="#pyfasst.audioModel.FASST.GEM_iteration" title="pyfasst.audioModel.FASST.GEM_iteration"><tt class="xref py py-meth docutils literal"><span class="pre">FASST.GEM_iteration()</span></tt></a>, to
 update the various parameters of the model, so as to
 maximize the likelihood of the data given these parameters.</p>
 <p>From these parameters, the posterior expectation of the
 &#8220;hidden&#8221; or latent variables (here the spatial and spectral
 components) can be computed, leading to the estimation of the
 separated underlying sources.</p>
-<p>Consider using <tt class="docutils literal"><span class="pre">self.separate_spat_comps</span></tt> or
-<tt class="docutils literal"><span class="pre">self.separate_spatial_filter_comp</span></tt> to obtain the separated time
+<p>Consider using <a class="reference internal" href="#pyfasst.audioModel.FASST.separate_spat_comps" title="pyfasst.audioModel.FASST.separate_spat_comps"><tt class="xref py py-meth docutils literal"><span class="pre">FASST.separate_spat_comps()</span></tt></a> or
+<a class="reference internal" href="#pyfasst.audioModel.FASST.separate_spatial_filter_comp" title="pyfasst.audioModel.FASST.separate_spatial_filter_comp"><tt class="xref py py-meth docutils literal"><span class="pre">FASST.separate_spatial_filter_comp()</span></tt></a> to obtain the separated time
 series, once the parameters have been estimated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><cite>logliks</cite>: The log-likelihoods as computed after each GEM iteration.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -306,20 +401,20 @@ main parameters:</p>
 <dl class="docutils">
 <dt><strong>Outputs</strong></dt>
 <dd><dl class="first last docutils">
-<dt><tt class="docutils literal"><span class="pre">spat_comp_powers</span></tt></dt>
-<dd>(<tt class="docutils literal"><span class="pre">total_spat_rank</span></tt> x <tt class="docutils literal"><span class="pre">nbFreqsSigRepr</span></tt> x <tt class="docutils literal"><span class="pre">nbFramesSigRepr</span></tt>) ndarray
+<dt><cite>spat_comp_powers</cite></dt>
+<dd>(<cite>total_spat_rank</cite> x <cite>nbFreqsSigRepr</cite> x <cite>nbFramesSigRepr</cite>) ndarray
 the spatial component power spectra. Note that total_spat_rank
 is the sum of all the spatial ranks for all the sources.</dd>
-<dt>mix_matrix</dt>
+<dt><cite>mix_matrix</cite></dt>
 <dd>(total_spat_rank x nchannels x nbFreqsSigRepr) ndarray
 the mixing matrices for each source</dd>
-<dt>rank_part_ind</dt>
+<dt><cite>rank_part_ind</cite></dt>
 <dd>dictionary: each key is one source, and the values are the indices
-in <tt class="docutils literal"><span class="pre">spat_comp_powers</span></tt> and <tt class="docutils literal"><span class="pre">mix_matrix</span></tt> that correspond to that source.
-If the spatial rank of source <tt class="docutils literal"><span class="pre">j</span></tt> is 2, then its spectra will appear
-twice in <tt class="docutils literal"><span class="pre">spat_comp_powers</span></tt>, with mixing parameters (potentially
+in <cite>spat_comp_powers</cite> and <cite>mix_matrix</cite> that correspond to that source.
+If the spatial rank of source <cite>j</cite> is 2, then its spectra will appear
+twice in <cite>spat_comp_powers</cite>, with mixing parameters (potentially
 different one from the other) appearing in two sub-matrices of
-<tt class="docutils literal"><span class="pre">mix_matrix</span></tt>.</dd>
+<cite>mix_matrix</cite>.</dd>
 </dl>
 </dd>
 </dl>
@@ -483,6 +578,60 @@ mixture, in case the parameter has not yet been changed to
 
 </dd></dl>
 
+<dl class="class">
+<dt id="pyfasst.audioModel.multichanLead">
+<em class="property">class </em><tt class="descclassname">pyfasst.audioModel.</tt><tt class="descname">multichanLead</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#multichanLead"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.multichanLead" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiple Channel Source Separation, with Lead/Accompaniment initial
+separation</p>
+<p>This instantiation of <a class="reference internal" href="#pyfasst.audioModel.multiChanSourceF0Filter" title="pyfasst.audioModel.multiChanSourceF0Filter"><tt class="xref py py-class docutils literal"><span class="pre">multiChanSourceF0Filter</span></tt></a> provides convenient
+methods (<a class="reference internal" href="#pyfasst.audioModel.multichanLead.runDecomp" title="pyfasst.audioModel.multichanLead.runDecomp"><tt class="xref py py-func docutils literal"><span class="pre">multichanLead.runDecomp()</span></tt></a> for instance) to separate the
+lead instrument from the accompaniment, as in <a class="reference internal" href="../description.html#durrieu2011">[Durrieu2011]</a>, and
+then use the obtained parameters/signals in order to initialize the more
+general source separation algorithm.</p>
+<p>NB: as for now, the sole Lead/Accompaniment separation achieves better
+separation than the combination of all the possibilities, probably
+because of a more flexible framework for the former than for the latter.</p>
+<dl class="method">
+<dt id="pyfasst.audioModel.multichanLead.demixOnGivenFile">
+<tt class="descname">demixOnGivenFile</tt><big>(</big><em>filename</em>, <em>nsources=1</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#multichanLead.demixOnGivenFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.multichanLead.demixOnGivenFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>running the DEMIX algorithm from :demix.DEMIX:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.audioModel.multichanLead.demixOnSepSIMM">
+<tt class="descname">demixOnSepSIMM</tt><big>(</big><em>unvoiced=True</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#multichanLead.demixOnSepSIMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.multichanLead.demixOnSepSIMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>run DEMIX on the separated signals resulting from SIMM model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.audioModel.multichanLead.estimSIMM">
+<tt class="descname">estimSIMM</tt><big>(</big><em>maxFrames=4000</em>, <em>dir_results='tmp/'</em>, <em>simmIterNum=30</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#multichanLead.estimSIMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.multichanLead.estimSIMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method runs the SIMM estimation on the provided audio file.</p>
+<p>The lead source is assumed to be self.spec_comps[0]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.audioModel.multichanLead.estimSUIMM">
+<tt class="descname">estimSUIMM</tt><big>(</big><em>maxFrames=4000</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#multichanLead.estimSUIMM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.multichanLead.estimSUIMM" title="Permalink to this definition">¶</a></dt>
+<dd><p>separates the audio signal into lead+accompaniment,
+including more noisy components for the lead than <cite>self.estimSIMM</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.audioModel.multichanLead.initConvDemixOnSepSrc">
+<tt class="descname">initConvDemixOnSepSrc</tt><big>(</big><em>suffix</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#multichanLead.initConvDemixOnSepSrc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.multichanLead.initConvDemixOnSepSrc" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialize the convolutive parameters with DEMIX, running on each of
+the separated sources</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyfasst.audioModel.multichanLead.runDecomp">
+<tt class="descname">runDecomp</tt><big>(</big><em>instrus=</em><span class="optional">[</span><span class="optional">]</span>, <em>instru2modelfile={}</em>, <em>dir_results='tmp/'</em>, <em>maxFrames=4000</em>, <em>niter_nmf=20</em>, <em>niter_simm=30</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/audioModel.html#multichanLead.runDecomp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.audioModel.multichanLead.runDecomp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Running the scheme that should make me famous.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
@@ -508,8 +657,8 @@ mixture, in case the parameter has not yet been changed to
   <p class="topless"><a href="../reference.html"
                         title="previous chapter">Reference</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="demix.html"
-                        title="next chapter">demix</a></p>
+  <p class="topless"><a href="audioobject.html"
+                        title="next chapter">audioObject</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/reference/audiomodel.txt"
@@ -542,7 +691,7 @@ mixture, in case the parameter has not yet been changed to
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="demix.html" title="demix"
+          <a href="audioobject.html" title="audioObject"
              >next</a> |</li>
         <li class="right" >
           <a href="../reference.html" title="Reference"

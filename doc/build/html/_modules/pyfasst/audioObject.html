@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyfasst.audioObject &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyfasst.audioObject</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;AudioObject</span>
+
+<span class="sd">The audioObject module provides a class for input/output of audio</span>
+<span class="sd">WAV files.</span>
+
+<span class="sd">Originally meant to wrap scikits.audiolab, yet allowing to load the</span>
+<span class="sd">scipy.io.wavfile if audiolab is missing.</span>
+
+<span class="sd">Unfortunately it got awfully complicated in time, and a clean up is</span>
+<span class="sd">necessary. Notably, there are problems with scaling, and some issues</span>
+<span class="sd">related to the type of the file from audiolab. </span>
+
+<span class="sd">Jean-Louis Durrieu, 2012 - 2013</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">tools.utils</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd"># functions to read and write audio files</span>
+<span class="sd">#     note that if audiolab is available, there are going to be</span>
+<span class="sd">#     more available audio formats to read/write.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">scikits.audiolab</span> <span class="kn">as</span> <span class="nn">al</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    # import marcel # just to make it read with scipy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">wavread</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">first</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">sndfile</span> <span class="o">=</span> <span class="n">al</span><span class="o">.</span><span class="n">pysndfile</span><span class="o">.</span><span class="n">Sndfile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">last</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="n">sndfile</span><span class="o">.</span><span class="n">nframes</span>
+        
+        <span class="n">sndfile</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">sndfile</span><span class="o">.</span><span class="n">samplerate</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">sndfile</span><span class="o">.</span><span class="n">read_frames</span><span class="p">(</span><span class="n">nframes</span><span class="o">=</span><span class="n">last</span><span class="o">-</span><span class="n">first</span><span class="p">,</span> <span class="p">)</span>
+        <span class="c"># Note: read_frame(nframes,dtype=np.int16) is broken! probably... </span>
+        <span class="k">if</span> <span class="n">sndfile</span><span class="o">.</span><span class="n">encoding</span> <span class="o">==</span> <span class="s">&#39;pcm16&#39;</span><span class="p">:</span>
+            <span class="c"># convert back to signed int16</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">(</span><span class="n">data</span> <span class="o">*</span> <span class="mf">2.</span><span class="o">**</span><span class="mi">15</span><span class="p">)</span>
+        <span class="n">sndfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sndfile</span><span class="o">.</span><span class="n">encoding</span>
+    
+    <span class="k">def</span> <span class="nf">wavwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                 <span class="n">formattype</span><span class="o">=</span><span class="s">&#39;wav&#39;</span><span class="p">,</span>
+                 <span class="n">formatenc</span><span class="o">=</span><span class="s">&#39;pcm16&#39;</span><span class="p">,</span>
+                 <span class="n">formatend</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">formattype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">al</span><span class="o">.</span><span class="n">pysndfile</span><span class="o">.</span><span class="n">available_file_formats</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">formattype</span><span class="o">+</span><span class="s">&#39; not available in sndfile.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">formatenc</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">al</span><span class="o">.</span><span class="n">pysndfile</span><span class="o">.</span><span class="n">available_encodings</span><span class="p">(</span><span class="n">formattype</span><span class="p">):</span>
+            <span class="n">formatenc</span> <span class="o">=</span> <span class="n">al</span><span class="o">.</span><span class="n">pysndfile</span><span class="o">.</span><span class="n">available_encodings</span><span class="p">(</span><span class="n">formattype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">format</span> <span class="o">=</span> <span class="n">al</span><span class="o">.</span><span class="n">pysndfile</span><span class="o">.</span><span class="n">Format</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">formattype</span><span class="p">,</span>
+                                     <span class="n">encoding</span><span class="o">=</span><span class="n">formatenc</span><span class="p">,</span>
+                                     <span class="n">endianness</span><span class="o">=</span><span class="n">formatend</span><span class="p">)</span>
+        <span class="n">sndfile</span> <span class="o">=</span> <span class="n">al</span><span class="o">.</span><span class="n">pysndfile</span><span class="o">.</span><span class="n">Sndfile</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+                                       <span class="n">mode</span><span class="o">=</span><span class="s">&#39;w&#39;</span><span class="p">,</span>
+                                       <span class="n">samplerate</span><span class="o">=</span><span class="n">rate</span><span class="p">,</span>
+                                       <span class="n">format</span><span class="o">=</span><span class="n">format</span><span class="p">,</span>
+                                       <span class="n">channels</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                                       <span class="p">)</span>
+        <span class="n">sndfile</span><span class="o">.</span><span class="n">write_frames</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">sndfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    
+    <span class="k">print</span> <span class="s">&quot;Reading and Writing WAV files with audiolab&quot;</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Using scipy.io.wavfile&quot;</span>
+    <span class="kn">import</span> <span class="nn">scipy.io.wavfile</span> <span class="kn">as</span> <span class="nn">wav</span>
+    
+    <span class="k">def</span> <span class="nf">wavread</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">first</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">fs</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">wav</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">first</span><span class="p">:</span><span class="n">last</span><span class="p">]</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span>
+        
+        <span class="k">return</span> <span class="n">fs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">encoding</span>
+    
+    <span class="k">def</span> <span class="nf">wavwrite</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                 <span class="n">formattype</span><span class="o">=</span><span class="s">&#39;wav&#39;</span><span class="p">,</span>
+                 <span class="n">formatenc</span><span class="o">=</span><span class="s">&#39;int16&#39;</span><span class="p">,</span>
+                 <span class="n">formatend</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">formatenc</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;int16&#39;</span><span class="p">,</span> <span class="s">&#39;int32&#39;</span><span class="p">,</span> <span class="s">&#39;int8&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">2</span><span class="o">**</span><span class="mi">15</span><span class="p">:</span>
+                <span class="n">formatenc</span> <span class="o">=</span> <span class="s">&#39;int32&#39;</span>
+            <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">2</span><span class="o">**</span><span class="mi">7</span><span class="p">:</span>
+                <span class="n">formatenc</span> <span class="o">=</span> <span class="s">&#39;int16&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">formatenc</span> <span class="o">=</span> <span class="s">&#39;int8&#39;</span>
+            <span class="k">print</span> <span class="s">&quot;Changing encoding to&quot;</span><span class="p">,</span> <span class="n">formatenc</span>
+        <span class="n">data_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">formatenc</span><span class="p">)</span>
+        <span class="c"># print data_.dtype</span>
+        <span class="n">wav</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">data_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="AudioObject"><a class="viewcode-back" href="../../reference/audioobject.html#pyfasst.audioObject.AudioObject">[docs]</a><span class="k">class</span> <span class="nc">AudioObject</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A wrapper for the wrapper by D. Cournapeau. Or in case it is not</span>
+<span class="sd">    installed, it falls back on :py:mod:`scipy.io.wavfile`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;rw&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;AudioObject initialization</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+    
+    <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;r&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Not in read mode.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samplerate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoding</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">wavread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nframes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nframes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span> <span class="o">=</span> <span class="mi">1</span>
+        
+        <span class="c"># rescaling the data array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maxdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+            <span class="mf">1.1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span>
+            <span class="mf">1e-10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maxdata</span> 
+        <span class="c"># self._encoding = </span>
+    
+    <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;w&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Not in write mode.&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="s">&#39;w&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_samplerate&#39;</span><span class="p">)</span> \
+               <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_data&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s">&quot;Should set sample rate and have data &quot;</span><span class="o">+</span>\
+                                 <span class="s">&quot;in write mode.&quot;</span><span class="p">)</span>
+        
+        <span class="c">##print &quot;Setting encoding to pcm16, converting data too...&quot;</span>
+        <span class="c">##self._encoding = &#39;pcm16&#39;</span>
+        <span class="c">##self._data = np.int16(self._maxdata * self._data)</span>
+        <span class="c">##self._maxdata = 1</span>
+        
+        <span class="n">wavwrite</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                 <span class="n">rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_samplerate</span><span class="p">,</span>
+                 <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_maxdata</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span>
+                 <span class="n">formatenc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoding</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_set_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Data shape is strangely ordered: transposing input data.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;C&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s">&#39;C&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maxdata</span> <span class="o">=</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maxdata</span>
+    
+    <span class="k">def</span> <span class="nf">_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_data&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+    
+    <span class="k">def</span> <span class="nf">_del_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;data&#39;</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_get_data</span><span class="p">,</span> <span class="n">_set_data</span><span class="p">,</span> <span class="n">_del_data</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_get_samplerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_samplerate&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="s">&#39;r&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplerate</span>
+    
+    <span class="k">def</span> <span class="nf">_set_samplerate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samplerate</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;r&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Changing the sampling rate in read mode&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samplerate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">samplerate</span><span class="p">)</span>
+        
+    <span class="n">samplerate</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_get_samplerate</span><span class="p">,</span> <span class="n">_set_samplerate</span><span class="p">)</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">samplerate</span> <span class="c"># just an alias, for ease of use</span>
+    
+    <span class="nd">@property</span> 
+    <span class="k">def</span> <span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_channels&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channels</span>
+    
+    <span class="nd">@property</span> 
+    <span class="k">def</span> <span class="nf">nframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;_nframes&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nframes</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

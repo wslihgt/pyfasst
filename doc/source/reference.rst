@@ -5,6 +5,7 @@ Reference
    :maxdepth: 2
    
    reference/audiomodel
+   reference/audioobject
    reference/demix
    reference/separateleadstereo
    reference/separateleadfunctions

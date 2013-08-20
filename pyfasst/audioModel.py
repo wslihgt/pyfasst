@@ -1,6 +1,4 @@
-"""AudioModel: 
-
-Description
+"""Description
 -----------
 
 FASST (Flexible Audio Source Separation Toolbox) class
@@ -14,7 +12,7 @@ TBD
 Reference
 ---------
 
-..[Ozerov2012] A. Ozerov, E. Vincent and F. Bimbot
+.. [Ozerov2012] A. Ozerov, E. Vincent and F. Bimbot
     \"A General Flexible Framework for the Handling of Prior Information
     in Audio Source Separation,\" 
     IEEE Transactions on Audio, Speech and Signal Processing 20(4),
@@ -27,7 +25,7 @@ http://bass-db.gforge.inria.fr/fasst/
 Copyright (TBD)
 ---------------
 
-Jean-Louis Durrieu, EPFL-SSTI-IEL-LTS5
+Jean-Louis Durrieu, EPFL-STI-IEL-LTS5
 ::
 
     jean DASH louis AT durrieu DOT ch
@@ -72,7 +70,86 @@ soundCelerity = 340. # m/s
 
 ########## Main classes for audio models ##########
 class FASST(object):
-    """**FASST audio model**, from [Ozerov2012]_
+    """**FASST**: Flexible Audio Source Separation Toolbox
+    
+    This is the superclass that implements the core functions for
+    the framework for audio source separation as introduced in [Ozerov2012]_
+    
+        A. Ozerov, E. Vincent and F. Bimbot
+        \"A General Flexible Framework for the Handling of Prior
+        Information in Audio Source Separation,\" 
+        IEEE Transactions on Audio, Speech and Signal Processing 20(4),
+        pp. 1118-1133 (2012)                            
+        Available: http://hal.inria.fr/hal-00626962/
+    
+    In order to use it, one should sub-class this class, and in particular
+    define several elements that are assumed by the core functions for
+    estimation and separation in this class, see below for a list.
+    
+    :param audio: the audio filename 
+    :param transf:
+        a string describing the desired Time-Frequency (TF) representation
+    :param wlen: length of the analysis windows, mostly for STFT representation
+    :param integer hopsize: the size of samples between two analysis frames
+    :param integer iter_num: number of GEM iterations for parameter esitmation
+    :param str sim_ann_opt: type of annealing strategy (`'ann'`. `'no_ann'`)
+    :param list ann_PSD_lim:
+        list of 2 elements, `ann_PSD_lim[0]` is the amount of added noise
+        to the PSD at beginning, and `ann_PSD_lim[1]` is this amount at the
+        end of the estimation.
+    :param integer verbose:
+        level of verbose: 0 for almost nothing, greater than 1 for debug
+        messages
+    :param double nmfUpdateCoeff:
+        the exponent for the Non-Negative Matrix Factorization-type updates
+        within the GEM iteration
+    :param tffmin: minimum frequency for the TF representation 
+    :param tffmax: maximal frequency
+    :param tfWinFunc: window function (please provide a python function here)
+    :param integer tfbpo:
+        number of bins per octave, for Constant-Q-based representations
+    :param double lambdaCorr:
+        penalization term to control the correlation between the sources.
+    
+    Some important attributes of this class are:
+    
+    :var dict spat_comps:
+        a dictionary containing the spatial component parameters and
+        variables. In particular, for a given component numbered `spat_ind`,
+        
+    :var dict spec_comps:
+        the spectral component parameters dictionary. 
+    
+    :var pyfasst.audioObject.AudioObject audioObject:
+        the audio object that is to be processed.
+        See :py:class:`pyfasst.audioObject.AudioObject` for details.
+    
+    :var sig_repr_params:
+        Parameters for the computation of the signal TF representation. The
+        keys in this dictionary are:
+        
+            `'transf'` - the type of TF representation
+
+            `'wlen'` - the window length in samples
+
+            `'fsize'` - the size of the Fourier transform (in samples)
+
+            `'hopsize'` - the hop-size in samples between two consecutive frames
+
+            `'tffmin'`, `'tffmax'`, `'tfbpo'`, `'tfWinFunc'`, `'hopfactor'` -
+            variables related to specific TF representations.
+            
+    :var pyfasst.tftransforms.tft.TFTransform tft:
+        The object that implements the TF transform.
+        See :py:class:`pyfasst.tftransforms.tft.TFTransform`
+
+    :var numpy.ndarray Cx:
+        The computed transform, after :py:meth:`FASST.omp_transf_Cx` has been
+        called. For memory management, as of 20130820, :py:attr:`FASST.Cx`,
+        for a given frame and given frequency, is supposed to be Hermitian:
+        only the upper diagonal is therefore kept. 
+        
+    
     """
     # for now only stft:
     implemented_transf = ['stft','stftold', 'mqt', 'minqt', 'cqt']
@@ -94,37 +171,6 @@ class FASST(object):
                  tfbpo=48,
                  lambdaCorr=0.):
         """**FASST**: Flexible Audio Source Separation Toolbox
-        
-        This is the superclass that implements the core functions for
-        the framework for audio source separation as introduced in
-            A. Ozerov, E. Vincent and F. Bimbot
-            \"A General Flexible Framework for the Handling of Prior
-            Information in Audio Source Separation,\" 
-            IEEE Transactions on Audio, Speech and Signal Processing 20(4),
-            pp. 1118-1133 (2012)                            
-            Available: http://hal.inria.fr/hal-00626962/
-        
-        In order to use it, one should sub-class this class, and in particular
-        define several elements that are assumed by the core functions for
-        estimation and separation in this class, namely:
-        
-        **ATTRIBUTES** (WIP)
-        spat_comps
-        
-        spec_comps
-        
-        audioObject
-            samplerate
-            channels
-            
-        sig_repr_params
-            'transf'
-            'wlen'
-            'fsize'
-            'hopsize'
-            
-        
-        **ARGUMENT**
         
         """
         
@@ -202,7 +248,8 @@ class FASST(object):
     
     def comp_transf_Cx(self):
         """Computes the signal representation, according
-        to the provided signal_representation flag
+        to the provided signal representation flag, in
+        :py:attr:`FASST.sig_repr_params['transf']`
         """
         if not hasattr(self.audioObject, '_data'):
             self.audioObject._read()
@@ -282,7 +329,8 @@ class FASST(object):
     def estim_param_a_post_model(self,):
         """Estimates the `a posteriori` model for the provided
         audio signal. In particular, this runs self.iter_num times
-        the Generalized Expectation-Maximisation algorithm to
+        the Generalized Expectation-Maximisation algorithm
+        :py:meth:`FASST.GEM_iteration`, to
         update the various parameters of the model, so as to
         maximize the likelihood of the data given these parameters.
         
@@ -291,9 +339,13 @@ class FASST(object):
         components) can be computed, leading to the estimation of the
         separated underlying sources.
 
-        Consider using ``self.separate_spat_comps`` or
-        ``self.separate_spatial_filter_comp`` to obtain the separated time
+        Consider using :py:meth:`FASST.separate_spat_comps` or
+        :py:meth:`FASST.separate_spatial_filter_comp` to obtain the separated time
         series, once the parameters have been estimated.
+
+        :returns:
+            `logliks`: The log-likelihoods as computed after each GEM iteration.
+        
         """
         
         logliks = np.ones(self.iter_num)
@@ -329,7 +381,14 @@ class FASST(object):
         return logliks
     
     def GEM_iteration(self,):
-        """GEM iteration
+        """GEM iteration: one iteration of the Generalized Expectation-
+        Maximization algorithm to update the various parameters whose
+        :py:attr:`FASST.spec_comp[spec_ind]['frdm_prior']` is set to ``'free'``.
+
+        :returns:
+            `loglik` (double): the log-likelihood of the data,
+            given the updated parameters
+        
         """
         if self.audioObject.channels==2:
             spat_comp_powers, mix_matrix, rank_part_ind = (
@@ -369,8 +428,7 @@ class FASST(object):
     
     def comp_spat_comp_power(self, spat_comp_ind,
                              spec_comp_ind=[], factor_ind=[]):
-        """
-    Matlab FASST Toolbox help::
+        """Matlab FASST Toolbox help::
         
         % V = comp_spat_comp_power(mix_str, spat_comp_ind,                  
         %                          spec_comp_ind, factor_ind);            
@@ -443,22 +501,22 @@ class FASST(object):
         main parameters:
         
         **Outputs**
-         ``spat_comp_powers``
-            (``total_spat_rank`` x ``nbFreqsSigRepr`` x ``nbFramesSigRepr``) ndarray
+         `spat_comp_powers`
+            (`total_spat_rank` x `nbFreqsSigRepr` x `nbFramesSigRepr`) ndarray
             the spatial component power spectra. Note that total_spat_rank
             is the sum of all the spatial ranks for all the sources.
             
-         mix_matrix
+         `mix_matrix`
             (total_spat_rank x nchannels x nbFreqsSigRepr) ndarray
             the mixing matrices for each source
             
-         rank_part_ind
+         `rank_part_ind`
             dictionary: each key is one source, and the values are the indices
-            in ``spat_comp_powers`` and ``mix_matrix`` that correspond to that source.
-            If the spatial rank of source ``j`` is 2, then its spectra will appear
-            twice in ``spat_comp_powers``, with mixing parameters (potentially
+            in `spat_comp_powers` and `mix_matrix` that correspond to that source.
+            If the spatial rank of source `j` is 2, then its spectra will appear
+            twice in `spat_comp_powers`, with mixing parameters (potentially
             different one from the other) appearing in two sub-matrices of
-            ``mix_matrix``.
+            `mix_matrix`.
             
         """
         K = len(self.spat_comps)
@@ -2788,6 +2846,19 @@ class multiChanSourceF0Filter(FASST):
                 TW *= twmask
 
 class multichanLead(multiChanSourceF0Filter):
+    """Multiple Channel Source Separation, with Lead/Accompaniment initial
+    separation
+
+    This instantiation of :class:`multiChanSourceF0Filter` provides convenient
+    methods (:func:`multichanLead.runDecomp` for instance) to separate the
+    lead instrument from the accompaniment, as in [Durrieu2011]_, and
+    then use the obtained parameters/signals in order to initialize the more
+    general source separation algorithm.
+
+    NB: as for now, the sole Lead/Accompaniment separation achieves better
+    separation than the combination of all the possibilities, probably
+    because of a more flexible framework for the former than for the latter.
+    """
     def __init__(self, *args, **kwargs):
         """multichanLead
         
@@ -2797,11 +2868,17 @@ class multichanLead(multiChanSourceF0Filter):
         meant to be used as initial parameters for one of the sources.
         
         Tentative plan for estimation:
-        ## estimate the Lead/Accompaniment using SIMM
-        ## estimate the spatial parameters for each of the separated signals
-        ## plug the SIMM params and the spatial params into pyFASST, and
-        ## re-estimate
-        ## write the estimated signals and enjoy success!
+        
+        1 estimate the Lead/Accompaniment using SIMM
+
+        2 estimate the spatial parameters for each of the separated signals
+
+        3 plug the SIMM params and the spatial params into pyFASST, and
+
+        4 re-estimate
+
+        5 write the estimated signals and enjoy success!
+        
         """
         super(multichanLead, self).__init__(*args, **kwargs)
         # removing some data from the object, recomputing when needed:

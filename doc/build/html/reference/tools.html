@@ -26,7 +26,9 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="pyFASST 0.1 documentation" href="../index.html" /> 
+    <link rel="top" title="pyFASST 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Reference" href="../reference.html" />
+    <link rel="prev" title="Time-Frequency Transforms" href="tftransforms.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +40,11 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="tftransforms.html" title="Time-Frequency Transforms"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" accesskey="U">Reference</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -179,7 +185,7 @@ divergence measure between SX and <tt class="docutils literal"><span class="pre"
 <p>gathers signal processing tools</p>
 <dl class="function">
 <dt id="pyfasst.tools.signalTools.f0detectionFunction">
-<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x10277a758&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x1025f9cf8&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Harmonic Sum</p>
 <p>detectFunc should be a function taking an array as argument, and</p>
 <p><cite>threshold</cite> is homogenous to a tone on the western musical scale</p>
@@ -212,14 +218,14 @@ reference to this by the former.</p>
 <p><strong>Inputs</strong></p>
 <blockquote>
 <div><dl class="docutils">
-<dt>sigma_x_diag</dt>
+<dt><cite>sigma_x_diag</cite></dt>
 <dd><p class="first">ndarray, with (dim of axis=0) = 2</p>
 <p class="last">The diagonal elements of the matrices to invert.
-sigma_x_diag[0] are the (0,0) elements and
-sigma_x_diag[1] are the (1,1) ones.</p>
+<cite>sigma_x_diag[0]</cite> are the (0,0) elements and
+<cite>sigma_x_diag[1]</cite> are the (1,1) ones.</p>
 </dd>
-<dt>sigma_x_off</dt>
-<dd><p class="first">ndarray, with the same dimensions as sigma_x_diag[0]</p>
+<dt><cite>sigma_x_off</cite></dt>
+<dd><p class="first">ndarray, with the same dimensions as <cite>sigma_x_diag[0]</cite></p>
 <p class="last">The off-diagonal elements of the matrices, more precisely the
 (0,1) element (since the matrices are assumed Hermitian,
 the (1,0) element is the complex conjugate)</p>
@@ -229,17 +235,17 @@ the (1,0) element is the complex conjugate)</p>
 <p><strong>Outputs</strong></p>
 <blockquote>
 <div><dl class="docutils">
-<dt>inv_sigma_x_diag</dt>
+<dt><cite>inv_sigma_x_diag</cite></dt>
 <dd><p class="first">ndarray, 2 x shape(sigma_x_off)</p>
 <p class="last">Diagonal elements of the inverse matrices.
 [0] &lt;-&gt; (0,0)
 [1] &lt;-&gt; (1,1)</p>
 </dd>
-<dt>inv_sigma_x_off</dt>
+<dt><cite>inv_sigma_x_off</cite></dt>
 <dd><p class="first">ndarray, shape(sigma_x_off)</p>
 <p class="last">Off-diagonal (0,1) elements of the inverse matrices</p>
 </dd>
-<dt>det_sigma_x</dt>
+<dt><cite>det_sigma_x</cite></dt>
 <dd><p class="first">ndarray, shape(sigma_x_off)</p>
 <p class="last">For each inversion, the determinant of the matrix.</p>
 </dd>
@@ -301,6 +307,9 @@ according to YIN and the like, in order to obtain better estimates.</p>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tftransforms.html"
+                        title="previous chapter">Time-Frequency Transforms</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/reference/tools.txt"
@@ -332,7 +341,11 @@ according to YIN and the like, in order to obtain better estimates.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">pyFASST 0.1 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="tftransforms.html" title="Time-Frequency Transforms"
+             >previous</a> |</li>
+        <li><a href="../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../reference.html" >Reference</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

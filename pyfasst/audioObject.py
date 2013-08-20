@@ -96,6 +96,9 @@ except ImportError:
         return 0
 
 class AudioObject(object):
+    """A wrapper for the wrapper by D. Cournapeau. Or in case it is not
+    installed, it falls back on :py:mod:`scipy.io.wavfile`.
+    """
     def __init__(self, filename, mode='rw'):
         """AudioObject initialization
         

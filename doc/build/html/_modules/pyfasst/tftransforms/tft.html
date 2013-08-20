@@ -1,0 +1,151 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyfasst.tftransforms.tft &mdash; pyFASST 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyFASST 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyfasst.tftransforms.tft</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;Time-Frequency Transforms</span>
+
+<span class="sd">TODO: turn this into something more self-contained (like defining a super class</span>
+<span class="sd">for all the possible time-freq transforms)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">minqt</span> <span class="kn">import</span> <span class="n">MinQTransfo</span><span class="p">,</span> <span class="n">CQTransfo</span><span class="p">,</span> <span class="n">sqrt_blackmanharris</span>
+
+<span class="kn">from</span> <span class="nn">stft</span> <span class="kn">import</span> <span class="n">STFT</span> <span class="c"># TODO: should be the opposite, should import stft from here into audioObject</span>
+<span class="kn">from</span> <span class="nn">nsgt</span> <span class="kn">import</span> <span class="n">NSGMinQT</span>
+
+<span class="c"># Possible super class transform:</span>
+<div class="viewcode-block" id="TFTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.tft.TFTransform">[docs]</a><span class="k">class</span> <span class="nc">TFTransform</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;TFTransform is the Time-Frequency Transform base class. All the</span>
+<span class="sd">    TF representations sub-classing it should implement the following</span>
+<span class="sd">    methods:</span>
+<span class="sd">    * :py:method:TFTransform.computeTransform to compute the desired transform</span>
+<span class="sd">      on data. The transform is then stored in :py:attrs:TFTransform.transfo</span>
+<span class="sd">    * :py:method:invertTransform to invert the transform from the stored</span>
+<span class="sd">    transform</span>
+
+<span class="sd">    It should </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">transformname</span> <span class="o">=</span> <span class="s">&#39;dummy&#39;</span>
+    
+    <span class="n">transfo</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># risky to have it defined here</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                 <span class="n">fmin</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                 <span class="n">fs</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span>
+                 <span class="n">q</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">atomHopFactor</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+                 <span class="n">thresh</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span> 
+                 <span class="n">winFunc</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">perfRast</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">cqtkernel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">lowPassCoeffs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+<div class="viewcode-block" id="TFTransform.computeTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.tft.TFTransform.computeTransform">[docs]</a>    <span class="k">def</span> <span class="nf">computeTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    </div>
+<div class="viewcode-block" id="TFTransform.invertTransform"><a class="viewcode-back" href="../../../reference/tftransforms.html#pyfasst.tftransforms.tft.TFTransform.invertTransform">[docs]</a>    <span class="k">def</span> <span class="nf">invertTransform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+</div></div>
+<span class="n">tftransforms</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;stftold&#39;</span><span class="p">:</span> <span class="n">TFTransform</span><span class="p">,</span> <span class="c"># just making dummy</span>
+    <span class="s">&#39;stft&#39;</span><span class="p">:</span> <span class="n">STFT</span><span class="p">,</span>
+    <span class="s">&#39;mqt&#39;</span><span class="p">:</span> <span class="n">MinQTransfo</span><span class="p">,</span>
+    <span class="s">&#39;minqt&#39;</span><span class="p">:</span> <span class="n">MinQTransfo</span><span class="p">,</span>
+    <span class="s">&#39;nsgmqt&#39;</span><span class="p">:</span> <span class="n">NSGMinQT</span><span class="p">,</span>
+    <span class="s">&#39;cqt&#39;</span><span class="p">:</span> <span class="n">CQTransfo</span><span class="p">}</span>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">pyFASST 0.1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jean-Louis Durrieu.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

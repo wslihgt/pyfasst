@@ -875,7 +875,7 @@
     <span class="n">implemented_transf</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;stft&#39;</span><span class="p">,</span><span class="s">&#39;stftold&#39;</span><span class="p">,</span> <span class="s">&#39;mqt&#39;</span><span class="p">,</span> <span class="s">&#39;minqt&#39;</span><span class="p">,</span> <span class="s">&#39;cqt&#39;</span><span class="p">]</span>
     <span class="n">implemented_annealing</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ann&#39;</span><span class="p">,</span> <span class="s">&#39;no_ann&#39;</span><span class="p">,</span> <span class="p">]</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="FASST.__init__"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">audio</span><span class="p">,</span>
                  <span class="n">transf</span><span class="o">=</span><span class="s">&#39;stft&#39;</span><span class="p">,</span>
                  <span class="n">wlen</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
@@ -996,7 +996,7 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">iter_num</span> <span class="o">=</span> <span class="n">iter_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lambdaCorr</span> <span class="o">=</span> <span class="n">lambdaCorr</span>
-    
+    </div>
 <div class="viewcode-block" id="FASST.comp_transf_Cx"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.FASST.comp_transf_Cx">[docs]</a>    <span class="k">def</span> <span class="nf">comp_transf_Cx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computes the signal representation, according</span>
 <span class="sd">        to the provided signal_representation flag</span>
@@ -3729,7 +3729,7 @@
                 <span class="n">twmask</span><span class="p">[:,</span><span class="n">twmask</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span> <span class="o">/=</span> <span class="n">twmask</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">twmask</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">TW</span> <span class="o">*=</span> <span class="n">twmask</span>
 </div></div>
-<span class="k">class</span> <span class="nc">multichanLead</span><span class="p">(</span><span class="n">multiChanSourceF0Filter</span><span class="p">):</span>
+<div class="viewcode-block" id="multichanLead"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multichanLead">[docs]</a><span class="k">class</span> <span class="nc">multichanLead</span><span class="p">(</span><span class="n">multiChanSourceF0Filter</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;multichanLead</span>
 <span class="sd">        </span>
@@ -3751,7 +3751,7 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">spat_comps</span>
         <span class="c">##del self.spec_comps</span>
         
-    <span class="k">def</span> <span class="nf">runDecomp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrus</span><span class="o">=</span><span class="p">[],</span>
+<div class="viewcode-block" id="multichanLead.runDecomp"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multichanLead.runDecomp">[docs]</a>    <span class="k">def</span> <span class="nf">runDecomp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instrus</span><span class="o">=</span><span class="p">[],</span>
                   <span class="n">instru2modelfile</span><span class="o">=</span><span class="p">{},</span>
                   <span class="n">dir_results</span><span class="o">=</span><span class="s">&#39;tmp/&#39;</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span>
                   <span class="n">niter_nmf</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">niter_simm</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
@@ -3953,8 +3953,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">separate_spat_comps</span><span class="p">(</span><span class="n">dir_results</span><span class="o">=</span><span class="n">dir_results</span><span class="p">,</span>
                                  <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">logliks</span>
-    
-    <span class="k">def</span> <span class="nf">estimSIMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span> <span class="n">dir_results</span><span class="o">=</span><span class="s">&#39;tmp/&#39;</span><span class="p">,</span> <span class="n">simmIterNum</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="multichanLead.estimSIMM"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multichanLead.estimSIMM">[docs]</a>    <span class="k">def</span> <span class="nf">estimSIMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span> <span class="n">dir_results</span><span class="o">=</span><span class="s">&#39;tmp/&#39;</span><span class="p">,</span> <span class="n">simmIterNum</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;This method runs the SIMM estimation on the provided audio file.</span>
 <span class="sd">        </span>
 <span class="sd">        The lead source is assumed to be self.spec_comps[0]</span>
@@ -4001,8 +4001,8 @@
             <span class="n">freeMemory</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">simmModel</span><span class="o">.</span><span class="n">autoMelSepAndWrite</span><span class="p">(</span><span class="n">maxFrames</span><span class="o">=</span><span class="n">maxFrames</span><span class="p">)</span>
-        
-    <span class="k">def</span> <span class="nf">estimSUIMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        </div>
+<div class="viewcode-block" id="multichanLead.estimSUIMM"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multichanLead.estimSUIMM">[docs]</a>    <span class="k">def</span> <span class="nf">estimSUIMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxFrames</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;separates the audio signal into lead+accompaniment,</span>
 <span class="sd">        including more noisy components for the lead than `self.estimSIMM`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -4011,8 +4011,8 @@
             
         <span class="bp">self</span><span class="o">.</span><span class="n">simmModel</span><span class="o">.</span><span class="n">estimStereoSUIMMParamsWriteSeps</span><span class="p">(</span><span class="n">maxFrames</span><span class="o">=</span><span class="n">maxFrames</span><span class="p">)</span>
         
-    
-    <span class="k">def</span> <span class="nf">demixOnSepSIMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unvoiced</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="multichanLead.demixOnSepSIMM"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multichanLead.demixOnSepSIMM">[docs]</a>    <span class="k">def</span> <span class="nf">demixOnSepSIMM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unvoiced</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;run DEMIX on the separated signals resulting from SIMM model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;simmModel&#39;</span><span class="p">):</span>
@@ -4041,8 +4041,8 @@
             <span class="n">nsources</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nbComps</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="n">ALead</span><span class="p">,</span> <span class="n">AAccp</span>
-    
-    <span class="k">def</span> <span class="nf">demixOnGivenFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">nsources</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="multichanLead.demixOnGivenFile"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multichanLead.demixOnGivenFile">[docs]</a>    <span class="k">def</span> <span class="nf">demixOnGivenFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">nsources</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;running the DEMIX algorithm from :demix.DEMIX:</span>
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -4081,8 +4081,8 @@
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">nsources</span><span class="p">,</span>
                                                    <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
         <span class="k">return</span> <span class="n">A</span>
-    
-    <span class="k">def</span> <span class="nf">initConvDemixOnSepSrc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="multichanLead.initConvDemixOnSepSrc"><a class="viewcode-back" href="../../reference/audiomodel.html#pyfasst.audioModel.multichanLead.initConvDemixOnSepSrc">[docs]</a>    <span class="k">def</span> <span class="nf">initConvDemixOnSepSrc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;initialize the convolutive parameters with DEMIX, running on each of</span>
 <span class="sd">        the separated sources</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -4105,7 +4105,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">renormalize_parameters</span><span class="p">()</span>
         
         <span class="k">return</span> <span class="n">estFiles</span>
-    
+    </div></div>
 </pre></div>
 
           </div>

@@ -3,7 +3,7 @@
 2013 Jean-Louis Durrieu
 """
 
-from ..testing import * # is this really legal?
+from ..testing import *
 
 import numpy as np
 import pyfasst.audioModel as am
@@ -12,8 +12,8 @@ from unittest import TestCase
 
 class FASSTTestCase(TestCase):
 
-    def __init__(self, ):
-        super(FASSTTestCase, self).__init__()
+    def setUp(self, ):
+        super(FASSTTestCase, self).setUp()
         self.fasstkwargs = {
             'audio': 'data/tamy.wav',
             'iter_num': 2,

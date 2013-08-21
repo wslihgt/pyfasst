@@ -5,3 +5,9 @@
 *.o
 *.npz
 *.wav
+.#*
+build
+dist
+pyfasst/SeparateLeadStereo/tracking/_tracking.cpp
+
+*.py#

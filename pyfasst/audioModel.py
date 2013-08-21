@@ -1,29 +1,16 @@
-"""Description
+"""\
+Description
 -----------
 
 FASST (Flexible Audio Source Separation Toolbox) class
     subclass it to obtain your own flavoured source separation model!
 
-Usage
------
-
-
-
-Reference
----------
-
-.. [Ozerov2012] A. Ozerov, E. Vincent and F. Bimbot
-    \"A General Flexible Framework for the Handling of Prior Information
-    in Audio Source Separation,\" 
-    IEEE Transactions on Audio, Speech and Signal Processing 20(4),
-    pp. 1118-1133 (2012)                            
-    Available: `Archive on HAL <http://hal.inria.fr/hal-00626962/>`_
+You can find more about the technique and how to use this module in the
+provided documentation in `doc/` (`using the python package
+<../description.html#using-the-python-package>`_)
     
-Adapted from the Matlab toolbox available at
+Adapted from the Matlab toolbox available at:
 http://bass-db.gforge.inria.fr/fasst/
-
-Copyright (TBD)
----------------
 
 Jean-Louis Durrieu, EPFL-STI-IEL-LTS5
 ::
@@ -1014,6 +1001,13 @@ class FASST(object):
         """separate_spat_comps
         
         This separates the sources for each spatial component.
+
+        :param dir_results:
+            provide the (existing) folder where to write the results
+        :param dict suffix:
+            a dictionary containing the labels for each source. If None,
+            then no suffix is appended to the file names and the files
+            are simply numbered `XXX_nbComps`. 
         
         """
         spec_comp_ind = {}
@@ -1038,6 +1032,20 @@ class FASST(object):
         This function differs from separate_spat_comps in the way
         that it does not assume the sources are defined by their spatial
         positions.
+
+        :param dir_results:
+            provide the (existing) folder where to write the results
+        :param dict spec_comp_ind:
+            a dictionary telling which spectral component to include in
+            which separated source. If None, the default is to assume
+            each spectral component is one source.
+            Note that this is different to the behaviour of
+            :py:meth:`separate_spat_comps` which assumes that each
+            *spatial* component corresponds to one source. 
+        :param dict suffix:
+            a dictionary containing the labels for each source. If None,
+            then no suffix is appended to the file names and the files
+            are simply numbered `XXX_nbComps`. 
         
         Note: Trying to bring into one method
         ozerov's separate_spec_comps and separate_spat_comps
@@ -2165,7 +2173,7 @@ class FASST(object):
             neighbours = 15
             
             # default for demix to work best: #FIXME!!!
-            wlen = self.demixParams['wlen']# 20482048
+            wlen = self.demixParams['wlen']# 2048
             hopsize = self.demixParams['hopsize']#1024 
             
             demixInst = demix.DEMIX(
@@ -2212,47 +2220,31 @@ class FASST(object):
                     )
     
 class MultiChanNMFInst_FASST(FASST):
-    """MultiChanNMFInst_FASST
-    
-    sub-classes FASST
-    
+    """\
     This class implements the Multi-channel Non-Negative Matrix Factorisation
     (NMF)
-
-    Inputs:
+    
+    **Inputs:**
     
     :param audio:
-        as :py:class:`FASST`, `audio` is the filename of the file to be
-        processed or directly an :py:class:`pyfasst.audioObject.AudioObject`
+        as in :py:class:`FASST`, `audio` is the filename of the file to be
+        processed or directly a :py:class:`pyfasst.audioObject.AudioObject`
     :param integer nbComps:
         the number of desired sources/components
     :param integer nbNMFComps:
         the number of NMF components for each of the components.
         TODO: allow to pass a list so that the user can control the number of
         elements source by source, individually
-    :param integer spatial_rank:
-        the spatial rank of all the components
-        TODO: idem `nbNMFComps`, we should allow the user to give a list.
-        
-        
+    :param spatial_rank:
+        the spatial rank of all the components. If it's a `nbComps`-long list,
+        then `spatial_rank[n]` will be the spatial rank for the `n`-th source.
+    :type spatial_rank: integer or list
     
     """
     def __init__(self, audio,
                  nbComps=3, nbNMFComps=4,
                  spatial_rank=2,
                  **kwargs):
-        """
-        **DESCRIPTION**
-        
-        
-        **ARGUMENTS**
-        
-        nbComps (int)
-            The number of (spatial) components in FASST framework.
-            
-        nbNMFComps (int)
-            The number of NMF components in each spatial component.
-        """
         super(MultiChanNMFInst_FASST, self).__init__(audio=audio, **kwargs)
         self.comp_transf_Cx()
         

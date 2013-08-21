@@ -1,6 +1,21 @@
 """pyFASST package setup file
-"""
 
+to build it::
+
+  python setup.py build
+
+to install it::
+
+  python setup.py install [--user | --record files.txt]
+  
+to remove:
+
+  check the files in `files.txt` (from above command)
+  and remove them manually. (`pip` or `easy_install` may allow you
+  to do this in a cleaner way)
+
+TODO: include data files for tests
+"""
 
 import setuptools
 from distutils.core import setup
@@ -17,8 +32,6 @@ else:
 
 cmdclass = {}
 ext_modules = []
-data_files = [
-    'data/tamy.wav',]
 
 if use_cython:
     ext_modules += [
@@ -34,14 +47,13 @@ if use_cython:
 else:
     ext_modules += [
         Extension("pyfasst.SeparateLeadStereo.tracking._tracking",
-                  ["pyfasst/SeparateLeadStereo/tracking/_tracking.c"],
+                  ["pyfasst/SeparateLeadStereo/tracking/_tracking.cpp"],
                   include_dirs=[numpy.get_include(), ],
                   language="c++"
                   # this is for mac, for the compiler to use
                   # g++ and not gcc
                   ),
         ]
-    
 
 setup(
     name='pyFASST',
@@ -62,3 +74,4 @@ setup(
     ext_modules=ext_modules,
     
     )
+

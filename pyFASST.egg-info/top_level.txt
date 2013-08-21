@@ -1,2 +1,2 @@
-tests
 pyfasst
+pyfasst_tests

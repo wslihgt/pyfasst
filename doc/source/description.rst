@@ -31,8 +31,6 @@ In addition to the aforementioned packages, installing this package requires to 
 
   python setup.py build_ext --inplace
 
-
-
 Examples
 --------
 
@@ -41,11 +39,77 @@ Using the provided audio model classes
 
 We have implemented several classes that can be used directly, without the need to re-implement or sub-class :py:class:`pyfasst.audioModel.FASST`. In particular, we have:
 
- * :py:class:`pyfasst.audioModel.MultiChanNMFInst_FASST`, :py:class:`pyfasst.audioModel.MultiChanNMFConv`, :py:class:`pyfasst.audioModel.MultiChanHMM`: these classes originate from the distributed Matlab version of FASST_
+ * :py:class:`pyfasst.audioModel.MultiChanNMFInst_FASST`, :py:class:`pyfasst.audioModel.MultiChanNMFConv`, :py:class:`pyfasst.audioModel.MultiChanHMM`: these classes originate from the distributed Matlab version of FASST_. For example, the separation of the voice and the guitar on the `tamy <>` example gives, with a simple model with 2 sources, with instantaneous mixing parameters and NMF model on the spectral parameters (to run from where one can find the `tamy.wav` file) - don't expect very good results!::
 
- * :py:class:`pyfasst.audioModel.multiChanSourceF0Filter`
+    >>> import pyfasst.audioModel as am
+    >>> filename = 'data/tamy.wav'
+    >>> # initialize the model
+    >>> model = am.MultiChanNMFInst_FASST(
+            audio=filename,
+            nbComps=2, nbNMFComps=32, spatial_rank=1,
+            verbose=1, iter_num=50)
+    >>> # estimate the parameters
+    >>> model.estim_param_a_post_model()
+    >>> # separate the sources using these parameters
+    >>> model.separate_spat_comps(dir_results='data/')
+
+   Somewhat improving the results could be to use the convolutive mixing parameters::
+  
+    >>> import pyfasst.audioModel as am
+    >>> filename = 'data/tamy.wav'
+    >>> # initialize the model
+    >>> model = am.MultiChanNMFConv(
+            audio=filename,
+            nbComps=2, nbNMFComps=32, spatial_rank=1,
+            verbose=1, iter_num=50)
+    >>> # to be more flexible, the user _has to_ make the parameters
+    >>> # convolutive by hand. This way, she can also start to estimate
+    >>> # parameters in an instantaneous setting, as an initialization, 
+    >>> # and only after "upgrade" to a convolutive setting:
+    >>> model.makeItConvolutive()
+    >>> # estimate the parameters
+    >>> model.estim_param_a_post_model()
+    >>> # separate the sources using these parameters
+    >>> model.separate_spat_comps(dir_results='data/')
+
+   The following example shows the results for a more synthetic example (synthetis anechoic mixture of the voice and the guitar, with a delay of 0 for the voice and 10 samples from the left to the right channel for the guitar)::
+
+    >>> import pyfasst.audioModel as am
+    >>> filename = 'data/dev1__tamy-que_pena_tanto_faz___thetas-0.79,0.79_delays-10.00,0.00.wav'
+    >>> # initialize the model
+    >>> model = am.MultiChanNMFConv(
+            audio=filename,
+            nbComps=2, nbNMFComps=32, spatial_rank=1,
+            verbose=1, iter_num=50)
+    >>> # to be more flexible, the user _has to_ make the parameters
+    >>> # convolutive by hand. This way, she can also start to estimate
+    >>> # parameters in an instantaneous setting, as an initialization, 
+    >>> # and only after "upgrade" to a convolutive setting:
+    >>> model.makeItConvolutive()
+    >>> # we can initialize these parameters with the DEMIX algorithm:
+    >>> model.initializeConvParams(initMethod='demix')
+    >>> # and estimate the parameters:
+    >>> model.estim_param_a_post_model()
+    >>> # separate the sources using these parameters
+    >>> model.separate_spat_comps(dir_results='data/')
+
+ * :py:class:`pyfasst.audioModel.multiChanSourceF0Filter`: this class assumes that all the sources share the same spectral shape dictionary and spectral structure, _i.e._ a source/filter model (2 _factors_, in FASST terminology), with a filter spectral shape dictionary generated as a collection of *smooth* windows (overlapping Hann windows), and the source dictionary is computed as a collection of spectral *combs* following a simple vocal glottal model (see [Durrieu2010]_). The advantage of this class is that in terms of memory, all the sources share the same dictionaries. However, that means it makes no sense to modify these dictionaries (at least not individually - which is the case in this algorithm) and they are therefore fixed by default. This class also provides methods that help to initialize the various parameters, assuming the specific structure presented above.
 
  * :py:class:`pyfasst.audioModel.multichanLead`
+
+ * Additionally, we provide a (not-very-exhaustive) plotting module which helps in displaying some interesting features from the model, such as::
+
+    >>> import pyfasst.tools.plotTools as pt
+    >>> # display the estimated spectral components
+    >>> # (one per row of subplot)
+    >>> pt.subplotsAudioModelSpecComps(model)
+    >>> # display a graph showing where the sources have been "spatially"
+    >>> # estimated: in an anechoic case, ideally, the graph for the 
+    >>> # corresponding source is null everywhere, except at the delay 
+    >>> # between the two channels:
+    >>> pt.plotTimeCorrelationMixingParams(model)
+
+TODO: add typical SDR/SIR results for these examples.
 
 Creating a new audio model class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

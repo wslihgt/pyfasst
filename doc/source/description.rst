@@ -9,7 +9,7 @@ A Python implementation to the Flexible Audio Source Separation Toolbox
 
 Abstract
 ========
-This toolbox is meant to allow to use the framework FASST and extend it within a python program. It is primarily a re-write in Python of the original Matlab (C) version. The object programming framework allows to extend and create 
+This toolbox is meant to allow to use the framework FASST and extend it within a python program. It is primarily a re-write in Python of the original Matlab (C) version. The object programming framework allows to extend and create new models an easy way, by subclassing the :py:class:`pyfasst.audioModel.FASST` and re-implementing some methods (in particular methods like :py:meth:`pyfasst.audioModel.MultiChanNMFInst_FASST._initialize_structures`)
 
 Using the Python package
 ========================
@@ -36,9 +36,19 @@ In addition to the aforementioned packages, installing this package requires to 
 Examples
 --------
 
-  * Using the provided audio model classes
+Using the provided audio model classes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  * Creating a new audio model class
+We have implemented several classes that can be used directly, without the need to re-implement or sub-class :py:class:`pyfasst.audioModel.FASST`. In particular, we have:
+
+ * :py:class:`pyfasst.audioModel.MultiChanNMFInst_FASST`, :py:class:`pyfasst.audioModel.MultiChanNMFConv`, :py:class:`pyfasst.audioModel.MultiChanHMM`: these classes originate from the distributed Matlab version of FASST_
+
+ * :py:class:`pyfasst.audioModel.multiChanSourceF0Filter`
+
+ * :py:class:`pyfasst.audioModel.multichanLead`
+
+Creating a new audio model class
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Algorithms
 ==========
@@ -74,3 +84,5 @@ References
    source separation <http://hal.inria.fr/hal-00626962/>`_, 
    IEEE Transactions on Audio, Speech and Signal Processing, Vol.  20 (4), 
    pp. 1118-1133 (2012).
+
+.. _FASST: http://bass-db.gforge.inria.fr/fasst/

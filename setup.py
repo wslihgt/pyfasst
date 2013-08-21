@@ -63,7 +63,7 @@ setup(
     packages=setuptools.find_packages(),
     scripts=[],
     url='http://github.com/wslihgt/pyfasst/',
-    license='LICENSE',
+    license='GNU GENERAL PUBLIC LICENSE',
     description=(
         'Python implementation of the Flexible Audio Source Separation Toolbox'+
         ' (FASST)'),

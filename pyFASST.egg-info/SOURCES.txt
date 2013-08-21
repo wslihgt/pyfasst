@@ -1,6 +1,6 @@
 setup.py
-data/tamy.wav
 data/dev1__tamy-que_pena_tanto_faz___thetas-0.79,0.79_delays-10.00,0.00.wav
+data/tamy.wav
 pyFASST.egg-info/PKG-INFO
 pyFASST.egg-info/SOURCES.txt
 pyFASST.egg-info/SOURCES.txt~

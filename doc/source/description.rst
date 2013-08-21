@@ -80,7 +80,7 @@ We have implemented several classes that can be used directly, without the need 
     >>> model = am.MultiChanNMFConv(
             audio=filename,
             nbComps=2, nbNMFComps=32, spatial_rank=1,
-            verbose=1, iter_num=50)
+            verbose=1, iter_num=200)
     >>> # to be more flexible, the user _has to_ make the parameters
     >>> # convolutive by hand. This way, she can also start to estimate
     >>> # parameters in an instantaneous setting, as an initialization, 

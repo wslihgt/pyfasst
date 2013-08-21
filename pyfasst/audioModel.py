@@ -136,6 +136,13 @@ class FASST(object):
         for a given frame and given frequency, is supposed to be Hermitian:
         only the upper diagonal is therefore kept. 
         
+    See also:
+
+    * :py:class:`MultiChanNMFInst_FASST`
+    * :py:class:`MultiChanNMFConv`
+    * :py:class:`MultiChanHMM`
+    * :py:class:`multiChanSourceF0Filter`
+    * :py:class:`multichanLead`
     
     """
     # for now only stft:
@@ -436,7 +443,21 @@ class FASST(object):
         % ------
         %
         % V                 : (F x N) spatial component power
-        
+
+        :param integer spat_comp_ind:
+            index of the spatial component 
+        :param list spec_comp_ind:
+            list of indices for the spectral components whose spatial component
+            corresponds to the provided `spat_comp_ind`
+        :param list factor_ind:
+            list of indices of factors to be included. 
+
+        Note: thanks to object-oriented programming, no need to provide the
+        structure containing all the parameters, the instance has direct access
+        to them.
+
+        Note2: this may not completely work because the factor_ind should
+        actually also depend on the index of the spectral component. TODO?
         """
         V = np.zeros([self.nbFreqsSigRepr, self.nbFramesSigRepr])
         if len(spec_comp_ind):
@@ -484,26 +505,30 @@ class FASST(object):
         return V
     
     def retrieve_subsrc_params(self,):
-        """Computes the various quantities necessary for the estimation of the
+        """\
+        Computes the various quantities necessary for the estimation of the
         main parameters:
         
         **Outputs**
-         `spat_comp_powers`
+        
+        :returns:
+        
+         1. :py:attr:`spat_comp_powers` - 
             (`total_spat_rank` x `nbFreqsSigRepr` x `nbFramesSigRepr`) ndarray
             the spatial component power spectra. Note that total_spat_rank
             is the sum of all the spatial ranks for all the sources.
             
-         `mix_matrix`
-            (total_spat_rank x nchannels x nbFreqsSigRepr) ndarray
-            the mixing matrices for each source
+         2. :py:attr:`mix_matrix` -
+            (`total_spat_rank` x `nchannels` x `nbFreqsSigRepr`)
+            :py:class:`ndarray` the mixing matrices for each source
             
-         `rank_part_ind`
+         3. :py:attr:`rank_part_ind` - 
             dictionary: each key is one source, and the values are the indices
             in `spat_comp_powers` and `mix_matrix` that correspond to that source.
             If the spatial rank of source `j` is 2, then its spectra will appear
             twice in `spat_comp_powers`, with mixing parameters (potentially
             different one from the other) appearing in two sub-matrices of
-            `mix_matrix`.
+            :py:attr:`mix_matrix`.
             
         """
         K = len(self.spat_comps)
@@ -546,15 +571,18 @@ class FASST(object):
         return spat_comp_powers, mix_matrix, rank_part_ind
     
     def compute_suff_stat(self, spat_comp_powers, mix_matrix):
-        """
+        """\
+        Computes the sufficient statistics, used to update the parameters.
         
         Outputs:
+
+        :returns:
         
-         hat_Rxx
-         hat_Rxs
-         hat_Rss
-         hat_Ws
-         loglik
+        1. hat_Rxx
+        2. hat_Rxs
+        3. hat_Rss
+        4. hat_Ws
+        5. loglik
          
         """
         if self.audioObject.channels != 2:
@@ -1403,7 +1431,7 @@ class FASST(object):
     
     def update_spectral_components(self, hat_W):
         """Update the spectral components,
-        with hat_W as the expected value of power
+        with `hat_W` as the expected value of power
         """
         if self.verbose:
             print "    Update the spectral components"
@@ -1977,7 +2005,7 @@ class FASST(object):
                               partLabel='FB', prior='free',
                               keepDimensions=True):
         """A helper function to set a
-        self.spec_comp[spec_ind]['factor'][fact_ind][partLabel] to
+        :py:attr:`FASST.spec_comp[spec_ind]['factor'][fact_ind][partLabel]` to
         the given value.
         
         TODO 20130522 finish this function to make it general purpose...
@@ -2157,6 +2185,14 @@ class FASST(object):
     
     def initializeConvParams(self, initMethod='demix'):
         """setting the spatial parameters
+
+        :param str initMethod:
+            initialization method. Can be either of: 'demix', 'rand'.
+            If 'demix', then the spatial parameters are initialized by the
+            anechoic steering vector corresponding to the first directions
+            estimated by the DEMIX algorithm [Arberet2010]_, using the
+            algorithm implemented in :py:mod:`pyfasst.demixTF`.
+        
         """
         nc = self.audioObject.channels
         for spat_ind, spat_comp in self.spat_comps.items():
@@ -2240,6 +2276,22 @@ class MultiChanNMFInst_FASST(FASST):
         then `spatial_rank[n]` will be the spatial rank for the `n`-th source.
     :type spatial_rank: integer or list
     
+    **Example:**
+    
+    ::
+    
+        >>> import pyfasst.audioModel as am
+        >>> filename = 'data/tamy.wav'
+        >>> # initialize the model
+        >>> model = am.MultiChanNMFInst_FASST(
+                audio=filename,
+                nbComps=2, nbNMFComps=32, spatial_rank=1,
+                verbose=1, iter_num=50)
+        >>> # estimate the parameters
+        >>> model.estim_param_a_post_model()
+        >>> # separate the sources using these parameters
+        >>> model.separate_spat_comps(dir_results='data/')
+    
     """
     def __init__(self, audio,
                  nbComps=3, nbNMFComps=4,
@@ -2257,6 +2309,9 @@ class MultiChanNMFInst_FASST(FASST):
         self._initialize_structures()
     
     def _initialize_structures(self): #, nbComps, nbNMFComps, spatial_rank):
+        """Initializes the structures: spatial components (instantaneous) and
+        spectral components (1 factor, with NMF simple structure).
+        """
         nc = self.audioObject.channels
         
         self.spat_comps = {}
@@ -2300,9 +2355,16 @@ class MultiChanNMFInst_FASST(FASST):
         self.renormalize_parameters()
         
     def setSpecCompFB(self, compNb, FB, FB_frdm_prior='fixed'):
-        """SetSpecCompFB
-        
+        """\
         sets the spectral component's frequency basis.
+
+        :param integer compNb:
+            the component to be initialized
+        :param numpy.ndarray FB:
+            the initial array to put in
+            :py:attr:`spec_comp[compNb]['factor'][0]['FB']`
+        :param str FB_frdm_prior:
+            either 'fixed' or 'free'. 
         
         """
         speccomp = self.spec_comps[compNb]['factor'][0]
@@ -2320,11 +2382,58 @@ class MultiChanNMFInst_FASST(FASST):
         speccomp['FB_frdm_prior'] = FB_frdm_prior
 
 class MultiChanNMFConv(MultiChanNMFInst_FASST):
-    """Takes the multichannel NMF instantaneous class, and makes it
+    """\
+    Takes the multichannel NMF instantaneous class, and makes it
     convolutive!
     
     Simply adds a method :py:meth:`makeItConvolutive` in order to transform
     instantaneous mixing parameters into convolutive ones.
+
+    **Example:**
+    
+    ::
+  
+        >>> import pyfasst.audioModel as am
+        >>> filename = 'data/tamy.wav'
+        >>> # initialize the model
+        >>> model = am.MultiChanNMFConv(
+                audio=filename,
+                nbComps=2, nbNMFComps=32, spatial_rank=1,
+                verbose=1, iter_num=50)
+        >>> # to be more flexible, the user _has to_ make the parameters
+        >>> # convolutive by hand. This way, she can also start to estimate
+        >>> # parameters in an instantaneous setting, as an initialization, 
+        >>> # and only after "upgrade" to a convolutive setting:
+        >>> model.makeItConvolutive()
+        >>> # estimate the parameters
+        >>> model.estim_param_a_post_model()
+        >>> # separate the sources using these parameters
+        >>> model.separate_spat_comps(dir_results='data/')
+
+    The following example shows the results for a more synthetic example
+    (synthetis anechoic mixture of the voice and the guitar, with a delay of 0
+    for the voice and 10 samples from the left to the right channel
+    for the guitar)::
+    
+        >>> import pyfasst.audioModel as am
+        >>> filename = 'data/dev1__tamy-que_pena_tanto_faz___thetas-0.79,0.79_delays-10.00,0.00.wav'
+        >>> # initialize the model
+        >>> model = am.MultiChanNMFConv(
+                audio=filename,
+                nbComps=2, nbNMFComps=32, spatial_rank=1,
+                verbose=1, iter_num=200)
+        >>> # to be more flexible, the user _has to_ make the parameters
+        >>> # convolutive by hand. This way, she can also start to estimate
+        >>> # parameters in an instantaneous setting, as an initialization, 
+        >>> # and only after "upgrade" to a convolutive setting:
+        >>> model.makeItConvolutive()
+        >>> # we can initialize these parameters with the DEMIX algorithm:
+        >>> model.initializeConvParams(initMethod='demix')
+        >>> # and estimate the parameters:
+        >>> model.estim_param_a_post_model()
+        >>> # separate the sources using these parameters
+        >>> model.separate_spat_comps(dir_results='data/')
+    
     """
     def __init__(self, audio,
                  nbComps=3, nbNMFComps=4,
@@ -2339,6 +2448,10 @@ class MultiChanNMFConv(MultiChanNMFInst_FASST):
         # DIY: upgrade to convolutive after a few instantaneous, maybe? 
         
     def makeItConvolutive(self):
+        """If the spatial parameters are instantaneous, then it will be turned
+        into a convolutive version of it. In this case, it duplicates the
+        instantaneous parameter on all the frequencies and spatial rank.
+        """
         nc = self.audioObject.channels
         for nspat, (spat_ind, spat_comp) in enumerate(self.spat_comps.items()):
             if spat_comp['mix_type'] != 'inst':

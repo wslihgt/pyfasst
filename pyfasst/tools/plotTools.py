@@ -1,4 +1,20 @@
 """Plotting tools to be used with PyFASST and audioModel classes
+
+**Examples:**
+
+::
+
+    >>> import pyfasst.tools.plotTools as pt
+    >>> # display the estimated spectral components
+    >>> # (one per row of subplot)
+    >>> pt.subplotsAudioModelSpecComps(model)
+    >>> # display a graph showing where the sources have been "spatially"
+    >>> # estimated: in an anechoic case, ideally, the graph for the 
+    >>> # corresponding source is null everywhere, except at the delay 
+    >>> # between the two channels:
+    >>> pt.plotTimeCorrelationMixingParams(model)
+
+
 """
 
 import matplotlib.pyplot as plt
@@ -114,8 +130,25 @@ def plotTimeCorrelationMixingParams(model, **kwargs):
     some insight in the spatial mixing process, since for an anechoic pair of
     steering vectors, the ratio is almost a complex exponential, with spatial
     frequency equal to the delay of arrival between the 2 channels.
+
+
+    **Inputs:**
     
-    
+    :param model:
+        a source model, instance of :py:class:`pyfasst.audioModel.FASST`
+    :param kwargs:
+        the other keyword arguments are passed to a :py:func:`plt.plot`
+        Please refer to that function to see what keywords are accepted.
+
+    **Outputs:**
+    :returns:
+    1. `delays` -
+       an array containing the delays in samples, the axis corresponding to
+       the other returned arrays
+    2. `delayDetectionFunction` -
+       an array of which each column corresponds to a spatial component in
+       :py:attr:`model`, 
+       
     """
     delayDetectionFunction = np.array(
         [np.fft.fftshift(
@@ -133,4 +166,5 @@ def plotTimeCorrelationMixingParams(model, **kwargs):
         **kwargs)
     plt.legend(model.spat_comps.keys())
     plt.xlabel('Delay in samples')
+    
     return delays, delayDetectionFunction

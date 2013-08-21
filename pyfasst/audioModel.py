@@ -7,7 +7,7 @@ FASST (Flexible Audio Source Separation Toolbox) class
 Usage
 -----
 
-TBD
+
 
 Reference
 ---------
@@ -2217,7 +2217,25 @@ class MultiChanNMFInst_FASST(FASST):
     sub-classes FASST
     
     This class implements the Multi-channel Non-Negative Matrix Factorisation
-    (NMF) 
+    (NMF)
+
+    Inputs:
+    
+    :param audio:
+        as :py:class:`FASST`, `audio` is the filename of the file to be
+        processed or directly an :py:class:`pyfasst.audioObject.AudioObject`
+    :param integer nbComps:
+        the number of desired sources/components
+    :param integer nbNMFComps:
+        the number of NMF components for each of the components.
+        TODO: allow to pass a list so that the user can control the number of
+        elements source by source, individually
+    :param integer spatial_rank:
+        the spatial rank of all the components
+        TODO: idem `nbNMFComps`, we should allow the user to give a list.
+        
+        
+    
     """
     def __init__(self, audio,
                  nbComps=3, nbNMFComps=4,
@@ -2312,6 +2330,9 @@ class MultiChanNMFInst_FASST(FASST):
 class MultiChanNMFConv(MultiChanNMFInst_FASST):
     """Takes the multichannel NMF instantaneous class, and makes it
     convolutive!
+    
+    Simply adds a method :py:meth:`makeItConvolutive` in order to transform
+    instantaneous mixing parameters into convolutive ones.
     """
     def __init__(self, audio,
                  nbComps=3, nbNMFComps=4,
@@ -2344,6 +2365,10 @@ class MultiChanNMFConv(MultiChanNMFInst_FASST):
                     spat_comp['params'][:,:,f] = spat_comp_param_inst.T
 
 class MultiChanHMM(MultiChanNMFConv):
+    """Conveniently adds methods to transform a :py:class:`MultiChanNMFConv`
+    object such that the time structure is configured as a hidden Markov
+    model (HMM) 
+    """
     def __init__(self, audio,
                  nbComps=3, nbNMFComps=4,
                  spatial_rank=2,
@@ -2857,15 +2882,15 @@ class multichanLead(multiChanSourceF0Filter):
 
     Tentative plan for estimation:
         
-        1 estimate the Lead/Accompaniment using SIMM
+        1) estimate the Lead/Accompaniment using SIMM
 
-        2 estimate the spatial parameters for each of the separated signals
+        2) estimate the spatial parameters for each of the separated signals
 
-        3 plug the SIMM params and the spatial params into pyFASST, and
+        3) plug the SIMM params and the spatial params into pyFASST, and
 
-        4 re-estimate
+        4) re-estimate
 
-        5 write the estimated signals and enjoy success!
+        5) write the estimated signals and enjoy success!
 
     NB: as for now, the sole Lead/Accompaniment separation achieves better
     separation than the combination of all the possibilities, probably

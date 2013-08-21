@@ -59,5 +59,6 @@ setup(
         'numpy',
         'scipy'],
     cmdclass=cmdclass,
-    ext_modules=ext_modules
+    ext_modules=ext_modules,
+    
     )

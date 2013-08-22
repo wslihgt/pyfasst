@@ -22,6 +22,17 @@ from distutils.core import setup
 from distutils.extension import Extension
 import numpy
 
+# Needed to fix pip
+# See https://pypi.python.org/pypi/setuptools_cython/,
+# http://mail.python.org/pipermail/distutils-sig/2007-September/thread.html#8204
+# DJL: from http://comments.gmane.org/gmane.comp.python.cython.user/9503
+# Added this, on Linux, this seems necessary otherwise Cython is not
+# called and the C/C++ source file is not generated.
+import sys
+if 'setuptools.extension' in sys.modules: 
+    m = sys.modules['setuptools.extension']        
+    m.Extension.__dict__ = m._Extension.__dict__
+
 # http://stackoverflow.com/questions/4505747/how-should-i-structure-a-python-package-that-contains-cython-code
 try:
     from Cython.Distutils import build_ext
@@ -35,13 +46,14 @@ ext_modules = []
 
 if use_cython:
     ext_modules += [
-        Extension("pyfasst.SeparateLeadStereo.tracking._tracking",
-                  ["pyfasst/SeparateLeadStereo/tracking/_tracking.pyx"],
-                  include_dirs=[numpy.get_include(), ],
-                  language="c++"
-                  # this is for mac, for the compiler to use
-                  # g++ and not gcc
-                  ),
+        Extension(
+            name="pyfasst.SeparateLeadStereo.tracking._tracking",
+            sources=["pyfasst/SeparateLeadStereo/tracking/_tracking.pyx"],
+            include_dirs=[numpy.get_include(), ],
+            language="c++"
+            # this is for mac, for the compiler to use
+            # g++ and not gcc
+            ),
         ]
     cmdclass.update({ 'build_ext': build_ext })
 else:

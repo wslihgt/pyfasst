@@ -6,6 +6,10 @@
 Welcome to pyFASST's documentation!
 ===================================
 
+This documentation gives some `example uses <description.html#using-the-python-package>`_ as well as some `descriptions <description.html#algorithms>`_ and `references <description.html#references>`_. 
+
+Furthermore, the documentation for each of the modules is given in `these reference pages <reference.html>`_. 
+
 Contents:
 =========
 

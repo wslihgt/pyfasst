@@ -337,12 +337,29 @@ def filter_conv_stft(data, W, analysisWindow=None,
 # wrapper transformation classes:
 ###########
 class STFT():
+    """Object that implements the computation of Short-Term Fourier Transforms
+    (STFT) and its inverse.
+    
+    **Inputs:**
+
+    :param integer linFTLen:
+        size of the Fourier transform
+    :param double atomHopFactor:
+        ratio of delay from frame to frame. 0.25 corresponds to a 25% "hop"
+        ratio, or equivalently to 75% of overlap between succesive frames.
+    :param function winFunc:
+        analysis window function.
+    :param integer fs:
+        sampling rate of the processed signals
+    :param synthWinFunc:
+
+    :param kwargs:
+    
+    """
     transformname = 'stft'
     def __init__(self, linFTLen=2048, atomHopFactor=0.25,
                  winFunc=np.hanning, fs=44100, synthWinFunc=None,
                  **kwargs):
-        """STFT class, wrapper for the functions from audioObject
-        """
         fthop = int(linFTLen * atomHopFactor)
         self.ftlen = linFTLen
         self.freqbins = self.ftlen / 2 + 1

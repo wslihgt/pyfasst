@@ -107,7 +107,7 @@ We have implemented several classes that can be used directly, without the need 
     >>> # estimated: in an anechoic case, ideally, the graph for the 
     >>> # corresponding source is null everywhere, except at the delay 
     >>> # between the two channels:
-    >>> pt.plotTimeCorrelationMixingParams(model)
+    >>> delays, delayDetectionFunc = pt.plotTimeCorrelationMixingParams(model)
 
 TODO: add typical SDR/SIR results for these examples.
 

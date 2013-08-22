@@ -141,13 +141,15 @@ def plotTimeCorrelationMixingParams(model, **kwargs):
         Please refer to that function to see what keywords are accepted.
 
     **Outputs:**
+    
     :returns:
-    1. `delays` -
+       1. `delays` -
        an array containing the delays in samples, the axis corresponding to
        the other returned arrays
-    2. `delayDetectionFunction` -
+       
+       2. `delayDetectionFunction` -
        an array of which each column corresponds to a spatial component in
-       :py:attr:`model`, 
+       :py:attr:`model`
        
     """
     delayDetectionFunction = np.array(

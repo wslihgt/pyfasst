@@ -91,7 +91,7 @@ else:
 
 setup(
     name='pyFASST',
-    version='0.9.1',
+    version='0.9.2',
     author='Jean-Louis Durrieu',
     author_email='jean-louis@durrieu.ch',
     packages=setuptools.find_packages(),

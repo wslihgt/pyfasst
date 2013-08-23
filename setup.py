@@ -22,6 +22,28 @@ from distutils.core import setup
 from distutils.extension import Extension
 import numpy
 
+# import pyfasst.audioModel as am
+long_description="""\
+FASST (Flexible Audio Source Separation Toolbox) class
+    subclass it to obtain your own flavoured source separation model!
+
+You can find more about the technique and how to use this module in the
+provided documentation in `doc/` (`using the python package
+<../description.html#using-the-python-package>`_)
+    
+Adapted from the Matlab toolbox available at:
+http://bass-db.gforge.inria.fr/fasst/
+
+Jean-Louis Durrieu, EPFL-STI-IEL-LTS5
+::
+
+    jean DASH louis AT durrieu DOT ch
+
+2012-2013
+http://www.durrieu.ch
+
+"""
+
 # Needed to fix pip
 # See https://pypi.python.org/pypi/setuptools_cython/,
 # http://mail.python.org/pipermail/distutils-sig/2007-September/thread.html#8204
@@ -84,6 +106,6 @@ setup(
         'scipy'],
     cmdclass=cmdclass,
     ext_modules=ext_modules,
-    
+    long_description=long_description,
     )
 

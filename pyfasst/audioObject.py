@@ -4,11 +4,13 @@ The audioObject module provides a class for input/output of audio
 WAV files.
 
 Originally meant to wrap scikits.audiolab, yet allowing to load the
-scipy.io.wavfile if audiolab is missing.
+scipy.io.wavfile if audiolab_ is missing.
 
 Unfortunately it got awfully complicated in time, and a clean up is
 necessary. Notably, there are problems with scaling, and some issues
-related to the type of the file from audiolab. 
+related to the type of the file from audiolab_. 
+
+.. _audiolab: http://pypi.python.org/pypi/scikits.auidolab
 
 Jean-Louis Durrieu, 2012 - 2013
 """

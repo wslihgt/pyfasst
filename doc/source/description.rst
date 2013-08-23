@@ -27,7 +27,13 @@ Most of the code is written in `Python <http://www.python.org>`_, but occasional
 Install
 -------
 
-In addition to the aforementioned packages, installing this package requires to compile the tracking part, in :py:mod:`pyfasst.SeparateLeadStereo.tracking`. In the corresponding folder, type::
+Unpack the tarball, change directory to it, and run the installation with `setup.py`. Namely:
+ 1. ``tar xvzf pyFASST-X.Y.Z.tar.gz``
+ 2. ``cd pyFASST-X.Y.Z``
+ 3. ``python setup.py build``
+ 4. [if you want to install it] ``[sudo] python setup.py install [--user]``
+
+In addition to the aforementioned packages, installing this package requires to compile the tracking part, :py:mod:`pyfasst.SeparateLeadStereo.tracking._tracking`. In the corresponding folder, type::
 
   python setup.py build_ext --inplace
 
@@ -114,18 +120,103 @@ TODO: add typical SDR/SIR results for these examples.
 Creating a new audio model class
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* In the base class :py:class:`pyfasst.audioModel.FASST`, there are already some basic implementations that should fit any ensuing model. In particular, the :py:meth:`pyfasst.audioModel.estim_param_a_post_model` method estimates the parameters of the model, using the GEM algorithm [Ozerov2012]_. It is therefore very likely that the only things that one should take care of is to initialize the model and construct the model such that it corresponds to the desired structure.
+
+* The base class does not implement a :py:meth:`_initialize_structures` method. The different subclasses that concretely correspond to different models do however define such a method, where the following parameters need to be initiated:
+
+ - :py:attr:`FASST.spat_comps`:
+    
+    +-----------------------------+--------------------------+---------------------------------------------+
+    | variable                    | description              |   possible values                           |
+    +=============================+==========================+=============================================+
+    |`spat_comps[n]`              | `n`-th spatial component | dictionary with the fields detailled below  |
+    +-----------------------------+--------------------------+---------------------------------------------+
+    |`spat_comps[n]['time_dep']`  | define the time          | 'indep'                                     |
+    |                             | dependencies             |                                             |
+    +-----------------------------+--------------------------+---------------------------------------------+
+    |`spat_comps[n]['mix_type']`  | which type of mixing     | * 'inst' - instantaneous                    |
+    |                             | should be considered     | * 'conv' - convolutive                      |
+    +-----------------------------+--------------------------+---------------------------------------------+
+    |`spat_comps[n]['frdm_prior']`|                          | * 'free' to update the mixing parameters    |
+    |                             |                          | * 'fixed' to keep the parameters unchanged  |
+    +-----------------------------+--------------------------+---------------------------------------------+
+    |`spat_comps[n]['params']`    | the actual mixing        | * mix_type == 'inst' :                      |
+    |                             | parameters.              |      n_channels x rank `numpy.ndarray`      |
+    |                             |                          | * mix_type == 'conv' :                      |
+    |                             |                          |      rank x n_chan x n_freq `numpy.ndarray` |
+    +-----------------------------+--------------------------+---------------------------------------------+
+
+   Note: the way the parameters are stored is a bit convoluted and making a more consistent ordering of the parameters (between instantaneous and convolutive) would be an improvement.
+
+ - :py:attr:`FASST.spec_comps`:
+
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | variable                                      | description                                | values                                                             |
+   +===============================================+============================================+====================================================================+
+   | `spec_comps[n]`                               | `n`-th spectral component                  | dictionary with the following fields                               |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['spat_comp_ind']`              | the associated spatial component           | (integer)                                                          |
+   |                                               | in `spat_comps`.                           |                                                                    |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]`                  | `f`-th factor of `n`-th spectral component | dictionary with the following parameters                           |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]['FB']`            | Frequency Basis                            | (`nbFreqsSigRepr` x `n_FB_elts`) `ndarray`:                        |
+   |                                               |                                            | `n_FB_elts` is the number of elements in the basis (or dictionary) |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]['FW']`            | Frequency Weights                          | (`n_FB_elts` x `n_FW_elts`) `ndarray`:                             |
+   |                                               |                                            | `n_FW_elts` is the number of desired combinations of FB elements   |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]['TW']`            | Time Weights                               | (`n_FW_elts` x `n_TB_elts`) `ndarray`:                             |
+   |                                               |                                            | `n_TB_elts` is the number of elements in the time basis            |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]['TB']`            | Temporal Basis                             | empty list `[]` or (`n_TB_elts` x `nbFramesSigRepr`) `ndarray`:    |
+   |                                               |                                            | if `[]`, then `n_TB_elts` in TW should be `nbFramesSigRepr`.       |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]['TW_constr']`     |                                            |  * 'NMF': Non-negative Matrix Factorization                        |
+   |                                               |                                            |  * 'GMM', 'GSMM': Gaussian (Scale) Mixture Model                   |
+   |                                               |                                            |  * 'HMM', 'SHMM': (Scaled) Hidden Markov Model                     |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]['TW_all']`        | for discrete state models                  |  same as `spec_comps[n]['factor'][f]['TW']`                        |
+   |                                               | (TW_constr != 'NMF'), keeps track of the   |                                                                    |
+   |                                               | scales for all the possible states         |                                                                    |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]['TW_DP_params']`  | *Dynamic Programming* (?) parameters       | * TW_constr in ('GMM', 'GSMM'):                                    |
+   |                                               | prior or transition probabilities.         |   (`number_states`) `ndarray`.                                     |
+   |                                               |                                            |   Prior probabilites for each state.                               | 
+   |                                               |                                            |   `number_states` is the number of states                          | 
+   |                                               |                                            |   (typically `spec_comp[n]['factor'][f]['TW'].shape[0]`).          |
+   |                                               |                                            | * TW_constr in ('HMM', 'SHMM'):                                    |
+   |                                               |                                            |   (`number_states` x `number_states`) `ndarray`.                   |
+   |                                               |                                            |   Transition probabilites for each state.                          |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+   | `spec_comps[n]['factor'][f]['XX_frdm_prior']` | whether to update a parameter set          |  * 'free' update the parameters                                    |
+   |                                               | or not, where `XX` is one of               |  * 'fixed' do not update                                           |
+   |                                               | `FB`, `FW`, `TW`, `TB`, `TW_DP`            |                                                                    |
+   +-----------------------------------------------+--------------------------------------------+--------------------------------------------------------------------+
+
+   The key names are reproduced from the Matlab toolbox. 
+    
+* When instantiating a subclass, in the :py:meth:`pyfasst.audioModel.FASST.__init__` method, or at least before running :py:meth:`pyfasst.audioModel.FASST.estim_param_a_post_model`, two things should be done: computing the signal representation by calling :py:meth:`pyfasst.audioModel.FASST.comp_transf_Cx` and initializing the model parameters (see above). By default, the base class does not compute the signal representation for memory saving. Some other processing can therefore be run (initializing with :py:class:`pyfasst.demixTF.DEMIX` or with a run of :py:class:`pyfasst.SeparateLeadStereo.SeparateLeadProcess`) without the burden of the (unused) memory in the current instance. Just call it when needed. 
+
 Algorithms
 ==========
 
-The FASST framework is described in [Ozerov2012]_. We have implemented this Python version mostly thanks to the provided Matlab (C) code available at http://bass-db.gforge.inria.fr/fasst/. 
+The FASST framework and the audio signal model are described in [Ozerov2012]_. We have implemented this Python version mostly thanks to the provided Matlab (C) code available at http://bass-db.gforge.inria.fr/fasst/. 
 
 For initialization purposes, several side algorithms and systems have also been implemented:
-  * SIMM model (Smooth Instantaneous Mixture Model) from [Durrieu2010]_ and [Durrieu2011]_: allows to analyze, detect and separate the lead instrument from a polyphonic audio (musical) mixture. Note: the original purpose of this implementation was to provide a sensible way of using information from the SIMM model into the more general multi-channel audio source separation model provided, for instance, by FASST. 
-  
-  * DEMIX algorithm (Direction Estimation of Mixing matrIX) [Arberet2010]_ for spatial mixing parameter initialization.
+* SIMM model (Smooth Instantaneous Mixture Model) from [Durrieu2010]_ and [Durrieu2011]_: allows to analyze, detect and separate the lead instrument from a polyphonic audio (musical) mixture. Note: the original purpose of this implementation was to provide a sensible way of using information from the SIMM model into the more general multi-channel audio source separation model provided, for instance, by FASST.  It is implemented in the :py:mod:`pyfasst.SeparateLeadStereo.SeparateLeadStereoTF` module.
 
-References
-==========
+* DEMIX algorithm (Direction Estimation of Mixing matrIX) [Arberet2010]_ for spatial mixing parameter initialization. It is implemented as the :py:mod:`pyfasst.demixTF` module.
+
+Notes and remarks
+=================
+
+* Reworking on the source code, it seems that the use of `spat_comps` and `spec_comps` to allow the various ranks is slightly complicated. A major refactoring of this algorithm could be to define, for instance, a class that represents one source or component, including its spatial and spectral parameters. This would allow to avoid to have to retrieve the association between spatial and spectral parameters (through the `spec_comps[n]['spat_comp_ind']` variable) during their re-estimation.
+
+* As of 20130823: documentation still *Work In Progress*. Hopefully the most important information is provided in this document. Specific implementation issues may come in time.
+
+* TODO: one should check that the computations are similar to those provided by the Matlab Toolbox. So far, in many cases, this implementation has provided the author with satisfying results, but a more formal evaluation to compare the performance of both implementations would be welcome. 
+
 .. [Arberet2010] Arberet, S.; Gribonval, R. and Bimbot, F., 
    `A Robust Method to Count and Locate Audio Sources in a Multichannel 
    Underdetermined Mixture`, IEEE Transactions on Signal Processing, 2010, 

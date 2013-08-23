@@ -12,6 +12,8 @@ provided documentation in `doc/` (`using the python package
 Adapted from the Matlab toolbox available at:
 http://bass-db.gforge.inria.fr/fasst/
 
+Contact
+-------
 Jean-Louis Durrieu, EPFL-STI-IEL-LTS5
 ::
 
@@ -19,6 +21,11 @@ Jean-Louis Durrieu, EPFL-STI-IEL-LTS5
 
 2012-2013
 http://www.durrieu.ch
+
+Copyright
+---------
+This software is distributed under the terms of the GNU Public 
+(http://www.gnu.org/licenses/gpl.txt)
 
 Reference
 ---------
@@ -136,7 +143,7 @@ class FASST(object):
         for a given frame and given frequency, is supposed to be Hermitian:
         only the upper diagonal is therefore kept. 
         
-    See also:
+    For examples, see also:
 
     * :py:class:`MultiChanNMFInst_FASST`
     * :py:class:`MultiChanNMFConv`
@@ -378,7 +385,7 @@ class FASST(object):
         """GEM iteration: one iteration of the Generalized Expectation-
         Maximization algorithm to update the various parameters whose
         :py:attr:`FASST.spec_comp[spec_ind]['frdm_prior']` is set to ``'free'``.
-
+        
         :returns:
             `loglik` (double): the log-likelihood of the data,
             given the updated parameters
@@ -574,16 +581,26 @@ class FASST(object):
         """\
         Computes the sufficient statistics, used to update the parameters.
         
-        Outputs:
+        **Inputs:**
+        
+        :param numpy.ndarray spat_comp_powers:
+            (`total_spat_rank`x`nbFreqsSigRepr`x`nbFramesSigRepr`) `ndarray`.
+            the estimated power spectra for the spatial components, as computed
+            by :py:meth:`FASST.retrieve_subsrc_params`. 
+        :param numpy.ndarray mix_matrix:
+            (`total_spat_rank` x `nchannels` x `nbFreqsSigRepr`) `ndarray`.
+            the mixing parameters, as a rank x n_channels x n_freqs `ndarray`.
+            Computed from :py:meth:`FASST.retrieve_subsrc_params`
+        
+        **Outputs:**
 
         :returns:
+            1. `hat_Rxx`
+            2. `hat_Rxs`
+            3. `hat_Rss`
+            4. `hat_Ws`
+            5. `loglik`
         
-        1. hat_Rxx
-        2. hat_Rxs
-        3. hat_Rss
-        4. hat_Ws
-        5. loglik
-         
         """
         if self.audioObject.channels != 2:
             raise ValueError("Nb channels not supported:"+
@@ -747,7 +764,27 @@ class FASST(object):
         return hat_Rxx, hat_Rxs, hat_Rss, hat_Ws, loglik
     
     def update_mix_matrix(self,hat_Rxs, hat_Rss, mix_matrix, rank_part_ind):
-        """
+        """Update the mixing parameters, according to the current estimated
+        spectral component parameters.
+        
+        :param hat_Rxs:
+            (`nbFreqsSigRepr` x 2 x `nbspatcomp`) `ndarray`.
+            Estimated intercorrelation between the observation and the
+            sources, for each frequency bin of the TF representation.
+        :param hat_Rss:
+            (`nbFreqsSigRepr` x `nbspatcomp` x `nbspatcomp`) `ndarray`.
+            Estimated auto-correlation matrix for each frequency bin, 
+        :param mix_matrix:
+            (`total_spat_rank` x `nchannels` x `nbFreqsSigRepr`) `ndarray`.
+            the mixing parameters, as a rank x n_channels x n_freqs `ndarray`.
+        :param rank_part_ind:
+            a dictionary giving, for each spectral component, which spatial
+            component should be used.
+        
+        The input parameters should be computed by :py:meth:`compute_suff_stat`
+        and :py:meth:`retrieve_subsrc_params`, done automatically in
+        :py:meth:`GEM_iteration`.
+        
         """
         # deriving which components have which updating rule:
         upd_inst_ind = []
@@ -1278,8 +1315,8 @@ class FASST(object):
     
     def gcc_phat_tdoa_2d(self):
         """Using the cross-spectrum in self.Cx[1] to estimate the time
-        difference of arrival detection function (the Generalized Cross-
-        Correllation GCC), with the phase transform (GCC-PHAT) weighing
+        difference of arrival detection function (the Generalized
+        Cross-Correlation GCC), with the phase transform (GCC-PHAT) weighing
         function for the cross-spectrum.
         """
         return np.fft.irfft(self.Cx[1]/np.abs(self.Cx[1]),
@@ -1432,6 +1469,7 @@ class FASST(object):
     def update_spectral_components(self, hat_W):
         """Update the spectral components,
         with `hat_W` as the expected value of power
+        (and computed from )
         """
         if self.verbose:
             print "    Update the spectral components"
@@ -2288,7 +2326,7 @@ class MultiChanNMFInst_FASST(FASST):
                 nbComps=2, nbNMFComps=32, spatial_rank=1,
                 verbose=1, iter_num=50)
         >>> # estimate the parameters
-        >>> model.estim_param_a_post_model()
+        >>> log_lik = model.estim_param_a_post_model()
         >>> # separate the sources using these parameters
         >>> model.separate_spat_comps(dir_results='data/')
     
@@ -2406,7 +2444,7 @@ class MultiChanNMFConv(MultiChanNMFInst_FASST):
         >>> # and only after "upgrade" to a convolutive setting:
         >>> model.makeItConvolutive()
         >>> # estimate the parameters
-        >>> model.estim_param_a_post_model()
+        >>> log_lik = model.estim_param_a_post_model()
         >>> # separate the sources using these parameters
         >>> model.separate_spat_comps(dir_results='data/')
 
@@ -2430,7 +2468,7 @@ class MultiChanNMFConv(MultiChanNMFInst_FASST):
         >>> # we can initialize these parameters with the DEMIX algorithm:
         >>> model.initializeConvParams(initMethod='demix')
         >>> # and estimate the parameters:
-        >>> model.estim_param_a_post_model()
+        >>> log_lik = model.estim_param_a_post_model()
         >>> # separate the sources using these parameters
         >>> model.separate_spat_comps(dir_results='data/')
     

@@ -6,11 +6,11 @@ DEMIX is an algorithm that counts the number of sources,
 based on their spatial cues, and returns the estimated parameters,
 which are related to the relative amplitudes between the channels,
 as well as the relative time shifts. The full description is given
-in::
+in [Arberet2010]_:
 
     Arberet, S.; Gribonval, R. & Bimbot, F.
-        A Robust Method to Count and Locate Audio Sources in
-        a Multichannel Underdetermined Mixture
+    A Robust Method to Count and Locate Audio Sources in
+    a Multichannel Underdetermined Mixture
     IEEE Transactions on Signal Processing, 2010, 58, 121 - 133
 
 This implementation is based on the MATLAB Toolbox provided

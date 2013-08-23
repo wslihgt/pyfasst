@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: pyFASST
-Version: 0.9.0
+Version: 0.9.1
 Summary: Python implementation of the Flexible Audio Source Separation Toolbox (FASST)
 Home-page: http://github.com/wslihgt/pyfasst/
 Author: Jean-Louis Durrieu

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -103,7 +101,7 @@ Neural Computation, vol. 21 (3), pp. 793-830, March 2009.
 divergence measure between <tt class="docutils literal"><span class="pre">SX</span></tt> and <tt class="docutils literal"><span class="pre">np.dot(W,H)</span></tt></p>
 <div class="math">
 \[\mathbf{S}_X \approx \mathbf{W} \mathbf{H}\]\[s_{X, fn} \approx \sum_{k=1}^K w_{fk} h_{kn}\]</div>
-<p>See for instance <a class="reference internal" href="#fevotte2009">[Fevotte2009]</a>.</p>
+<p>See for instance <a class="reference internal" href="#fevotte2009" id="id1">[Fevotte2009]</a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -138,72 +136,95 @@ a C-ordered contiguous array. The output is however in the &#8220;correct&#8221;
 <tt class="descclassname">pyfasst.tools.nmf.</tt><tt class="descname">NMF_decomposition</tt><big>(</big><em>SX</em>, <em>nbComps=10</em>, <em>niter=10</em>, <em>verbose=0</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/nmf.html#NMF_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.nmf.NMF_decomposition" title="Permalink to this definition">¶</a></dt>
 <dd><p>NMF multiplicative gradient, for Itakura Saito
 divergence measure between SX and <tt class="docutils literal"><span class="pre">np.dot(W,H)</span></tt></p>
-<p>See for instance <a class="reference internal" href="#fevotte2009">[Fevotte2009]</a>.</p>
+<p>See for instance <a class="reference internal" href="#fevotte2009" id="id2">[Fevotte2009]</a>.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyfasst.tools.nmf.SFNMF_decomp_init">
 <tt class="descclassname">pyfasst.tools.nmf.</tt><tt class="descname">SFNMF_decomp_init</tt><big>(</big><em>SX</em>, <em>nbComps=10</em>, <em>nbFiltComps=10</em>, <em>niter=10</em>, <em>verbose=0</em>, <em>Winit=None</em>, <em>Hinit=None</em>, <em>WFiltInit=None</em>, <em>HFiltInit=None</em>, <em>updateW=True</em>, <em>updateH=True</em>, <em>updateWFilt=True</em>, <em>updateHFilt=True</em>, <em>nbResComps=2</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/nmf.html#SFNMF_decomp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.nmf.SFNMF_decomp_init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements a simple source/filter NMF algorithm, similar to that introduced in
-<a class="reference internal" href="#durrieu2010">[Durrieu2010]</a></p>
+<a class="reference internal" href="#durrieu2010" id="id3">[Durrieu2010]</a></p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-pyfasst.tools.utils">
-<span id="utils"></span><h2>UTILS<a class="headerlink" href="#module-pyfasst.tools.utils" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">utils.py</span></tt></p>
-<p>Useful functions for (audio) signal processing</p>
-<p>2013 Jean-Louis Durrieu</p>
-<p><a class="reference external" href="http://www.durrieu.ch">http://www.durrieu.ch</a></p>
-<div class="section" id="content">
-<h3>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h3>
-<dl class="function">
-<dt id="pyfasst.tools.utils.db">
-<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">db</tt><big>(</big><em>val</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.db" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyfasst.tools.utils.db" title="pyfasst.tools.utils.db"><tt class="xref py py-func docutils literal"><span class="pre">db()</span></tt></a> db(positiveValue)</p>
-<p>Returns the decibel value of the input positiveValue</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.tools.utils.hann">
-<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">hann</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#hann"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.hann" title="Permalink to this definition">¶</a></dt>
-<dd><p>window = hann(args)</p>
-<p>Computes a Hann window, with NumPy&#8217;s function hanning(args).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.tools.utils.ident">
-<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">ident</tt><big>(</big><em>energy</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#ident"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.ident" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="#pyfasst.tools.utils.ident" title="pyfasst.tools.utils.ident"><tt class="xref py py-func docutils literal"><span class="pre">ident()</span></tt></a> : identity function, return the inputs unchanged</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.tools.utils.nextpow2">
-<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">nextpow2</tt><big>(</big><em>i</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#nextpow2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.nextpow2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find <span class="math">\(2^n\)</span> that is equal to or greater than.</p>
-<p>code taken from the website:</p>
-<blockquote>
-<div><a class="reference external" href="http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html">http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html</a></div></blockquote>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.tools.utils.sinebell">
-<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">sinebell</tt><big>(</big><em>lengthWindow</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#sinebell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.sinebell" title="Permalink to this definition">¶</a></dt>
-<dd><p>window = sinebell(lengthWindow)</p>
-<p>Computes a &#8220;sinebell&#8221; window function of length L=lengthWindow</p>
-<p>The formula is:</p>
-<div class="math">
-\[window(t) = sin(\pi \frac{t}{L}), t=0..L-1\]</div>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyfasst.tools.utils.sqrt_blackmanharris">
-<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">sqrt_blackmanharris</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#sqrt_blackmanharris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.sqrt_blackmanharris" title="Permalink to this definition">¶</a></dt>
-<dd><p>A root-squared Blackman-Harris window function.</p>
-<p>For use in scholkhuber and klapuri&#8217;s framework.</p>
-</dd></dl>
-
+<div class="section" id="module-pyfasst.tools.plotTools">
+<span id="plot-tools"></span><h2>PLOT TOOLS<a class="headerlink" href="#module-pyfasst.tools.plotTools" title="Permalink to this headline">¶</a></h2>
+<p>Plotting tools to be used with PyFASST and audioModel classes</p>
+<p><strong>Examples:</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyfasst.tools.plotTools</span> <span class="kn">as</span> <span class="nn">pt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># display the estimated spectral components</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># (one per row of subplot)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pt</span><span class="o">.</span><span class="n">subplotsAudioModelSpecComps</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># display a graph showing where the sources have been &quot;spatially&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># estimated: in an anechoic case, ideally, the graph for the </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># corresponding source is null everywhere, except at the delay </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># between the two channels:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pt</span><span class="o">.</span><span class="n">plotTimeCorrelationMixingParams</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
 </div>
+<dl class="function">
+<dt id="pyfasst.tools.plotTools.plotTimeCorrelationMixingParams">
+<tt class="descclassname">pyfasst.tools.plotTools.</tt><tt class="descname">plotTimeCorrelationMixingParams</tt><big>(</big><em>model</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/plotTools.html#plotTimeCorrelationMixingParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.plotTools.plotTimeCorrelationMixingParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the inverse Fourier transform of the ratio of each of the
+&#8216;steering vectors&#8217;, for each spatial component. This correlation provides
+some insight in the spatial mixing process, since for an anechoic pair of
+steering vectors, the ratio is almost a complex exponential, with spatial
+frequency equal to the delay of arrival between the 2 channels.</p>
+<p><strong>Inputs:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> &#8211; a source model, instance of <a class="reference internal" href="audiomodel.html#pyfasst.audioModel.FASST" title="pyfasst.audioModel.FASST"><tt class="xref py py-class docutils literal"><span class="pre">pyfasst.audioModel.FASST</span></tt></a></li>
+<li><strong>kwargs</strong> &#8211; the other keyword arguments are passed to a <tt class="xref py py-func docutils literal"><span class="pre">plt.plot()</span></tt>
+Please refer to that function to see what keywords are accepted.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Outputs:</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">1. <cite>delays</cite> -
+an array containing the delays in samples, the axis corresponding to
+the other returned arrays<p>2. <cite>delayDetectionFunction</cite> -
+an array of which each column corresponds to a spatial component in
+<tt class="xref py py-attr docutils literal"><span class="pre">model</span></tt></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.plotTools.subplotsAudioModelSpecCompNimp">
+<tt class="descclassname">pyfasst.tools.plotTools.</tt><tt class="descname">subplotsAudioModelSpecCompNimp</tt><big>(</big><em>model</em>, <em>nimp='FB'</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/plotTools.html#subplotsAudioModelSpecCompNimp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.plotTools.subplotsAudioModelSpecCompNimp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display any of the field for the first factor of each
+spectral component of <cite>model</cite>, <cite>nimp</cite> should therefore either be
+&#8216;FB&#8217;, &#8216;FW&#8217;, &#8216;TW&#8217; or &#8216;TB&#8217;.</p>
+<p>model should be instance of (at least) FASST</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.plotTools.subplotsAudioModelSpecComps">
+<tt class="descclassname">pyfasst.tools.plotTools.</tt><tt class="descname">subplotsAudioModelSpecComps</tt><big>(</big><em>model</em>, <em>fig=None</em>, <em>diffdispdb=60</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/plotTools.html#subplotsAudioModelSpecComps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.plotTools.subplotsAudioModelSpecComps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the spectral powers for each of the spatial components
+of model, and displays them on a single figure.</p>
+<p>model should be instance of a sub-class of FASST</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.plotTools.subplotsAudioModelSpecTW">
+<tt class="descclassname">pyfasst.tools.plotTools.</tt><tt class="descname">subplotsAudioModelSpecTW</tt><big>(</big><em>model</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/plotTools.html#subplotsAudioModelSpecTW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.plotTools.subplotsAudioModelSpecTW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays the time weights for each of the spectral component of
+<cite>model</cite>.</p>
+<p><cite>model</cite> should be instance of (at least) FASST</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-pyfasst.tools.signalTools">
 <span id="signaltools"></span><h2>SIGNALTOOLS<a class="headerlink" href="#module-pyfasst.tools.signalTools" title="Permalink to this headline">¶</a></h2>
@@ -211,7 +232,7 @@ divergence measure between SX and <tt class="docutils literal"><span class="pre"
 <p>gathers signal processing tools</p>
 <dl class="function">
 <dt id="pyfasst.tools.signalTools.f0detectionFunction">
-<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x101bd5e60&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">pyfasst.tools.signalTools.</tt><tt class="descname">f0detectionFunction</tt><big>(</big><em>TFmatrix</em>, <em>freqs=None</em>, <em>axis=None</em>, <em>samplingrate=44100</em>, <em>fouriersize=2048</em>, <em>f0min=80</em>, <em>f0max=3000</em>, <em>stepnote=16</em>, <em>numberHarmonics=20</em>, <em>threshold=0.5</em>, <em>detectFunc=&lt;function sum at 0x10575cde8&gt;</em>, <em>weightFreqs=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/signalTools.html#f0detectionFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.signalTools.f0detectionFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Harmonic Sum</p>
 <p>detectFunc should be a function taking an array as argument, and</p>
 <p><cite>threshold</cite> is homogenous to a tone on the western musical scale</p>
@@ -311,6 +332,62 @@ according to YIN and the like, in order to obtain better estimates.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-pyfasst.tools.utils">
+<span id="utils"></span><h2>UTILS<a class="headerlink" href="#module-pyfasst.tools.utils" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">utils.py</span></tt></p>
+<p>Useful functions for (audio) signal processing</p>
+<p>2013 Jean-Louis Durrieu</p>
+<p><a class="reference external" href="http://www.durrieu.ch">http://www.durrieu.ch</a></p>
+<div class="section" id="content">
+<h3>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="pyfasst.tools.utils.db">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">db</tt><big>(</big><em>val</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.db" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyfasst.tools.utils.db" title="pyfasst.tools.utils.db"><tt class="xref py py-func docutils literal"><span class="pre">db()</span></tt></a> db(positiveValue)</p>
+<p>Returns the decibel value of the input positiveValue</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.hann">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">hann</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#hann"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.hann" title="Permalink to this definition">¶</a></dt>
+<dd><p>window = hann(args)</p>
+<p>Computes a Hann window, with NumPy&#8217;s function hanning(args).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.ident">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">ident</tt><big>(</big><em>energy</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#ident"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.ident" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#pyfasst.tools.utils.ident" title="pyfasst.tools.utils.ident"><tt class="xref py py-func docutils literal"><span class="pre">ident()</span></tt></a> : identity function, return the inputs unchanged</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.nextpow2">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">nextpow2</tt><big>(</big><em>i</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#nextpow2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.nextpow2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find <span class="math">\(2^n\)</span> that is equal to or greater than.</p>
+<p>code taken from the website:</p>
+<blockquote>
+<div><a class="reference external" href="http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html">http://www.phys.uu.nl/~haque/computing/WPark_recipes_in_python.html</a></div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.sinebell">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">sinebell</tt><big>(</big><em>lengthWindow</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#sinebell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.sinebell" title="Permalink to this definition">¶</a></dt>
+<dd><p>window = sinebell(lengthWindow)</p>
+<p>Computes a &#8220;sinebell&#8221; window function of length L=lengthWindow</p>
+<p>The formula is:</p>
+<div class="math">
+\[window(t) = sin(\pi \frac{t}{L}), t=0..L-1\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyfasst.tools.utils.sqrt_blackmanharris">
+<tt class="descclassname">pyfasst.tools.utils.</tt><tt class="descname">sqrt_blackmanharris</tt><big>(</big><em>M</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/tools/utils.html#sqrt_blackmanharris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.tools.utils.sqrt_blackmanharris" title="Permalink to this definition">¶</a></dt>
+<dd><p>A root-squared Blackman-Harris window function.</p>
+<p>For use in scholkhuber and klapuri&#8217;s framework.</p>
+</dd></dl>
+
+</div>
+</div>
 </div>
 
 
@@ -324,11 +401,12 @@ according to YIN and the like, in order to obtain better estimates.</p>
 <li><a class="reference internal" href="#">TOOLS</a><ul>
 <li><a class="reference internal" href="#module-pyfasst.tools.distances">DISTANCES</a></li>
 <li><a class="reference internal" href="#module-pyfasst.tools.nmf">NONNEGATIVE MATRIX FACTORIZATION</a></li>
+<li><a class="reference internal" href="#module-pyfasst.tools.plotTools">PLOT TOOLS</a></li>
+<li><a class="reference internal" href="#module-pyfasst.tools.signalTools">SIGNALTOOLS</a></li>
 <li><a class="reference internal" href="#module-pyfasst.tools.utils">UTILS</a><ul>
 <li><a class="reference internal" href="#content">Content</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-pyfasst.tools.signalTools">SIGNALTOOLS</a></li>
 </ul>
 </li>
 </ul>
@@ -376,7 +454,7 @@ according to YIN and the like, in order to obtain better estimates.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Jean-Louis Durrieu.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

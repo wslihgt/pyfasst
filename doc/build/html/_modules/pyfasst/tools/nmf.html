@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -144,7 +142,10 @@
 <span class="sd">    :param boolean updateH: </span>
 <span class="sd">        whether to update H or not</span>
 
-<span class="sd">    Returns :</span>
+<span class="sd">    :returns:</span>
+<span class="sd">      `W` and `H` (:py:class:`numpy.ndarray`) -</span>
+<span class="sd">      the &quot;spectral&quot; component dictionary matrix and the &quot;activation&quot;</span>
+<span class="sd">      coefficient matrix.</span>
 <span class="sd">    </span>
 <span class="sd">    Notes :</span>
 <span class="sd">    For (probably marginal) efficiency, the amplitude matrix ``H``</span>
@@ -214,7 +215,8 @@
                       <span class="n">updateW</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">updateH</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                       <span class="n">updateWFilt</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">updateHFilt</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                       <span class="n">nbResComps</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Implements a simple source/filter NMF algorithm, similar to that introduced in</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">    Implements a simple source/filter NMF algorithm, similar to that introduced in</span>
 <span class="sd">    [Durrieu2010]_</span>
 <span class="sd">       </span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -445,7 +447,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, Jean-Louis Durrieu.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

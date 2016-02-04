@@ -17,15 +17,21 @@ NONNEGATIVE MATRIX FACTORIZATION
 .. automodule:: pyfasst.tools.nmf
     :members:
 
-UTILS
-=====
+PLOT TOOLS
+==========
 
-.. automodule:: pyfasst.tools.utils
-    :members: 
+.. automodule:: pyfasst.tools.plotTools
+    :members:
 
 SIGNALTOOLS
 ===========
 
 .. automodule:: pyfasst.tools.signalTools
     :members:
+
+UTILS
+=====
+
+.. automodule:: pyfasst.tools.utils
+    :members: 
 

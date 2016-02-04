@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -66,12 +64,12 @@
 based on their spatial cues, and returns the estimated parameters,
 which are related to the relative amplitudes between the channels,
 as well as the relative time shifts. The full description is given
-in:</p>
-<div class="highlight-python"><pre>Arberet, S.; Gribonval, R. &amp; Bimbot, F.
-    A Robust Method to Count and Locate Audio Sources in
-    a Multichannel Underdetermined Mixture
-IEEE Transactions on Signal Processing, 2010, 58, 121 - 133</pre>
-</div>
+in <a class="reference internal" href="../description.html#arberet2010" id="id1">[Arberet2010]</a>:</p>
+<blockquote>
+<div>Arberet, S.; Gribonval, R. &amp; Bimbot, F.
+A Robust Method to Count and Locate Audio Sources in
+a Multichannel Underdetermined Mixture
+IEEE Transactions on Signal Processing, 2010, 58, 121 - 133</div></blockquote>
 <p>This implementation is based on the MATLAB Toolbox provided
 by the authors of the above article.</p>
 <p>Additionally, this implementation further allows time-frequency
@@ -87,7 +85,7 @@ representations other than the short-term Fourier transform (STFT).</p>
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pyfasst.demixTF.DEMIX">
-<em class="property">class </em><tt class="descclassname">pyfasst.demixTF.</tt><tt class="descname">DEMIX</tt><big>(</big><em>audio</em>, <em>nsources=2</em>, <em>wlen=2048</em>, <em>hopsize=1024</em>, <em>neighbors=20</em>, <em>verbose=0</em>, <em>maxclusters=100</em>, <em>tfrepresentation='stft'</em>, <em>tffmin=25</em>, <em>tffmax=18000</em>, <em>tfbpo=48</em>, <em>winFunc=&lt;function sqrt_blackmanharris at 0x1022ef8c0&gt;</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/demixTF.html#DEMIX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.demixTF.DEMIX" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">pyfasst.demixTF.</tt><tt class="descname">DEMIX</tt><big>(</big><em>audio</em>, <em>nsources=2</em>, <em>wlen=2048</em>, <em>hopsize=1024</em>, <em>neighbors=20</em>, <em>verbose=0</em>, <em>maxclusters=100</em>, <em>tfrepresentation='stft'</em>, <em>tffmin=25</em>, <em>tffmax=18000</em>, <em>tfbpo=48</em>, <em>winFunc=&lt;function sqrt_blackmanharris at 0x1074377d0&gt;</em><big>)</big><a class="reference internal" href="../_modules/pyfasst/demixTF.html#DEMIX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyfasst.demixTF.DEMIX" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEMIX algorithm, for 2 channels.</p>
 <dl class="method">
 <dt id="pyfasst.demixTF.DEMIX.adaptive_thresholding_clusters">
@@ -209,10 +207,11 @@ MVDR or assuming the sources are normal, independent and
 with same variance (not sure whether this does not mean that
 we can&#8217;t separate them...)</p>
 <p>From:</p>
-<div class="highlight-python"><pre>Maazaoui, M.; Grenier, Y. &amp; Abed-Meraim, K.
+<div class="highlight-python"><div class="highlight"><pre>Maazaoui, M.; Grenier, Y. &amp; Abed-Meraim, K.
 ``Blind Source Separation for Robot Audition using
-Fixed Beamforming with HRTFs'', 
-in proc. of INTERSPEECH, 2011.</pre>
+Fixed Beamforming with HRTFs&#39;&#39;, 
+in proc. of INTERSPEECH, 2011.
+</pre></div>
 </div>
 <p>per channel, the filter steering vector, source p:</p>
 <div class="math">
@@ -312,7 +311,7 @@ with values down to  <tt class="docutils literal"><span class="pre">threshold</s
     </div>
     <div class="footer">
         &copy; Copyright 2013, Jean-Louis Durrieu.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

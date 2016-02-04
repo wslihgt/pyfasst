@@ -1500,10 +1500,14 @@ class SeparateLeadProcess():
             fname = self.files['voc_output_file'][:-4] + suffix
             # data.append(wav.read(fname)[1])
             _, datatmp = wav.read(fname)
+            datatype = type(datatmp[0][0])
+            print datatype
             if n == 0 and nChunks!=1:
                 # weighing by the overlapping function
-                datatmp[-overlapSamp:,0] *= overlapFunc
-                datatmp[-overlapSamp:,1] *= overlapFunc
+                datatmp[-overlapSamp:,0] = datatype(
+                    datatmp[-overlapSamp:,0]* overlapFunc)
+                datatmp[-overlapSamp:,1] = datatype(
+                    datatmp[-overlapSamp:,1]* overlapFunc)
                 lendatatmp = (datatmp.shape[0] - offsetTF) # (datatmp.shape[0] - wlen/2)
                 data[:lendatatmp, :] = np.copy(
                     datatmp[offsetTF:, :])# datatmp[wlen/2:, :])
@@ -1511,10 +1515,14 @@ class SeparateLeadProcess():
             elif nChunks != 1:
                 # weighing by the overlapping function
                 if n!=nChunks-1:
-                    datatmp[-overlapSamp:,0] *= overlapFunc
-                    datatmp[-overlapSamp:,1] *= overlapFunc
-                datatmp[:overlapSamp,0] *= overlapFunc[::-1]
-                datatmp[:overlapSamp,1] *= overlapFunc[::-1]
+                    datatmp[-overlapSamp:,0] = datatype(
+                        datatmp[-overlapSamp:,0] * overlapFunc)
+                    datatmp[-overlapSamp:,1] = datatype(
+                        datatmp[-overlapSamp:,1]* overlapFunc)
+                datatmp[:overlapSamp,0] = datatype(
+                    datatmp[:overlapSamp,0] * overlapFunc[::-1])
+                datatmp[:overlapSamp,1] = datatype(
+                    datatmp[:overlapSamp,1] * overlapFunc[::-1])
                 start = cumulframe - wlen + hopsize
                 lendatatmp = datatmp.shape[0]
                 stop = start + lendatatmp
@@ -1538,10 +1546,13 @@ class SeparateLeadProcess():
             fname = self.files['mus_output_file'][:-4] + suffix
             #data.append(wav.read(fname)[1])
             _, datatmp = wav.read(fname)
+            datatype = type(datatmp[0][0])
             if n == 0 and nChunks!=1:
                 # weighing by the overlapping function
-                datatmp[-overlapSamp:,0] *= overlapFunc
-                datatmp[-overlapSamp:,1] *= overlapFunc
+                datatmp[-overlapSamp:,0] = datatype(
+                    datatmp[-overlapSamp:,0]* overlapFunc)
+                datatmp[-overlapSamp:,1] = datatype(
+                    datatmp[-overlapSamp:,1]* overlapFunc)
                 lendatatmp = (datatmp.shape[0] - offsetTF) # (datatmp.shape[0] - wlen/2)
                 data[:lendatatmp, :] = np.copy(
                     datatmp[offsetTF:, :])# datatmp[wlen/2:, :])
@@ -1549,10 +1560,14 @@ class SeparateLeadProcess():
             elif nChunks != 1:
                 # weighing by the overlapping function
                 if n!=nChunks-1:
-                    datatmp[-overlapSamp:,0] *= overlapFunc
-                    datatmp[-overlapSamp:,1] *= overlapFunc
-                datatmp[:overlapSamp,0] *= overlapFunc[::-1]
-                datatmp[:overlapSamp,1] *= overlapFunc[::-1]
+                    datatmp[-overlapSamp:,0] = datatype(
+                        datatmp[-overlapSamp:,0] * overlapFunc)
+                    datatmp[-overlapSamp:,1] = datatype(
+                        datatmp[-overlapSamp:,1] * overlapFunc)
+                datatmp[:overlapSamp,0] = datatype(
+                    datatmp[:overlapSamp,0] * overlapFunc[::-1])
+                datatmp[:overlapSamp,1] = datatype(
+                    datatmp[:overlapSamp,1] * overlapFunc[::-1])
                 start = cumulframe - wlen + hopsize
                 lendatatmp = datatmp.shape[0]
                 stop = start + lendatatmp
